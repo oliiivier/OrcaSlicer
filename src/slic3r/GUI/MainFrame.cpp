@@ -82,6 +82,9 @@
 #include <slic3r/GUI/CreatePresetsDialog.hpp>
 #include "sentry_wrapper/SentryWrapper.hpp"
 #include "GenericDownloadDialog.hpp"
+#ifdef SNAPMAKER_AI_ASSISTANT // fork
+#include "slic3r/AIAssistant/AIAssistant.hpp"
+#endif
 
 #define UPDATE_BUSER    true
 #define UPDATE_BUAUTO   false
@@ -2427,6 +2430,10 @@ static wxMenu* generate_help_menu()
     wxString about_title = wxString::Format(_L("&About %s"), SLIC3R_APP_FULL_NAME);
     append_menu_item(helpMenu, wxID_ANY, about_title, about_title,
             [](wxCommandEvent&) { Slic3r::GUI::about(); });
+#endif
+
+#ifdef SNAPMAKER_AI_ASSISTANT // fork
+    Slic3r::AIAssistant::append_menu_items(helpMenu);
 #endif
 
     return helpMenu;
