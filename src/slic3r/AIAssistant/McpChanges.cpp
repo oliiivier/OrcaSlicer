@@ -1,4 +1,5 @@
 #include "McpChanges.hpp"
+#include "McpExperiences.hpp"
 #include "McpToolUtils.hpp"
 
 #include "libslic3r/Model.hpp"
@@ -377,6 +378,7 @@ json apply_changes(const json& args, const std::atomic<bool>& abandoned)
     json applied = json::array();
     for (const Change& c : changes)
         applied.push_back(describe_applied(c));
+    log_applied_changes(applied, reason);
     return { { "applied", true },
              { "changes", std::move(applied) },
              { "message", "Applied as unsaved preset edits (object overrides can be undone with Ctrl+Z). Filament "

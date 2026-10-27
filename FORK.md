@@ -70,13 +70,14 @@ dans Claude Code, Gemini CLI ou Claude Desktop. Le serveur écoute uniquement su
 | `McpSlicing` | Slicing du plateau et résumé du résultat (`slice`) |
 | `McpRender` | Rendu PNG du plateau depuis une vue nommée (`render_view`) |
 | `McpPrinter` | Lecture seule de l'imprimante connectée (`get_printer_status`, écarts projet/imprimante) |
+| `McpExperiences` | Journal local des retours d'expérience (`record_experience`, `report_outcome`, `search_experiences`) |
 | `McpDocs` | Documentation des réglages livrée avec l'application (`describe_setting`, `read_documentation`) |
 | `McpService` | Cycle de vie du serveur (démarrage, arrêt à la fermeture) |
 | `McpSettings` | Section `[ai_assistant]` de la configuration de l'application |
 | `McpDialog` | Fenêtre de réglages |
 
 Outils : `get_issues`, `get_project`, `get_config`, `describe_setting`, `read_documentation`, `apply_changes`,
-`slice`, `render_view`, `get_printer_status`.
+`slice`, `render_view`, `get_printer_status`, `record_experience`, `report_outcome`, `search_experiences`.
 
 Accès à l'imprimante : désactivé par défaut (case à cocher dans la fenêtre MCP), en lecture seule, via la
 connexion Snapmaker Connect déjà ouverte par l'application (`query.device.objects`). Numéros de série, réseau,
@@ -85,7 +86,20 @@ comptes et secrets sont retirés avant envoi au modèle. Aucune commande n'est j
 La documentation vient de `doc/` (wiki OrcaSlicer) : `scripts/fork/build-setting-docs.py` relie chaque réglage
 à sa section grâce aux liens d'aide de `Tab.cpp` et produit `resources/ai_assistant/setting_docs.json`, livré
 avec l'application (aucun accès réseau). `sync-upstream.sh` le régénère et le commite après chaque fusion.
-Prompts (commandes slash dans Claude Code / Gemini CLI) : `diagnose_print`, `fix_issues`, `optimize_settings`.
+Prompts (commandes slash dans Claude Code / Gemini CLI) : `diagnose_print`, `fix_issues`, `optimize_settings`,
+`capitalize_experiences`.
+
+### Retours d'expérience
+
+1. **Journal local** (`<dossier de config>/ai_assistant/experiences/*.json`, hors dépôt) : une fiche par
+   diagnostic. Le serveur y met les faits (imprimante, matériaux, problèmes, réglages modifiés par
+   `apply_changes`), le modèle le symptôme et le diagnostic, puis le résultat réel de l'impression
+   (`report_outcome`, avec le rapport de l'imprimante si l'accès est activé).
+2. **Capitalisation** : prompt `capitalize_experiences` lancé dans Claude Code depuis ce dépôt. Il regroupe
+   les fiches confirmées et rédige `resources/ai_assistant/guides/exp_*.md` (format et règles :
+   `resources/ai_assistant/guides/README.md`), puis attend la relecture du diff.
+3. **Injection** : après relecture, commit. Les guides sont livrés dans `setting_docs.json` et servis par
+   `read_documentation` (type `experience`).
 
 `render_view` montre le modèle (pas les supports ni les trajectoires) ; pour l'aperçu tranché, l'utilisateur
 peut coller une capture d'écran dans le client. Le serveur traite une requête à la fois : pendant un `slice`

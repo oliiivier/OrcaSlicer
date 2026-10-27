@@ -1,6 +1,7 @@
 {
  "pages": {
   "Home": {
+   "kind": "official",
    "title": "Home",
    "path": "Home.md",
    "sections": [
@@ -55,6 +56,7 @@
    ]
   },
   "Calibration": {
+   "kind": "official",
    "title": "Calibration Guide",
    "path": "calibration/Calibration.md",
    "sections": [
@@ -67,6 +69,7 @@
    ]
   },
   "adaptive-pressure-advance-calib": {
+   "kind": "official",
    "title": "Adaptive Pressure Advance",
    "path": "calibration/adaptive-pressure-advance-calib.md",
    "sections": [
@@ -181,6 +184,7 @@
    ]
   },
   "cornering-calib": {
+   "kind": "official",
    "title": "Cornering",
    "path": "calibration/cornering-calib.md",
    "sections": [
@@ -211,6 +215,7 @@
    ]
   },
   "flow-rate-calib": {
+   "kind": "official",
    "title": "Flow Rate Calibration",
    "path": "calibration/flow-rate-calib.md",
    "sections": [
@@ -247,6 +252,7 @@
    ]
   },
   "input-shaping-calib": {
+   "kind": "official",
    "title": "Input Shaping",
    "path": "calibration/input-shaping-calib.md",
    "sections": [
@@ -295,6 +301,7 @@
    ]
   },
   "pressure-advance-calib": {
+   "kind": "official",
    "title": "Pressure Advance",
    "path": "calibration/pressure-advance-calib.md",
    "sections": [
@@ -331,6 +338,7 @@
    ]
   },
   "retraction-calib": {
+   "kind": "official",
    "title": "Retraction test",
    "path": "calibration/retraction-calib.md",
    "sections": [
@@ -343,6 +351,7 @@
    ]
   },
   "temp-calib": {
+   "kind": "official",
    "title": "Temp Calibration",
    "path": "calibration/temp-calib.md",
    "sections": [
@@ -379,6 +388,7 @@
    ]
   },
   "tolerance-calib": {
+   "kind": "official",
    "title": "Filament Tolerance Calibration",
    "path": "calibration/tolerance-calib.md",
    "sections": [
@@ -403,6 +413,7 @@
    ]
   },
   "vfa-calib": {
+   "kind": "official",
    "title": "VFA",
    "path": "calibration/vfa-calib.md",
    "sections": [
@@ -421,6 +432,7 @@
    ]
   },
   "volumetric-speed-calib": {
+   "kind": "official",
    "title": "Max Volumetric Speed (FlowRate) Calibration",
    "path": "calibration/volumetric-speed-calib.md",
    "sections": [
@@ -439,6 +451,7 @@
    ]
   },
   "pellet-flow-coefficient": {
+   "kind": "official",
    "title": "Pellet Flow Coefficient",
    "path": "material_settings/pellet-flow-coefficient.md",
    "sections": [
@@ -451,6 +464,7 @@
    ]
   },
   "semm": {
+   "kind": "official",
    "title": "Single Extruder Multimaterial Printing in OrcaSlicer",
    "path": "material_settings/semm.md",
    "sections": [
@@ -487,6 +501,7 @@
    ]
   },
   "stl-transformation": {
+   "kind": "official",
    "title": "STL Transformation",
    "path": "print_prepare/stl-transformation.md",
    "sections": [
@@ -535,6 +550,7 @@
    ]
   },
   "multimaterial_settings_advanced": {
+   "kind": "official",
    "title": "Multimaterial Advanced",
    "path": "print_settings/multimaterial/multimaterial_settings_advanced.md",
    "sections": [
@@ -601,6 +617,7 @@
    ]
   },
   "multimaterial_settings_filament_for_features": {
+   "kind": "official",
    "title": "Filament for Features",
    "path": "print_settings/multimaterial/multimaterial_settings_filament_for_features.md",
    "sections": [
@@ -637,6 +654,7 @@
    ]
   },
   "multimaterial_settings_flush_options": {
+   "kind": "official",
    "title": "Flush Options",
    "path": "print_settings/multimaterial/multimaterial_settings_flush_options.md",
    "sections": [
@@ -661,6 +679,7 @@
    ]
   },
   "multimaterial_settings_ooze_prevention": {
+   "kind": "official",
    "title": "Ooze prevention",
    "path": "print_settings/multimaterial/multimaterial_settings_ooze_prevention.md",
    "sections": [
@@ -691,6 +710,7 @@
    ]
   },
   "multimaterial_settings_prime_tower": {
+   "kind": "official",
    "title": "Prime Tower",
    "path": "print_settings/multimaterial/multimaterial_settings_prime_tower.md",
    "sections": [
@@ -799,6 +819,7 @@
    ]
   },
   "others_settings_brim": {
+   "kind": "official",
    "title": "Brim",
    "path": "print_settings/others/others_settings_brim.md",
    "sections": [
@@ -877,6 +898,7 @@
    ]
   },
   "others_settings_fuzzy_skin": {
+   "kind": "official",
    "title": "Fuzzy Skin",
    "path": "print_settings/others/others_settings_fuzzy_skin.md",
    "sections": [
@@ -1015,6 +1037,7 @@
    ]
   },
   "others_settings_g_code_output": {
+   "kind": "official",
    "title": "G-Code Output",
    "path": "print_settings/others/others_settings_g_code_output.md",
    "sections": [
@@ -1063,6 +1086,7 @@
    ]
   },
   "others_settings_notes": {
+   "kind": "official",
    "title": "Notes",
    "path": "print_settings/others/others_settings_notes.md",
    "sections": [
@@ -1075,6 +1099,7 @@
    ]
   },
   "others_settings_post_processing_scripts": {
+   "kind": "official",
    "title": "Post-Processing Scripts",
    "path": "print_settings/others/others_settings_post_processing_scripts.md",
    "sections": [
@@ -1087,6 +1112,7 @@
    ]
   },
   "others_settings_skirt": {
+   "kind": "official",
    "title": "Skirt",
    "path": "print_settings/others/others_settings_skirt.md",
    "sections": [
@@ -1165,6 +1191,7 @@
    ]
   },
   "others_settings_special_mode": {
+   "kind": "official",
    "title": "Special Mode",
    "path": "print_settings/others/others_settings_special_mode.md",
    "sections": [
@@ -1261,6 +1288,7 @@
    ]
   },
   "quality_settings_bridging": {
+   "kind": "official",
    "title": "Bridging",
    "path": "print_settings/quality/quality_settings_bridging.md",
    "sections": [
@@ -1309,6 +1337,7 @@
    ]
   },
   "quality_settings_ironing": {
+   "kind": "official",
    "title": "Ironing",
    "path": "print_settings/quality/quality_settings_ironing.md",
    "sections": [
@@ -1363,6 +1392,7 @@
    ]
   },
   "quality_settings_layer_height": {
+   "kind": "official",
    "title": "Layer Height",
    "path": "print_settings/quality/quality_settings_layer_height.md",
    "sections": [
@@ -1399,6 +1429,7 @@
    ]
   },
   "quality_settings_line_width": {
+   "kind": "official",
    "title": "Line Width",
    "path": "print_settings/quality/quality_settings_line_width.md",
    "sections": [
@@ -1465,6 +1496,7 @@
    ]
   },
   "quality_settings_overhangs": {
+   "kind": "official",
    "title": "Overhangs",
    "path": "print_settings/quality/quality_settings_overhangs.md",
    "sections": [
@@ -1525,6 +1557,7 @@
    ]
   },
   "quality_settings_precision": {
+   "kind": "official",
    "title": "Precision",
    "path": "print_settings/quality/quality_settings_precision.md",
    "sections": [
@@ -1591,6 +1624,7 @@
    ]
   },
   "quality_settings_seam": {
+   "kind": "official",
    "title": "Seam",
    "path": "print_settings/quality/quality_settings_seam.md",
    "sections": [
@@ -1771,6 +1805,7 @@
    ]
   },
   "quality_settings_wall_and_surfaces": {
+   "kind": "official",
    "title": "Wall and surfaces",
    "path": "print_settings/quality/quality_settings_wall_and_surfaces.md",
    "sections": [
@@ -1861,6 +1896,7 @@
    ]
   },
   "quality_settings_wall_generator": {
+   "kind": "official",
    "title": "Wall Generator",
    "path": "print_settings/quality/quality_settings_wall_generator.md",
    "sections": [
@@ -1933,6 +1969,7 @@
    ]
   },
   "speed_settings_acceleration": {
+   "kind": "official",
    "title": "Acceleration",
    "path": "print_settings/speed/speed_settings_acceleration.md",
    "sections": [
@@ -1999,6 +2036,7 @@
    ]
   },
   "speed_settings_advanced": {
+   "kind": "official",
    "title": "Speed Advanced - Extrusion Rate Smoothing",
    "path": "print_settings/speed/speed_settings_advanced.md",
    "sections": [
@@ -2059,6 +2097,7 @@
    ]
   },
   "speed_settings_initial_layer_speed": {
+   "kind": "official",
    "title": "Initial layer speed",
    "path": "print_settings/speed/speed_settings_initial_layer_speed.md",
    "sections": [
@@ -2095,6 +2134,7 @@
    ]
   },
   "speed_settings_jerk_xy": {
+   "kind": "official",
    "title": "Jerk XY",
    "path": "print_settings/speed/speed_settings_jerk_xy.md",
    "sections": [
@@ -2173,6 +2213,7 @@
    ]
   },
   "speed_settings_other_layers_speed": {
+   "kind": "official",
    "title": "Other layers speed",
    "path": "print_settings/speed/speed_settings_other_layers_speed.md",
    "sections": [
@@ -2257,6 +2298,7 @@
    ]
   },
   "speed_settings_overhang_speed": {
+   "kind": "official",
    "title": "Overhang Speed",
    "path": "print_settings/speed/speed_settings_overhang_speed.md",
    "sections": [
@@ -2293,6 +2335,7 @@
    ]
   },
   "speed_settings_travel": {
+   "kind": "official",
    "title": "Travel",
    "path": "print_settings/speed/speed_settings_travel.md",
    "sections": [
@@ -2305,6 +2348,7 @@
    ]
   },
   "strength_settings_advanced": {
+   "kind": "official",
    "title": "Strength Advanced",
    "path": "print_settings/strength/strength_settings_advanced.md",
    "sections": [
@@ -2359,6 +2403,7 @@
    ]
   },
   "strength_settings_infill": {
+   "kind": "official",
    "title": "Infill",
    "path": "print_settings/strength/strength_settings_infill.md",
    "sections": [
@@ -2467,6 +2512,7 @@
    ]
   },
   "strength_settings_infill_rotation_template_metalanguage": {
+   "kind": "official",
    "title": "Infill rotation template metalanguage",
    "path": "print_settings/strength/strength_settings_infill_rotation_template_metalanguage.md",
    "sections": [
@@ -2569,6 +2615,7 @@
    ]
   },
   "strength_settings_patterns": {
+   "kind": "official",
    "title": "Patterns",
    "path": "print_settings/strength/strength_settings_patterns.md",
    "sections": [
@@ -2755,6 +2802,7 @@
    ]
   },
   "strength_settings_top_bottom_shells": {
+   "kind": "official",
    "title": "Top and Bottom Shells",
    "path": "print_settings/strength/strength_settings_top_bottom_shells.md",
    "sections": [
@@ -2797,6 +2845,7 @@
    ]
   },
   "strength_settings_walls": {
+   "kind": "official",
    "title": "Walls",
    "path": "print_settings/strength/strength_settings_walls.md",
    "sections": [
@@ -2827,6 +2876,7 @@
    ]
   },
   "support_settings_advanced": {
+   "kind": "official",
    "title": "Support Advanced",
    "path": "print_settings/support/support_settings_advanced.md",
    "sections": [
@@ -2917,6 +2967,7 @@
    ]
   },
   "support_settings_filament": {
+   "kind": "official",
    "title": "Support Filament",
    "path": "print_settings/support/support_settings_filament.md",
    "sections": [
@@ -2947,6 +2998,7 @@
    ]
   },
   "support_settings_ironing": {
+   "kind": "official",
    "title": "Support Ironing",
    "path": "print_settings/support/support_settings_ironing.md",
    "sections": [
@@ -2977,6 +3029,7 @@
    ]
   },
   "support_settings_raft": {
+   "kind": "official",
    "title": "Raft",
    "path": "print_settings/support/support_settings_raft.md",
    "sections": [
@@ -3001,6 +3054,7 @@
    ]
   },
   "support_settings_support": {
+   "kind": "official",
    "title": "Support",
    "path": "print_settings/support/support_settings_support.md",
    "sections": [
@@ -3127,6 +3181,7 @@
    ]
   },
   "support_settings_tree": {
+   "kind": "official",
    "title": "Tree Support",
    "path": "print_settings/support/support_settings_tree.md",
    "sections": [
@@ -3181,6 +3236,7 @@
    ]
   },
   "Auxiliary-fan": {
+   "kind": "official",
    "title": "Auxiliary Fan",
    "path": "printer_settings/Auxiliary-fan.md",
    "sections": [
@@ -3217,6 +3273,7 @@
    ]
   },
   "Chamber-temperature": {
+   "kind": "official",
    "title": "Chamber Temperature Control",
    "path": "printer_settings/Chamber-temperature.md",
    "sections": [
@@ -3241,6 +3298,7 @@
    ]
   },
   "adaptive-bed-mesh": {
+   "kind": "official",
    "title": "Adaptive Bed Mesh Support",
    "path": "printer_settings/adaptive-bed-mesh.md",
    "sections": [
@@ -3289,6 +3347,7 @@
    ]
   },
   "air-filtration": {
+   "kind": "official",
    "title": "Air Filtration/Exhaust Fan Control in OrcaSlicer",
    "path": "printer_settings/air-filtration.md",
    "sections": [
@@ -3301,6 +3360,7 @@
    ]
   },
   "bed-types": {
+   "kind": "official",
    "title": "Multiple bed types",
    "path": "printer_settings/bed-types.md",
    "sections": [

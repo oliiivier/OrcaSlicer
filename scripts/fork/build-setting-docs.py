@@ -1,11 +1,13 @@
 #!/usr/bin/env python3
 """Fork-only: bundles the setting documentation for the MCP server.
 
-Reads the setting -> wiki page links of src/slic3r/GUI/Tab.cpp and the Markdown
-pages of doc/, and writes resources/ai_assistant/setting_docs.json:
+Reads the setting -> wiki page links of src/slic3r/GUI/Tab.cpp, the Markdown
+pages of doc/ (kind "official") and the guides capitalized from real print
+experiences in resources/ai_assistant/guides/ (kind "experience"), and writes
+resources/ai_assistant/setting_docs.json:
 
   {
-    "pages":    { "<page>": { "title", "path", "sections": [{ "anchor", "title", "level", "text" }] } },
+    "pages":    { "<page>": { "kind", "title", "path", "sections": [{ "anchor", "title", "level", "text" }] } },
     "settings": { "<setting key>": "<page>[#<anchor>]" }
   }
 
@@ -21,6 +23,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 TAB_CPP = ROOT / "src" / "slic3r" / "GUI" / "Tab.cpp"
 DOC_DIR = ROOT / "doc"
+GUIDES_DIR = ROOT / "resources" / "ai_assistant" / "guides"
 OUTPUT = ROOT / "resources" / "ai_assistant" / "setting_docs.json"
 
 # Developer notes are not user documentation.
@@ -48,7 +51,7 @@ def clean(lines):
     return re.sub(r"\n{3,}", "\n\n", text).strip()
 
 
-def parse_page(path):
+def parse_page(path, base, kind):
     sections = []
     current = {"anchor": "", "title": path.stem, "level": 0, "lines": []}
     in_code = False
@@ -70,7 +73,7 @@ def parse_page(path):
         if text or s["level"] > 0:
             out.append({"anchor": s["anchor"], "title": s["title"], "level": s["level"], "text": text})
     title = next((s["title"] for s in out if s["level"] == 1), path.stem)
-    return {"title": title, "path": path.relative_to(DOC_DIR).as_posix(), "sections": out}
+    return {"kind": kind, "title": title, "path": path.relative_to(base).as_posix(), "sections": out}
 
 
 def main():
@@ -79,8 +82,16 @@ def main():
     for path in sorted(DOC_DIR.rglob("*.md")):
         if EXCLUDED_DIRS.intersection(path.relative_to(DOC_DIR).parts):
             continue
-        pages[path.stem] = parse_page(path)
+        pages[path.stem] = parse_page(path, DOC_DIR, "official")
         by_lower_name[path.stem.lower()] = path.stem
+
+    # README.md describes the guide format for the authors, it is not a guide.
+    for path in sorted(GUIDES_DIR.glob("*.md")) if GUIDES_DIR.exists() else []:
+        if path.name == "README.md":
+            continue
+        if path.stem in pages:
+            sys.exit(f"error: guide '{path.name}' has the same name as a documentation page")
+        pages[path.stem] = parse_page(path, GUIDES_DIR, "experience")
 
     settings = {}
     warnings = []

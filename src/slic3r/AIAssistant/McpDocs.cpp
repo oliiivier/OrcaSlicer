@@ -115,15 +115,20 @@ json read_documentation(const json& args)
     if (page_name.empty()) {
         json pages = json::array();
         for (const auto& [name, page] : docs()["pages"].items())
-            pages.push_back({ { "page", name }, { "title", page["title"] }, { "path", page["path"] } });
-        return { { "source", "Snapmaker Orca / OrcaSlicer user documentation, bundled with this version" },
+            pages.push_back({ { "page", name }, { "kind", page.value("kind", "official") }, { "title", page["title"] }, { "path", page["path"] } });
+        return { { "source", "Bundled with this slicer version. kind=official: Snapmaker Orca / OrcaSlicer user "
+                             "documentation; kind=experience: guides written from the user's real prints and reviewed "
+                             "by them" },
                  { "pages", std::move(pages) } };
     }
 
     const json&       page   = find_page(page_name);
     const std::string anchor = args.value("section", std::string());
     bool              truncated = false;
-    json out = { { "page", page_name }, { "title", page["title"] }, { "text", truncate(section_text(page, anchor), PAGE_MAX_CHARS, truncated) } };
+    json out = { { "page", page_name },
+                 { "kind", page.value("kind", "official") },
+                 { "title", page["title"] },
+                 { "text", truncate(section_text(page, anchor), PAGE_MAX_CHARS, truncated) } };
     if (!anchor.empty())
         out["section"] = anchor;
     if (truncated) {

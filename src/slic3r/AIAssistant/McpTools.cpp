@@ -1,6 +1,7 @@
 #include "McpTools.hpp"
 #include "McpChanges.hpp"
 #include "McpDocs.hpp"
+#include "McpExperiences.hpp"
 #include "McpIssues.hpp"
 #include "McpMaterials.hpp"
 #include "McpPrinter.hpp"
@@ -156,8 +157,8 @@ using ToolFn = std::function<json(const json& args, ToolContext& ctx)>;
 // image) instead of data to be sent as JSON text.
 const char* MCP_CONTENT = "$mcp_content";
 
-// Adapts a read-only tool, which has nothing to roll back when the client stops waiting.
-ToolFn read_only(json (*fn)(const json&))
+// Adapts a tool that needs neither the retry state nor to know whether the client stopped waiting.
+ToolFn simple(json (*fn)(const json&))
 {
     return [fn](const json& args, ToolContext&) { return fn(args); };
 }
@@ -186,21 +187,21 @@ const std::vector<Tool>& tools()
           "Errors and warnings currently reported by the slicer for the current plate, errors first: objects outside "
           "the build volume, invalid settings (with the setting key and its limits), incompatible filaments, slicing "
           "warnings, toolpath collisions. Call it first and after every change.",
-          read_only(&get_issues),
+          simple(&get_issues),
           { { "type", "object" }, { "properties", json::object() } },
           60s },
         { "get_project",
           "Summary of the open project: printer toolheads, filament slots (preset, type, color, temperature, toolhead, "
           "used on the plate), mixed filaments, filament assigned to walls/infill/supports, and for each object its "
           "size, filaments and per-object setting overrides.",
-          read_only(&get_project),
+          simple(&get_project),
           { { "type", "object" }, { "properties", json::object() } },
           60s },
         { "get_config",
           "Current values of the active print, filament and printer settings, including unsaved edits. Filament "
           "settings are arrays with one value per filament slot, per-toolhead printer settings arrays with one value "
           "per toolhead. Without arguments returns every setting except G-code templates and other long texts.",
-          read_only(&get_config),
+          simple(&get_config),
           { { "type", "object" },
             { "properties",
               { { "keys", string_array },
@@ -209,7 +210,7 @@ const std::vector<Tool>& tools()
         { "describe_setting",
           "Meaning of settings: label, tooltip, unit, min/max, allowed values, default and current value, and the "
           "section of the official documentation describing the setting (bundled with this slicer version).",
-          read_only(&describe_setting),
+          simple(&describe_setting),
           { { "type", "object" }, { "properties", { { "keys", string_array } } }, { "required", { "keys" } } },
           60s },
         { "apply_changes",
@@ -249,7 +250,7 @@ const std::vector<Tool>& tools()
           "color and nozzle of each toolhead, print state and progress, last firmware error, temperatures, and the "
           "names of the firmware objects. Pass 'objects' to read some of them in full (e.g. sensors) for diagnosis. "
           "The printer cannot be controlled through this server.",
-          read_only(&printer_status),
+          simple(&printer_status),
           { { "type", "object" },
             { "properties",
               { { "objects",
@@ -261,11 +262,48 @@ const std::vector<Tool>& tools()
           "Official user documentation bundled with this slicer version (settings, calibration guides, multi-material, "
           "printer features). Without arguments lists the pages; with 'page' (and optionally 'section', an anchor from "
           "a documentation link) returns the text. Use it instead of searching the web.",
-          read_only(&read_documentation),
+          simple(&read_documentation),
           { { "type", "object" },
             { "properties",
               { { "page", { { "type", "string" } } },
                 { "section", { { "type", "string" }, { "description", "Section anchor, e.g. scarf-joint-seam." } } } } } },
+          60s },
+        { "record_experience",
+          "Saves a diagnosis in the user's local journal of real print experiences (never shared without their "
+          "review). The server adds the printer, materials, current issues and the settings changed by apply_changes "
+          "since the last record. New record: give 'symptom' (user's words) and 'diagnosis'. Update: give 'id'. Ask "
+          "the user before recording.",
+          simple(&record_experience),
+          { { "type", "object" },
+            { "properties",
+              { { "id", { { "type", "string" }, { "description", "Existing record to update." } } },
+                { "symptom", { { "type", "string" } } },
+                { "diagnosis", { { "type", "string" } } },
+                { "notes", { { "type", "string" } } },
+                { "capitalized_in",
+                  { { "type", "string" }, { "description", "Guide page that now includes this experience." } } } } } },
+          60s },
+        { "report_outcome",
+          "Records the real result of a print for an experience (default: the latest one awaiting it): success, "
+          "partial or failure, with the user's notes. Adds the printer's report of the last print when available.",
+          simple(&report_outcome),
+          { { "type", "object" },
+            { "properties",
+              { { "id", { { "type", "string" } } },
+                { "result", { { "type", "string" }, { "enum", { "success", "partial", "failure" } } } },
+                { "notes", { { "type", "string" } } } } },
+            { "required", { "result" } } },
+          60s },
+        { "search_experiences",
+          "Searches the local journal for similar past cases: by words of the symptom, material type, status "
+          "(confirmed = real outcome known, awaiting_outcome, all).",
+          simple(&search_experiences),
+          { { "type", "object" },
+            { "properties",
+              { { "text", { { "type", "string" } } },
+                { "material", { { "type", "string" }, { "description", "Filament type, e.g. PETG." } } },
+                { "status", { { "type", "string" }, { "enum", { "confirmed", "awaiting_outcome", "all" } } } },
+                { "limit", { { "type", "integer" }, { "minimum", 1 }, { "maximum", 500 } } } } } },
           60s },
         { "slice",
           "Slices the current plate (like the Slice plate button, the slicer shows the preview) and waits for the "
@@ -280,7 +318,7 @@ const std::vector<Tool>& tools()
           "PNG image of the objects of the current plate seen from a viewpoint, colored by filament, with a legend. "
           "Shows the model, not the supports or toolpaths: use it to check orientation, overhangs, placement and "
           "color assignment, and slice to know about supports.",
-          read_only(&render_view),
+          simple(&render_view),
           { { "type", "object" },
             { "properties",
               { { "view",
@@ -326,9 +364,27 @@ const char* INSTRUCTIONS =
     "differences between the project and the printer (missing filament, other material or nozzle on a used "
     "toolhead). After a failed print, start from last_error and the print state, then inspect the related firmware "
     "objects. You cannot start, stop or control a print, heat or move the printer: tell the user what to do.\n"
+    "Experience: before diagnosing, search_experiences for similar cases and read_documentation for guides of kind "
+    "'experience' (reviewed lessons from real prints). Say where each recommendation comes from: official "
+    "documentation, reviewed guide, or an unreviewed past case of the journal. At the end of a diagnosis, offer to "
+    "record_experience; when the user reports how the print went, call report_outcome.\n"
     "When the user describes a visual problem (missing supports, stringing, wrong colors...), use render_view to "
     "look at the model from the relevant side and slice to get the supports and per-feature results; the user may "
     "also paste a screenshot of the preview. Slice again after changes to confirm the fix.";
+
+const char* CAPITALIZE_PROMPT =
+    "Turn my confirmed print experiences into guides of this repository.\n"
+    "1. Call search_experiences with status=confirmed and limit=500. Skip records that already have capitalized_in.\n"
+    "2. Group them by situation: printer, material(s), symptom. Read the existing guides first "
+    "(resources/ai_assistant/guides/*.md and resources/ai_assistant/guides/README.md for the format).\n"
+    "3. Write or update one guide per topic in resources/ai_assistant/guides/. Each lesson states its conditions "
+    "(printer, toolhead layout, materials, nozzle), the symptom, the settings that fixed it with values, and its "
+    "evidence: number of prints, how many succeeded, date of the last one. A single case is an 'Observation'; a "
+    "'Recommendation' needs at least 3 concordant confirmed cases and no contradicting one. Report contradictions "
+    "instead of resolving them. Never copy object names, file names, serial numbers or personal data.\n"
+    "4. Run python3 -I scripts/fork/build-setting-docs.py so the slicer serves the guides.\n"
+    "5. Show me the git diff and wait for my review. Only after I approve: call record_experience with id and "
+    "capitalized_in for each record used. Do not commit unless I ask.";
 
 json prompt_message(const std::string& description, const std::string& text)
 {
@@ -361,6 +417,9 @@ json McpTools::list_prompts() const
               json::array({ { { "name", "problem" },
                               { "description", "What is wrong, and where: e.g. no support under the chin" },
                               { "required", true } } }) } },
+          { { "name", "capitalize_experiences" },
+            { "description", "Turn confirmed experiences of the journal into reviewed guides of the repository "
+                             "(run from Claude Code in the fork's working copy)." } },
           { { "name", "fix_issues" },
             { "description", "Find the problems reported by the slicer and fix them, blocking errors first." } },
           { { "name", "optimize_settings" },
@@ -378,6 +437,8 @@ json McpTools::get_prompt(const std::string& name, const json& arguments)
                               "Check my current slicer project with get_issues and fix the problems, blocking errors "
                               "first, then warnings. For each one, explain the cause briefly and propose the fix with "
                               "apply_changes. Verify with get_issues after each change.");
+    if (name == "capitalize_experiences")
+        return prompt_message("Capitalize experiences", CAPITALIZE_PROMPT);
     if (name == "diagnose_print") {
         const std::string problem = arguments.value("problem", std::string());
         if (problem.empty())
