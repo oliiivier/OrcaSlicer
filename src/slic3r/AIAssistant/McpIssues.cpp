@@ -17,6 +17,7 @@
 namespace Slic3r { namespace AIAssistant {
 
 using nlohmann::json;
+using GUI::GLCanvas3D;
 using GUI::Plater;
 using GUI::wxGetApp;
 

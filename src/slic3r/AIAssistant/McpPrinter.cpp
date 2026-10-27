@@ -58,7 +58,7 @@ std::optional<json> query_objects(std::string& reason, bool allow_cached)
     static std::chrono::steady_clock::time_point cached_at;
     const auto                                   now = std::chrono::steady_clock::now();
     if (allow_cached && !cached.is_null() && now - cached_at < ISSUES_CACHE_TTL)
-        return cached;
+        return std::make_optional<json>(cached);
 
     // Read-only query; the callback runs on the gateway thread, so waiting here is safe.
     const Gateway::GatewayService::ApiResult result = gateway->request_sync("query.device.objects", json::object(), QUERY_TIMEOUT);
@@ -68,7 +68,7 @@ std::optional<json> query_objects(std::string& reason, bool allow_cached)
     }
     cached    = result.value;
     cached_at = now;
-    return result.value;
+    return std::make_optional<json>(result.value);
 }
 
 bool is_sensitive_key(std::string key)
