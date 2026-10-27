@@ -59,10 +59,17 @@ else
     fi
 fi
 
+# Keep the documentation served by the MCP server in step with the merged code.
+python3 -I scripts/fork/build-setting-docs.py
+if [ -n "$(git status --porcelain -- resources/ai_assistant)" ]; then
+    git add resources/ai_assistant
+    git commit -m "Regenerate MCP setting documentation"
+fi
+
 echo
 echo "Fork changes to upstream files (should stay limited to the hook points listed in FORK.md):"
 git diff --stat upstream/main...HEAD -- . \
-    ':!src/slic3r/AIAssistant' ':!scripts/fork' ':!FORK.md'
+    ':!src/slic3r/AIAssistant' ':!resources/ai_assistant' ':!scripts/fork' ':!FORK.md'
 
 if [ "$BUILD" = 1 ]; then
     ./build_linux.sh -s

@@ -13,6 +13,8 @@ if (SNAPMAKER_AI_ASSISTANT)
         ${_ai_dir}/McpChanges.hpp
         ${_ai_dir}/McpDialog.cpp
         ${_ai_dir}/McpDialog.hpp
+        ${_ai_dir}/McpDocs.cpp
+        ${_ai_dir}/McpDocs.hpp
         ${_ai_dir}/McpIssues.cpp
         ${_ai_dir}/McpIssues.hpp
         ${_ai_dir}/McpMaterials.cpp

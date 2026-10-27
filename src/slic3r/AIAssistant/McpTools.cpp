@@ -1,5 +1,6 @@
 #include "McpTools.hpp"
 #include "McpChanges.hpp"
+#include "McpDocs.hpp"
 #include "McpIssues.hpp"
 #include "McpMaterials.hpp"
 #include "McpRender.hpp"
@@ -131,6 +132,8 @@ json describe_setting(const json& args)
         json d = setting_summary(*def);
         if (const ConfigOption* opt = config.option(key))
             d["current"] = option_value(*opt);
+        json doc         = setting_documentation(key);
+        d["documentation"] = doc.is_null() ? json(no_documentation_note(!def->tooltip.empty())) : std::move(doc);
         out[key] = std::move(d);
     }
     return out;
@@ -203,7 +206,8 @@ const std::vector<Tool>& tools()
                 { "search", { { "type", "string" }, { "description", "Substring of a setting key or label." } } } } } },
           60s },
         { "describe_setting",
-          "Meaning of settings: label, tooltip, unit, min/max, allowed values, default and current value.",
+          "Meaning of settings: label, tooltip, unit, min/max, allowed values, default and current value, and the "
+          "section of the official documentation describing the setting (bundled with this slicer version).",
           read_only(&describe_setting),
           { { "type", "object" }, { "properties", { { "keys", string_array } } }, { "required", { "keys" } } },
           60s },
@@ -239,6 +243,16 @@ const std::vector<Tool>& tools()
             { "required", { "reason", "changes" } } },
           // The user has to read and confirm the changes.
           10min },
+        { "read_documentation",
+          "Official user documentation bundled with this slicer version (settings, calibration guides, multi-material, "
+          "printer features). Without arguments lists the pages; with 'page' (and optionally 'section', an anchor from "
+          "a documentation link) returns the text. Use it instead of searching the web.",
+          read_only(&read_documentation),
+          { { "type", "object" },
+            { "properties",
+              { { "page", { { "type", "string" } } },
+                { "section", { { "type", "string" }, { "description", "Section anchor, e.g. scarf-joint-seam." } } } } } },
+          60s },
         { "slice",
           "Slices the current plate (like the Slice plate button, the slicer shows the preview) and waits for the "
           "result: print time, filament per slot (model, supports, wipe tower, flush), time and filament per feature "
@@ -273,7 +287,9 @@ const char* INSTRUCTIONS =
     "1. Call get_issues first. Fix errors (blocks_slicing=true) before anything else, then warnings, and only then "
     "work on other improvements the user asked for.\n"
     "2. For each issue, explain the cause in one or two sentences. Check the setting meaning, unit and limits with "
-    "describe_setting (often already included as setting_info) before choosing a value.\n"
+    "describe_setting (often already included as setting_info) before choosing a value; its documentation field is "
+    "the official documentation of this slicer version, and read_documentation gives the related pages "
+    "(calibration guides...). Rely on them rather than on web searches or memory of other slicers.\n"
     "3. Fix settings with apply_changes; the user confirms in the slicer. Group the changes fixing one issue in a "
     "single call with a clear reason. Do not change settings unrelated to the issues or the user's request.\n"
     "4. Call get_issues again after each applied change to verify, and iterate.\n"

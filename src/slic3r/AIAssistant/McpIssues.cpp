@@ -1,4 +1,5 @@
 #include "McpIssues.hpp"
+#include "McpDocs.hpp"
 #include "McpToolUtils.hpp"
 
 #include "libslic3r/Model.hpp"
@@ -35,6 +36,9 @@ void attach_setting(json& issue, const std::string& key)
         const DynamicPrintConfig config = wxGetApp().preset_bundle->full_config();
         if (const ConfigOption* opt = config.option(key))
             summary["current"] = option_value(*opt);
+        // The full text would make the issue list long: only say whether it exists.
+        summary["documentation"] = setting_documentation(key).is_null() ? no_documentation_note(!def->tooltip.empty()) :
+                                                                          "available: call describe_setting";
         issue["setting_info"] = std::move(summary);
     }
 }

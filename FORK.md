@@ -18,6 +18,7 @@ avec un minimum de conflits.
 
 1. Tout le code du fork vit dans des dossiers qui n'existent pas upstream :
    - `src/slic3r/AIAssistant/` (C++ et `AIAssistant.cmake`)
+   - `resources/ai_assistant/` (documentation générée pour le serveur MCP)
    - `scripts/fork/`
 2. Les fichiers upstream ne sont touchés qu'aux **points d'accroche** ci-dessous, toujours entourés de
    `#ifdef SNAPMAKER_AI_ASSISTANT // fork`. Si un nouveau point est nécessaire, l'ajouter à cette liste.
@@ -33,7 +34,7 @@ avec un minimum de conflits.
 Lister les écarts réels avec upstream (doit rester court) :
 
 ```bash
-git diff upstream/main...ai-assistant --stat -- . ':!src/slic3r/AIAssistant' ':!scripts/fork' ':!FORK.md'
+git diff upstream/main...ai-assistant --stat -- . ':!src/slic3r/AIAssistant' ':!resources/ai_assistant' ':!scripts/fork' ':!FORK.md'
 ```
 
 ## Synchronisation avec upstream
@@ -68,11 +69,17 @@ dans Claude Code, Gemini CLI ou Claude Desktop. Le serveur écoute uniquement su
 | `McpMaterials` | Têtes, emplacements de filament, filaments mixtes, attribution par élément |
 | `McpSlicing` | Slicing du plateau et résumé du résultat (`slice`) |
 | `McpRender` | Rendu PNG du plateau depuis une vue nommée (`render_view`) |
+| `McpDocs` | Documentation des réglages livrée avec l'application (`describe_setting`, `read_documentation`) |
 | `McpService` | Cycle de vie du serveur (démarrage, arrêt à la fermeture) |
 | `McpSettings` | Section `[ai_assistant]` de la configuration de l'application |
 | `McpDialog` | Fenêtre de réglages |
 
-Outils : `get_issues`, `get_project`, `get_config`, `describe_setting`, `apply_changes`, `slice`, `render_view`.
+Outils : `get_issues`, `get_project`, `get_config`, `describe_setting`, `read_documentation`, `apply_changes`,
+`slice`, `render_view`.
+
+La documentation vient de `doc/` (wiki OrcaSlicer) : `scripts/fork/build-setting-docs.py` relie chaque réglage
+à sa section grâce aux liens d'aide de `Tab.cpp` et produit `resources/ai_assistant/setting_docs.json`, livré
+avec l'application (aucun accès réseau). `sync-upstream.sh` le régénère et le commite après chaque fusion.
 Prompts (commandes slash dans Claude Code / Gemini CLI) : `diagnose_print`, `fix_issues`, `optimize_settings`.
 
 `render_view` montre le modèle (pas les supports ni les trajectoires) ; pour l'aperçu tranché, l'utilisateur
