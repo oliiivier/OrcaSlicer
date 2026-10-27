@@ -66,12 +66,18 @@ dans Claude Code, Gemini CLI ou Claude Desktop. Le serveur écoute uniquement su
 | `McpIssues` | Collecte des erreurs et avertissements du slicer (`get_issues`) |
 | `McpChanges` | Validation, confirmation et application des réglages (`apply_changes`) |
 | `McpMaterials` | Têtes, emplacements de filament, filaments mixtes, attribution par élément |
+| `McpSlicing` | Slicing du plateau et résumé du résultat (`slice`) |
+| `McpRender` | Rendu PNG du plateau depuis une vue nommée (`render_view`) |
 | `McpService` | Cycle de vie du serveur (démarrage, arrêt à la fermeture) |
 | `McpSettings` | Section `[ai_assistant]` de la configuration de l'application |
 | `McpDialog` | Fenêtre de réglages |
 
-Outils : `get_issues`, `get_project`, `get_config`, `describe_setting`, `apply_changes`.
-Prompts (commandes slash dans Claude Code / Gemini CLI) : `fix_issues`, `optimize_settings`.
+Outils : `get_issues`, `get_project`, `get_config`, `describe_setting`, `apply_changes`, `slice`, `render_view`.
+Prompts (commandes slash dans Claude Code / Gemini CLI) : `diagnose_print`, `fix_issues`, `optimize_settings`.
+
+`render_view` montre le modèle (pas les supports ni les trajectoires) ; pour l'aperçu tranché, l'utilisateur
+peut coller une capture d'écran dans le client. Le serveur traite une requête à la fois : pendant un `slice`
+(jusqu'à 10 min), les autres requêtes attendent.
 
 Multi-têtes (Snapmaker U1, 4 têtes) : `get_project.materials` décrit les têtes et chaque emplacement
 (preset, type, couleur, température, tête, utilisé sur le plateau) ; les réglages par emplacement/tête sont

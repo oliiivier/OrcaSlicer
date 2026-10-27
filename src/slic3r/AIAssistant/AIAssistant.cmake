@@ -17,12 +17,16 @@ if (SNAPMAKER_AI_ASSISTANT)
         ${_ai_dir}/McpIssues.hpp
         ${_ai_dir}/McpMaterials.cpp
         ${_ai_dir}/McpMaterials.hpp
+        ${_ai_dir}/McpRender.cpp
+        ${_ai_dir}/McpRender.hpp
         ${_ai_dir}/McpServer.cpp
         ${_ai_dir}/McpServer.hpp
         ${_ai_dir}/McpService.cpp
         ${_ai_dir}/McpService.hpp
         ${_ai_dir}/McpSettings.cpp
         ${_ai_dir}/McpSettings.hpp
+        ${_ai_dir}/McpSlicing.cpp
+        ${_ai_dir}/McpSlicing.hpp
         ${_ai_dir}/McpTools.cpp
         ${_ai_dir}/McpTools.hpp
         ${_ai_dir}/McpToolUtils.cpp

@@ -2,6 +2,8 @@
 #include "McpChanges.hpp"
 #include "McpIssues.hpp"
 #include "McpMaterials.hpp"
+#include "McpRender.hpp"
+#include "McpSlicing.hpp"
 #include "McpToolUtils.hpp"
 
 #include "libslic3r/Model.hpp"
@@ -136,15 +138,29 @@ json describe_setting(const json& args)
 
 // ---------------------------------------------------------------- registry
 
-using ToolFn = std::function<json(const json& args, const std::atomic<bool>& abandoned)>;
+struct ToolContext
+{
+    // Set when the client stopped waiting: nothing must be changed anymore.
+    const std::atomic<bool>& abandoned;
+    // Kept between the calls of a tool retried with ToolRetry.
+    json& state;
+};
+
+using ToolFn = std::function<json(const json& args, ToolContext& ctx)>;
+
+// Key marking a tool result that is already a list of MCP content items (e.g. an
+// image) instead of data to be sent as JSON text.
+const char* MCP_CONTENT = "$mcp_content";
 
 // Adapts a read-only tool, which has nothing to roll back when the client stops waiting.
 ToolFn read_only(json (*fn)(const json&))
 {
-    return [fn](const json& args, const std::atomic<bool>&) { return fn(args); };
+    return [fn](const json& args, ToolContext&) { return fn(args); };
 }
 
 json get_issues(const json& /* args */) { return collect_issues(); }
+
+json render_view(const json& args) { return { { MCP_CONTENT, render_view_content(args) } }; }
 
 struct Tool
 {
@@ -152,7 +168,10 @@ struct Tool
     const char*               description;
     ToolFn                    run;
     json                      input_schema;
+    // Time the GUI thread may take for one call (the user may have to confirm).
     std::chrono::milliseconds timeout;
+    // Time during which a call answering ToolRetry is repeated.
+    std::chrono::milliseconds retry_for { 5s };
 };
 
 const std::vector<Tool>& tools()
@@ -194,7 +213,7 @@ const std::vector<Tool>& tools()
           "'filament_slot' (one slot per call; the change applies to that slot's filament preset, so to every slot "
           "using the same preset). Per-toolhead printer settings take 'toolhead' to change a single toolhead, "
           "otherwise the value lists every toolhead. Invalid changes are all rejected with the reason.",
-          &apply_changes,
+          [](const json& args, ToolContext& ctx) { return apply_changes(args, ctx.abandoned); },
           { { "type", "object" },
             { "properties",
               { { "reason",
@@ -220,6 +239,28 @@ const std::vector<Tool>& tools()
             { "required", { "reason", "changes" } } },
           // The user has to read and confirm the changes.
           10min },
+        { "slice",
+          "Slices the current plate (like the Slice plate button, the slicer shows the preview) and waits for the "
+          "result: print time, filament per slot (model, supports, wipe tower, flush), time and filament per feature "
+          "(supports, walls, infill...), support layers per object, and the issues found while slicing. Refuses to "
+          "slice while blocking errors remain.",
+          [](const json&, ToolContext& ctx) { return slice_plate(ctx.state); },
+          { { "type", "object" }, { "properties", json::object() } },
+          60s,
+          10min },
+        { "render_view",
+          "PNG image of the objects of the current plate seen from a viewpoint, colored by filament, with a legend. "
+          "Shows the model, not the supports or toolpaths: use it to check orientation, overhangs, placement and "
+          "color assignment, and slice to know about supports.",
+          read_only(&render_view),
+          { { "type", "object" },
+            { "properties",
+              { { "view",
+                  { { "type", "string" },
+                    { "enum", { "iso", "top_front", "left", "right", "top", "bottom", "front", "rear" } },
+                    { "default", "iso" } } },
+                { "size", { { "type", "integer" }, { "minimum", 256 }, { "maximum", 1024 }, { "default", 768 } } } } } },
+          60s },
     };
     return list;
 }
@@ -250,7 +291,10 @@ const char* INSTRUCTIONS =
     "- feature_filaments and the per-object filaments tell which slot prints walls, infill, supports and each "
     "object (0 = the object's default filament). Mixed filaments are virtual IDs after the physical slots.\n"
     "Issues fixed in the slicer UI rather than in settings (object placement, filament assignment to slots, plate "
-    "type) must be explained to the user step by step.";
+    "type) must be explained to the user step by step.\n"
+    "When the user describes a visual problem (missing supports, stringing, wrong colors...), use render_view to "
+    "look at the model from the relevant side and slice to get the supports and per-feature results; the user may "
+    "also paste a screenshot of the preview. Slice again after changes to confirm the fix.";
 
 json prompt_message(const std::string& description, const std::string& text)
 {
@@ -277,7 +321,13 @@ json McpTools::list_tools() const
 json McpTools::list_prompts() const
 {
     return json::array(
-        { { { "name", "fix_issues" },
+        { { { "name", "diagnose_print" },
+            { "description", "Investigate a problem you see in the slicer (e.g. missing supports) and fix it." },
+            { "arguments",
+              json::array({ { { "name", "problem" },
+                              { "description", "What is wrong, and where: e.g. no support under the chin" },
+                              { "required", true } } }) } },
+          { { "name", "fix_issues" },
             { "description", "Find the problems reported by the slicer and fix them, blocking errors first." } },
           { { "name", "optimize_settings" },
             { "description", "Fix the reported problems, then tune the settings for a goal." },
@@ -294,6 +344,18 @@ json McpTools::get_prompt(const std::string& name, const json& arguments)
                               "Check my current slicer project with get_issues and fix the problems, blocking errors "
                               "first, then warnings. For each one, explain the cause briefly and propose the fix with "
                               "apply_changes. Verify with get_issues after each change.");
+    if (name == "diagnose_print") {
+        const std::string problem = arguments.value("problem", std::string());
+        if (problem.empty())
+            throw std::invalid_argument("Missing argument: problem");
+        return prompt_message("Diagnose a print problem",
+                              "In my current slicer project I see this problem: " + problem +
+                                  "\nInvestigate it: check get_issues, look at the model with render_view from the "
+                                  "relevant sides, slice to get the supports and per-feature results, and inspect "
+                                  "the related settings (get_config / describe_setting), including which filament "
+                                  "slot prints the feature. Explain the cause, then propose the fix with "
+                                  "apply_changes and slice again to confirm it.");
+    }
     if (name == "optimize_settings") {
         const std::string goal = arguments.value("goal", std::string());
         if (goal.empty())
@@ -320,7 +382,9 @@ json McpTools::call_tool(const std::string& name, const json& arguments)
     };
 
     constexpr auto RETRY_DELAY    = 250ms;
-    const auto     retry_deadline = std::chrono::steady_clock::now() + 5s;
+    const auto     retry_deadline = std::chrono::steady_clock::now() + it->retry_for;
+    // Only touched on the GUI thread, by the successive calls.
+    auto state = std::make_shared<json>(json::object());
     for (;;) {
         if (*m_cancelled || wxTheApp == nullptr)
             throw std::runtime_error("The application is shutting down");
@@ -328,13 +392,20 @@ json McpTools::call_tool(const std::string& name, const json& arguments)
         auto promise   = std::make_shared<std::promise<Outcome>>();
         auto future    = promise->get_future();
         auto abandoned = std::make_shared<std::atomic<bool>>(false);
-        wxTheApp->CallAfter([promise, abandoned, run = it->run, arguments, cancelled = m_cancelled]() {
+        wxTheApp->CallAfter([promise, abandoned, state, run = it->run, arguments, cancelled = m_cancelled]() {
             if (*cancelled || *abandoned) {
                 promise->set_value({ text_result("The request was abandoned", true) });
                 return;
             }
             try {
-                promise->set_value({ text_result(run(arguments, *abandoned).dump(2)) });
+                ToolContext ctx { *abandoned, *state };
+                json        result = run(arguments, ctx);
+                if (result.is_object() && result.contains(MCP_CONTENT)) {
+                    json content = { { "content", std::move(result[MCP_CONTENT]) }, { "isError", false } };
+                    promise->set_value(Outcome { std::move(content) });
+                } else {
+                    promise->set_value(Outcome { text_result(result.dump(2)) });
+                }
             } catch (const ToolRetry&) {
                 promise->set_value({ json(), true });
             } catch (const ToolError& e) {
