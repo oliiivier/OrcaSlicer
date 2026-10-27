@@ -1,4 +1,8 @@
 #include "McpTools.hpp"
+#include "McpChanges.hpp"
+#include "McpIssues.hpp"
+#include "McpMaterials.hpp"
+#include "McpToolUtils.hpp"
 
 #include "libslic3r/Model.hpp"
 #include "libslic3r/PresetBundle.hpp"
@@ -12,84 +16,29 @@
 
 #include <algorithm>
 #include <chrono>
-#include <climits>
+#include <functional>
 #include <future>
 #include <stdexcept>
+#include <thread>
 
 namespace Slic3r { namespace AIAssistant {
 
 using nlohmann::json;
 using GUI::wxGetApp;
+using namespace std::chrono_literals;
 
 namespace {
-
-// Raised by a tool for a problem the model should see and can fix (bad key...).
-struct ToolError : std::runtime_error
-{
-    using std::runtime_error::runtime_error;
-};
-
-constexpr auto GUI_CALL_TIMEOUT = std::chrono::seconds(60);
 
 json text_result(const std::string& text, bool is_error = false)
 {
     return { { "content", json::array({ { { "type", "text" }, { "text", text } } }) }, { "isError", is_error } };
 }
 
-const char* type_name(ConfigOptionType type)
-{
-    switch (static_cast<ConfigOptionType>(int(type) & ~int(coVectorType))) {
-    case coFloat: return "float";
-    case coInt: return "int";
-    case coString: return "string";
-    case coPercent: return "percent";
-    case coFloatOrPercent: return "float_or_percent";
-    case coPoint: return "point";
-    case coPoint3: return "point3";
-    case coBool: return "bool";
-    case coEnum: return "enum";
-    default: return "unknown";
-    }
-}
-
-const char* mode_name(ConfigOptionMode mode)
-{
-    switch (mode) {
-    case comSimple: return "simple";
-    case comAdvanced: return "advanced";
-    default: return "develop";
-    }
-}
-
-std::vector<std::string> string_list(const json& args, const char* name)
-{
-    std::vector<std::string> out;
-    if (!args.contains(name))
-        return out;
-    const json& list = args[name];
-    if (!list.is_array())
-        throw ToolError(std::string("'") + name + "' must be an array of strings");
-    for (const json& item : list) {
-        if (!item.is_string())
-            throw ToolError(std::string("'") + name + "' must be an array of strings");
-        out.push_back(item.get<std::string>());
-    }
-    return out;
-}
-
-GUI::Plater& plater()
-{
-    GUI::Plater* p = wxGetApp().plater();
-    if (p == nullptr || wxGetApp().preset_bundle == nullptr)
-        throw ToolError("No project is open (the application may be in G-code viewer mode)");
-    return *p;
-}
-
 // ---------------------------------------------------------------- tools
 
 json get_project(const json& /* args */)
 {
-    GUI::Plater&        p      = plater();
+    GUI::Plater&        p      = require_plater();
     const PresetBundle& bundle = *wxGetApp().preset_bundle;
 
     json objects = json::array();
@@ -101,6 +50,7 @@ json get_project(const json& /* args */)
         json o = { { "name", obj->name },
                    { "instances", obj->instances.size() },
                    { "parts", obj->volumes.size() },
+                   { "filaments", object_filaments(*obj) },
                    { "setting_overrides", std::move(overrides) },
                    { "height_range_overrides", obj->layer_config_ranges.size() } };
         if (!obj->instances.empty()) {
@@ -110,17 +60,23 @@ json get_project(const json& /* args */)
         objects.push_back(std::move(o));
     }
 
-    return { { "project_name", GUI::into_u8(p.get_project_name()) },
-             { "presets",
-               { { "printer", bundle.printers.get_selected_preset_name() },
-                 { "process", bundle.prints.get_selected_preset_name() },
-                 { "filaments", bundle.filament_presets } } },
-             { "objects", std::move(objects) } };
+    json out = { { "project_name", GUI::into_u8(p.get_project_name()) },
+                 { "presets",
+                   { { "printer", bundle.printers.get_selected_preset_name() },
+                     { "process", bundle.prints.get_selected_preset_name() } } },
+                 { "materials", describe_materials() },
+                 { "objects", std::move(objects) } };
+    try {
+        out["issues"] = collect_issues()["summary"].get<std::string>() + " (details: get_issues)";
+    } catch (const ToolRetry&) {
+        out["issues"] = "unknown, the slicer is updating (call get_issues)";
+    }
+    return out;
 }
 
 json get_config(const json& args)
 {
-    plater();
+    require_plater();
     const std::vector<std::string> keys   = string_list(args, "keys");
     const std::string              search = boost::algorithm::to_lower_copy(args.value("search", std::string()));
     const DynamicPrintConfig       config = wxGetApp().preset_bundle->full_config();
@@ -129,8 +85,8 @@ json get_config(const json& args)
     if (!keys.empty()) {
         json unknown = json::array();
         for (const std::string& key : keys) {
-            if (config.option(key) != nullptr)
-                values[key] = config.opt_serialize(key);
+            if (const ConfigOption* opt = config.option(key))
+                values[key] = option_value(*opt);
             else
                 unknown.push_back(key);
         }
@@ -150,14 +106,14 @@ json get_config(const json& args)
             if (!boost::algorithm::contains(key, search) && !boost::algorithm::contains(label, search))
                 continue;
         }
-        values[key] = config.opt_serialize(key);
+        values[key] = option_value(*config.option(key));
     }
     return { { "values", std::move(values) } };
 }
 
 json describe_setting(const json& args)
 {
-    plater();
+    require_plater();
     const std::vector<std::string> keys = string_list(args, "keys");
     if (keys.empty())
         throw ToolError("'keys' must list at least one setting");
@@ -170,29 +126,9 @@ json describe_setting(const json& args)
             out[key] = { { "error", "unknown setting" } };
             continue;
         }
-        json d = { { "label", def->full_label.empty() ? def->label : def->full_label },
-                   { "category", def->category },
-                   { "tooltip", def->tooltip },
-                   { "type", type_name(def->type) },
-                   { "per_extruder", !def->is_scalar() },
-                   { "mode", mode_name(def->mode) } };
-        if (!def->sidetext.empty())
-            d["unit"] = def->sidetext;
-        if (def->min != INT_MIN)
-            d["min"] = def->min;
-        if (def->max != INT_MAX)
-            d["max"] = def->max;
-        if (!def->enum_values.empty()) {
-            json values = json::array();
-            for (size_t i = 0; i < def->enum_values.size(); ++i)
-                values.push_back({ { "value", def->enum_values[i] },
-                                   { "label", i < def->enum_labels.size() ? def->enum_labels[i] : def->enum_values[i] } });
-            d["allowed_values"] = std::move(values);
-        }
-        if (def->default_value)
-            d["default"] = def->default_value->serialize();
-        if (config.option(key) != nullptr)
-            d["current"] = config.opt_serialize(key);
+        json d = setting_summary(*def);
+        if (const ConfigOption* opt = config.option(key))
+            d["current"] = option_value(*opt);
         out[key] = std::move(d);
     }
     return out;
@@ -200,37 +136,126 @@ json describe_setting(const json& args)
 
 // ---------------------------------------------------------------- registry
 
+using ToolFn = std::function<json(const json& args, const std::atomic<bool>& abandoned)>;
+
+// Adapts a read-only tool, which has nothing to roll back when the client stops waiting.
+ToolFn read_only(json (*fn)(const json&))
+{
+    return [fn](const json& args, const std::atomic<bool>&) { return fn(args); };
+}
+
+json get_issues(const json& /* args */) { return collect_issues(); }
+
 struct Tool
 {
-    const char* name;
-    const char* description;
-    json (*run)(const json& args);
-    json input_schema;
+    const char*               name;
+    const char*               description;
+    ToolFn                    run;
+    json                      input_schema;
+    std::chrono::milliseconds timeout;
 };
 
 const std::vector<Tool>& tools()
 {
     static const json string_array = { { "type", "array" }, { "items", { { "type", "string" } } } };
     static const std::vector<Tool> list = {
+        { "get_issues",
+          "Errors and warnings currently reported by the slicer for the current plate, errors first: objects outside "
+          "the build volume, invalid settings (with the setting key and its limits), incompatible filaments, slicing "
+          "warnings, toolpath collisions. Call it first and after every change.",
+          read_only(&get_issues),
+          { { "type", "object" }, { "properties", json::object() } },
+          60s },
         { "get_project",
-          "Summary of the open project: selected printer, process and filament presets, and for each object its size, "
-          "instance count and per-object setting overrides.",
-          &get_project,
-          { { "type", "object" }, { "properties", json::object() } } },
+          "Summary of the open project: printer toolheads, filament slots (preset, type, color, temperature, toolhead, "
+          "used on the plate), mixed filaments, filament assigned to walls/infill/supports, and for each object its "
+          "size, filaments and per-object setting overrides.",
+          read_only(&get_project),
+          { { "type", "object" }, { "properties", json::object() } },
+          60s },
         { "get_config",
-          "Current values of the active print, filament and printer settings, including unsaved edits. Without "
-          "arguments returns every setting except G-code templates and other long texts.",
-          &get_config,
+          "Current values of the active print, filament and printer settings, including unsaved edits. Filament "
+          "settings are arrays with one value per filament slot, per-toolhead printer settings arrays with one value "
+          "per toolhead. Without arguments returns every setting except G-code templates and other long texts.",
+          read_only(&get_config),
           { { "type", "object" },
             { "properties",
               { { "keys", string_array },
-                { "search", { { "type", "string" }, { "description", "Substring of a setting key or label." } } } } } } },
+                { "search", { { "type", "string" }, { "description", "Substring of a setting key or label." } } } } } },
+          60s },
         { "describe_setting",
           "Meaning of settings: label, tooltip, unit, min/max, allowed values, default and current value.",
-          &describe_setting,
-          { { "type", "object" }, { "properties", { { "keys", string_array } } }, { "required", { "keys" } } } },
+          read_only(&describe_setting),
+          { { "type", "object" }, { "properties", { { "keys", string_array } } }, { "required", { "keys" } } },
+          60s },
+        { "apply_changes",
+          "Proposes setting changes to the user, who confirms or declines them in the slicer. Applied to the edited "
+          "(unsaved) presets, or as per-object overrides when 'object' is given. Filament settings need "
+          "'filament_slot' (one slot per call; the change applies to that slot's filament preset, so to every slot "
+          "using the same preset). Per-toolhead printer settings take 'toolhead' to change a single toolhead, "
+          "otherwise the value lists every toolhead. Invalid changes are all rejected with the reason.",
+          &apply_changes,
+          { { "type", "object" },
+            { "properties",
+              { { "reason",
+                  { { "type", "string" },
+                    { "description", "Short explanation shown to the user, e.g. the issue being fixed." } } },
+                { "changes",
+                  { { "type", "array" },
+                    { "items",
+                      { { "type", "object" },
+                        { "properties",
+                          { { "key", { { "type", "string" } } },
+                            { "value",
+                              { { "type", { "string", "number", "boolean", "array" } },
+                                { "description", "Value in the get_config format." } } },
+                            { "object", { { "type", "string" }, { "description", "Object name for a per-object override." } } },
+                            { "filament_slot",
+                              { { "type", "integer" }, { "minimum", 1 }, { "description", "1-based slot, for filament settings." } } },
+                            { "toolhead",
+                              { { "type", "integer" },
+                                { "minimum", 1 },
+                                { "description", "1-based toolhead, for one entry of a per-toolhead printer setting." } } } } },
+                        { "required", { "key", "value" } } } } } } } },
+            { "required", { "reason", "changes" } } },
+          // The user has to read and confirm the changes.
+          10min },
     };
     return list;
+}
+
+// ---------------------------------------------------------------- prompts
+
+const char* INSTRUCTIONS =
+    "You are connected to Snapmaker Orca, the 3D printing slicer the user has open.\n"
+    "Workflow:\n"
+    "1. Call get_issues first. Fix errors (blocks_slicing=true) before anything else, then warnings, and only then "
+    "work on other improvements the user asked for.\n"
+    "2. For each issue, explain the cause in one or two sentences. Check the setting meaning, unit and limits with "
+    "describe_setting (often already included as setting_info) before choosing a value.\n"
+    "3. Fix settings with apply_changes; the user confirms in the slicer. Group the changes fixing one issue in a "
+    "single call with a clear reason. Do not change settings unrelated to the issues or the user's request.\n"
+    "4. Call get_issues again after each applied change to verify, and iterate.\n"
+    "Multi-material: check get_project.materials before recommending anything. On a multi-toolhead printer "
+    "(toolhead_layout=multi_toolhead, e.g. Snapmaker U1 with 4 toolheads) every filament slot has its own toolhead "
+    "and nozzle; a print commonly mixes materials with different temperatures and behaviours. Therefore:\n"
+    "- Always name the filament slot or toolhead (1-based) a recommendation is about.\n"
+    "- Filament settings belong to one slot: pass filament_slot to apply_changes. Changing a slot whose preset is "
+    "shared by other slots changes them too (see also_applies_to_slots). Only one filament preset can hold unsaved "
+    "edits: before changing another slot, ask the user to save the previous one.\n"
+    "- Per-toolhead printer settings (retraction, z hop, nozzle diameter...) are lists in toolhead order: pass "
+    "toolhead to change one entry.\n"
+    "- Process settings are shared by every filament: check that a new speed, layer height or cooling value suits "
+    "all the materials used on the plate (filament_slots[].used_on_plate), not only one.\n"
+    "- feature_filaments and the per-object filaments tell which slot prints walls, infill, supports and each "
+    "object (0 = the object's default filament). Mixed filaments are virtual IDs after the physical slots.\n"
+    "Issues fixed in the slicer UI rather than in settings (object placement, filament assignment to slots, plate "
+    "type) must be explained to the user step by step.";
+
+json prompt_message(const std::string& description, const std::string& text)
+{
+    return { { "description", description },
+             { "messages", json::array({ { { "role", "user" }, { "content", { { "type", "text" }, { "text", text } } } } }) } };
 }
 
 } // namespace
@@ -238,6 +263,8 @@ const std::vector<Tool>& tools()
 McpTools::McpTools() : m_cancelled(std::make_shared<std::atomic<bool>>(false)) {}
 
 void McpTools::cancel() { *m_cancelled = true; }
+
+std::string McpTools::instructions() const { return INSTRUCTIONS; }
 
 json McpTools::list_tools() const
 {
@@ -247,39 +274,95 @@ json McpTools::list_tools() const
     return out;
 }
 
+json McpTools::list_prompts() const
+{
+    return json::array(
+        { { { "name", "fix_issues" },
+            { "description", "Find the problems reported by the slicer and fix them, blocking errors first." } },
+          { { "name", "optimize_settings" },
+            { "description", "Fix the reported problems, then tune the settings for a goal." },
+            { "arguments",
+              json::array({ { { "name", "goal" },
+                              { "description", "e.g. faster print, stronger part, better surface finish" },
+                              { "required", true } } }) } } });
+}
+
+json McpTools::get_prompt(const std::string& name, const json& arguments)
+{
+    if (name == "fix_issues")
+        return prompt_message("Fix slicer issues",
+                              "Check my current slicer project with get_issues and fix the problems, blocking errors "
+                              "first, then warnings. For each one, explain the cause briefly and propose the fix with "
+                              "apply_changes. Verify with get_issues after each change.");
+    if (name == "optimize_settings") {
+        const std::string goal = arguments.value("goal", std::string());
+        if (goal.empty())
+            throw std::invalid_argument("Missing argument: goal");
+        return prompt_message("Optimize settings",
+                              "First check my slicer project with get_issues and fix any error. Then, using get_project "
+                              "and get_config, recommend setting changes for this goal: " +
+                                  goal +
+                                  ". Explain the trade-offs, and apply them with apply_changes once I agree.");
+    }
+    throw std::invalid_argument("Unknown prompt: " + name);
+}
+
 json McpTools::call_tool(const std::string& name, const json& arguments)
 {
     const auto it = std::find_if(tools().begin(), tools().end(), [&name](const Tool& t) { return name == t.name; });
     if (it == tools().end())
         throw std::invalid_argument("Unknown tool: " + name);
-    if (*m_cancelled || wxTheApp == nullptr)
-        throw std::runtime_error("The application is shutting down");
 
-    auto       promise = std::make_shared<std::promise<json>>();
-    auto       future  = promise->get_future();
-    const auto run     = it->run;
-    wxTheApp->CallAfter([promise, run, arguments, cancelled = m_cancelled]() {
-        if (*cancelled) {
-            promise->set_value(text_result("The application is shutting down", true));
-            return;
-        }
-        try {
-            promise->set_value(text_result(run(arguments).dump(2)));
-        } catch (const ToolError& e) {
-            promise->set_value(text_result(e.what(), true));
-        } catch (...) {
-            promise->set_exception(std::current_exception());
-        }
-    });
+    struct Outcome
+    {
+        json result;
+        bool retry { false };
+    };
 
-    const auto deadline = std::chrono::steady_clock::now() + GUI_CALL_TIMEOUT;
-    while (future.wait_for(std::chrono::milliseconds(100)) != std::future_status::ready) {
-        if (*m_cancelled)
+    constexpr auto RETRY_DELAY    = 250ms;
+    const auto     retry_deadline = std::chrono::steady_clock::now() + 5s;
+    for (;;) {
+        if (*m_cancelled || wxTheApp == nullptr)
             throw std::runtime_error("The application is shutting down");
-        if (std::chrono::steady_clock::now() > deadline)
-            throw std::runtime_error("The slicer did not answer in time (busy or showing a modal dialog?)");
+
+        auto promise   = std::make_shared<std::promise<Outcome>>();
+        auto future    = promise->get_future();
+        auto abandoned = std::make_shared<std::atomic<bool>>(false);
+        wxTheApp->CallAfter([promise, abandoned, run = it->run, arguments, cancelled = m_cancelled]() {
+            if (*cancelled || *abandoned) {
+                promise->set_value({ text_result("The request was abandoned", true) });
+                return;
+            }
+            try {
+                promise->set_value({ text_result(run(arguments, *abandoned).dump(2)) });
+            } catch (const ToolRetry&) {
+                promise->set_value({ json(), true });
+            } catch (const ToolError& e) {
+                promise->set_value({ text_result(e.what(), true) });
+            } catch (...) {
+                promise->set_exception(std::current_exception());
+            }
+        });
+
+        const auto deadline = std::chrono::steady_clock::now() + it->timeout;
+        while (future.wait_for(100ms) != std::future_status::ready) {
+            if (*m_cancelled) {
+                *abandoned = true;
+                throw std::runtime_error("The application is shutting down");
+            }
+            if (std::chrono::steady_clock::now() > deadline) {
+                *abandoned = true;
+                throw std::runtime_error("The slicer did not answer in time (busy or waiting for the user?)");
+            }
+        }
+
+        Outcome outcome = future.get();
+        if (!outcome.retry)
+            return outcome.result;
+        if (std::chrono::steady_clock::now() + RETRY_DELAY > retry_deadline)
+            return text_result(ToolRetry().what(), true);
+        std::this_thread::sleep_for(RETRY_DELAY);
     }
-    return future.get();
 }
 
 }} // namespace Slic3r::AIAssistant

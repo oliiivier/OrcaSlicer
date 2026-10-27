@@ -245,13 +245,15 @@ json McpServer::handle_message(const json& msg)
             const std::string requested = params.value("protocolVersion", "");
             const bool        supported = std::any_of(std::begin(SUPPORTED_PROTOCOLS), std::end(SUPPORTED_PROTOCOLS),
                                                       [&requested](const char* v) { return requested == v; });
-            return rpc_result(id, { { "protocolVersion", supported ? requested : LATEST_PROTOCOL },
-                                    { "capabilities", { { "tools", json::object() } } },
-                                    { "serverInfo", { { "name", "snapmaker-orca" }, { "version", "0.1.0" } } },
-                                    { "instructions",
-                                      "Tools to inspect the project and print settings currently open in Snapmaker Orca. "
-                                      "Use describe_setting to check the meaning, unit and limits of a setting before "
-                                      "recommending a value." } });
+            json capabilities = { { "tools", json::object() } };
+            if (!m_toolbox.list_prompts().empty())
+                capabilities["prompts"] = json::object();
+            json result = { { "protocolVersion", supported ? requested : LATEST_PROTOCOL },
+                            { "capabilities", std::move(capabilities) },
+                            { "serverInfo", { { "name", "snapmaker-orca" }, { "version", "0.2.0" } } } };
+            if (const std::string instructions = m_toolbox.instructions(); !instructions.empty())
+                result["instructions"] = instructions;
+            return rpc_result(id, std::move(result));
         }
         if (method == "ping")
             return rpc_result(id, json::object());
@@ -262,6 +264,14 @@ json McpServer::handle_message(const json& msg)
                 return rpc_error(id, INVALID_PARAMS, "Missing tool name");
             return rpc_result(id, m_toolbox.call_tool(params["name"].get<std::string>(),
                                                       params.value("arguments", json::object())));
+        }
+        if (method == "prompts/list")
+            return rpc_result(id, { { "prompts", m_toolbox.list_prompts() } });
+        if (method == "prompts/get") {
+            if (!params.contains("name") || !params["name"].is_string())
+                return rpc_error(id, INVALID_PARAMS, "Missing prompt name");
+            return rpc_result(id, m_toolbox.get_prompt(params["name"].get<std::string>(),
+                                                       params.value("arguments", json::object())));
         }
         return rpc_error(id, METHOD_NOT_FOUND, "Method not found: " + method);
     } catch (const std::invalid_argument& e) {

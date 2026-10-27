@@ -48,7 +48,7 @@ void append_menu_items(wxMenu* menu)
 
     menu->AppendSeparator();
     ::append_menu_item(
-        menu, wxID_ANY, _L("AI Assistant (MCP server)"), _L("Let Claude, Gemini or another MCP client read the project settings"),
+        menu, wxID_ANY, _L("AI Assistant (MCP server)"), _L("Let Claude, Gemini or another MCP client analyze and fix the print settings"),
         [](wxCommandEvent&) { show_settings(); }, "", nullptr,
         []() { return wxGetApp().plater() != nullptr && !wxGetApp().is_gcode_viewer(); });
 }

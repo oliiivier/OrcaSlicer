@@ -16,6 +16,9 @@ public:
 
     nlohmann::json list_tools() const override;
     nlohmann::json call_tool(const std::string& name, const nlohmann::json& arguments) override;
+    std::string    instructions() const override;
+    nlohmann::json list_prompts() const override;
+    nlohmann::json get_prompt(const std::string& name, const nlohmann::json& arguments) override;
 
     // Makes pending and future calls fail immediately. Call before stopping the
     // server from the GUI thread, otherwise the server thread may wait for a

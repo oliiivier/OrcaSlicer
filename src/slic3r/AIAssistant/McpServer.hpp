@@ -3,6 +3,7 @@
 #include <nlohmann/json.hpp>
 
 #include <memory>
+#include <stdexcept>
 #include <string>
 
 namespace Slic3r { namespace AIAssistant {
@@ -19,6 +20,16 @@ public:
     // MCP "tools/call" result: { content: [...], isError: bool }.
     // Throws std::invalid_argument for an unknown tool or invalid arguments.
     virtual nlohmann::json call_tool(const std::string& name, const nlohmann::json& arguments) = 0;
+
+    // Guidance sent to the client at initialization.
+    virtual std::string instructions() const { return {}; }
+
+    // MCP "prompts/list" entries and "prompts/get" result; no prompts by default.
+    virtual nlohmann::json list_prompts() const { return nlohmann::json::array(); }
+    virtual nlohmann::json get_prompt(const std::string& name, const nlohmann::json& /* arguments */)
+    {
+        throw std::invalid_argument("Unknown prompt: " + name);
+    }
 };
 
 // Minimal MCP server over the Streamable HTTP transport (single "/mcp" endpoint,

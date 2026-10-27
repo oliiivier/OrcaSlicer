@@ -53,7 +53,8 @@ McpDialog::McpDialog(wxWindow* parent)
     const McpSettings settings = McpSettings::load();
 
     auto* intro = new wxStaticText(this, wxID_ANY,
-                                   _L("Lets an AI assistant (Claude, Gemini...) read the open project and print settings. "
+                                   _L("Lets an AI assistant (Claude, Gemini...) analyze the open project, fix the problems reported by "
+                                      "the slicer and tune the print settings. Every change has to be confirmed here. "
                                       "The server only accepts connections from this computer."));
     intro->Wrap(FromDIP(560));
 

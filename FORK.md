@@ -62,12 +62,26 @@ dans Claude Code, Gemini CLI ou Claude Desktop. Le serveur écoute uniquement su
 | Fichier | Rôle |
 |---|---|
 | `McpServer` | Transport Streamable HTTP + JSON-RPC, indépendant de l'interface (testable seul) |
-| `McpTools` | Outils exposés, exécutés sur le thread de l'interface |
+| `McpTools` | Registre des outils et prompts, exécution sur le thread de l'interface |
+| `McpIssues` | Collecte des erreurs et avertissements du slicer (`get_issues`) |
+| `McpChanges` | Validation, confirmation et application des réglages (`apply_changes`) |
+| `McpMaterials` | Têtes, emplacements de filament, filaments mixtes, attribution par élément |
 | `McpService` | Cycle de vie du serveur (démarrage, arrêt à la fermeture) |
 | `McpSettings` | Section `[ai_assistant]` de la configuration de l'application |
 | `McpDialog` | Fenêtre de réglages |
 
-Outils disponibles : `get_project`, `get_config`, `describe_setting` (lecture seule).
+Outils : `get_issues`, `get_project`, `get_config`, `describe_setting`, `apply_changes`.
+Prompts (commandes slash dans Claude Code / Gemini CLI) : `fix_issues`, `optimize_settings`.
+
+Multi-têtes (Snapmaker U1, 4 têtes) : `get_project.materials` décrit les têtes et chaque emplacement
+(preset, type, couleur, température, tête, utilisé sur le plateau) ; les réglages par emplacement/tête sont
+renvoyés en tableaux ; `apply_changes` cible un emplacement (`filament_slot`) ou une tête (`toolhead`).
+Un seul preset de filament peut avoir des modifications non enregistrées à la fois : l'assistant doit
+faire enregistrer le précédent avant de passer à un autre emplacement.
+
+Les instructions envoyées au client imposent l'ordre : erreurs bloquantes, puis avertissements, puis
+optimisations. Toute modification passe par une confirmation dans le slicer ; les surcharges par objet
+s'annulent avec Ctrl+Z, les modifications de presets restent des éditions non enregistrées.
 
 ## Compilation
 
