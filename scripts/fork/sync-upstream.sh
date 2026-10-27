@@ -40,7 +40,7 @@ git fetch origin
 git switch "$FORK_BRANCH"
 
 # main is a pure mirror of upstream: it never carries fork commits.
-git branch -f main upstream/main
+git branch -f --no-track main upstream/main
 
 if ! git merge --ff-only "origin/$FORK_BRANCH" 2>/dev/null; then
     echo "Local $FORK_BRANCH has diverged from origin/$FORK_BRANCH, reconcile it first." >&2
