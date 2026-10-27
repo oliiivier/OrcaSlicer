@@ -8,9 +8,11 @@ class wxMenu;
 namespace Slic3r { namespace AIAssistant {
 
 // Appends the assistant entries to the given menu (called from MainFrame's help menu).
+// The first call also starts the MCP server when it is enabled, so that no other
+// hook in upstream code is needed.
 void append_menu_items(wxMenu* menu);
 
-// Opens (or raises) the assistant window.
-void show_assistant();
+// Opens the MCP server settings.
+void show_settings();
 
 }} // namespace Slic3r::AIAssistant

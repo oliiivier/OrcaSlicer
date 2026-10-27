@@ -1,7 +1,8 @@
 # Fork oliiivier/OrcaSlicer — Assistant IA
 
-Fork de [Snapmaker/OrcaSlicer](https://github.com/Snapmaker/OrcaSlicer) qui ajoute un assistant LLM capable
-d'analyser le projet et la configuration, de recommander des réglages et de les appliquer après confirmation.
+Fork de [Snapmaker/OrcaSlicer](https://github.com/Snapmaker/OrcaSlicer) qui intègre un serveur
+[MCP](https://modelcontextprotocol.io) : un assistant (Claude, Gemini…) peut analyser le projet et la configuration,
+recommander des réglages et, à terme, les appliquer après confirmation dans le slicer.
 Ce fork n'a pas vocation à être fusionné en amont : l'objectif est de pouvoir intégrer les mises à jour upstream
 avec un minimum de conflits.
 
@@ -17,7 +18,6 @@ avec un minimum de conflits.
 
 1. Tout le code du fork vit dans des dossiers qui n'existent pas upstream :
    - `src/slic3r/AIAssistant/` (C++ et `AIAssistant.cmake`)
-   - `resources/web/ai_assistant/` (interface web)
    - `scripts/fork/`
 2. Les fichiers upstream ne sont touchés qu'aux **points d'accroche** ci-dessous, toujours entourés de
    `#ifdef SNAPMAKER_AI_ASSISTANT // fork`. Si un nouveau point est nécessaire, l'ajouter à cette liste.
@@ -33,7 +33,7 @@ avec un minimum de conflits.
 Lister les écarts réels avec upstream (doit rester court) :
 
 ```bash
-git diff upstream/main...ai-assistant --stat -- . ':!src/slic3r/AIAssistant' ':!resources/web/ai_assistant' ':!scripts/fork' ':!FORK.md'
+git diff upstream/main...ai-assistant --stat -- . ':!src/slic3r/AIAssistant' ':!scripts/fork' ':!FORK.md'
 ```
 
 ## Synchronisation avec upstream
@@ -52,6 +52,22 @@ En cas de conflit, le script s'arrête en listant les fichiers concernés (norma
 d'accroche) : les résoudre, `git commit`, puis relancer le script.
 
 Réactiver Actions si besoin : `gh api -X PUT repos/oliiivier/OrcaSlicer/actions/permissions -F enabled=true`.
+
+## Serveur MCP
+
+Menu *Aide → AI Assistant (MCP server)* : activation, port (13700 par défaut), jeton, et configuration à copier
+dans Claude Code, Gemini CLI ou Claude Desktop. Le serveur écoute uniquement sur `127.0.0.1`, exige
+`Authorization: Bearer <jeton>` et refuse les requêtes venant d'un navigateur (en-têtes `Origin`/`Host`).
+
+| Fichier | Rôle |
+|---|---|
+| `McpServer` | Transport Streamable HTTP + JSON-RPC, indépendant de l'interface (testable seul) |
+| `McpTools` | Outils exposés, exécutés sur le thread de l'interface |
+| `McpService` | Cycle de vie du serveur (démarrage, arrêt à la fermeture) |
+| `McpSettings` | Section `[ai_assistant]` de la configuration de l'application |
+| `McpDialog` | Fenêtre de réglages |
+
+Outils disponibles : `get_project`, `get_config`, `describe_setting` (lecture seule).
 
 ## Compilation
 

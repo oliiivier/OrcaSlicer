@@ -1,0 +1,67 @@
+#include "McpSettings.hpp"
+
+#include "libslic3r/AppConfig.hpp"
+#include "slic3r/GUI/GUI_App.hpp"
+
+#include <openssl/rand.h>
+
+#include <stdexcept>
+
+namespace Slic3r { namespace AIAssistant {
+
+static const char* SECTION = "ai_assistant";
+
+McpSettings McpSettings::load()
+{
+    McpSettings s;
+    AppConfig*  cfg = GUI::wxGetApp().app_config;
+    if (cfg == nullptr)
+        return s;
+
+    std::string value;
+    if (cfg->get(SECTION, "mcp_enabled", value))
+        s.enabled = value == "1";
+    if (cfg->get(SECTION, "mcp_port", value) && !value.empty()) {
+        try {
+            const int port = std::stoi(value);
+            if (port > 1024 && port < 65536)
+                s.port = static_cast<unsigned short>(port);
+        } catch (const std::exception&) {}
+    }
+    cfg->get(SECTION, "mcp_token", s.token);
+
+    if (s.token.empty()) {
+        s.token = generate_token();
+        cfg->set(SECTION, "mcp_token", s.token);
+    }
+    return s;
+}
+
+void McpSettings::save() const
+{
+    AppConfig* cfg = GUI::wxGetApp().app_config;
+    if (cfg == nullptr)
+        return;
+
+    cfg->set(SECTION, "mcp_enabled", enabled ? "1" : "0");
+    cfg->set(SECTION, "mcp_port", std::to_string(port));
+    cfg->set(SECTION, "mcp_token", token);
+}
+
+std::string McpSettings::generate_token()
+{
+    unsigned char buf[32];
+    if (RAND_bytes(buf, sizeof(buf)) != 1)
+        throw std::runtime_error("Could not generate a random MCP token");
+
+    static const char hex[] = "0123456789abcdef";
+    std::string       token;
+    token.reserve(2 * sizeof(buf));
+    for (unsigned char c : buf) {
+        token += hex[c >> 4];
+        token += hex[c & 0xf];
+    }
+    return token;
+}
+
+}} // namespace Slic3r::AIAssistant

@@ -62,7 +62,7 @@ fi
 echo
 echo "Fork changes to upstream files (should stay limited to the hook points listed in FORK.md):"
 git diff --stat upstream/main...HEAD -- . \
-    ':!src/slic3r/AIAssistant' ':!resources/web/ai_assistant' ':!scripts/fork' ':!FORK.md'
+    ':!src/slic3r/AIAssistant' ':!scripts/fork' ':!FORK.md'
 
 if [ "$BUILD" = 1 ]; then
     ./build_linux.sh -s
