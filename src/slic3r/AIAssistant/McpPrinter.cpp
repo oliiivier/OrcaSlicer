@@ -191,7 +191,7 @@ std::string slot_value(const DynamicPrintConfig& config, const char* key, size_t
 std::set<int> used_slots(GUI::Plater& plater, size_t physical)
 {
     std::set<int> used;
-    const Print&  print = plater.fff_print();
+    const Print&  print = plater.get_partplate_list().get_current_fff_print();
     if (!print.empty()) {
         for (unsigned int e : print.extruders())
             used.insert(int(e) + 1);

@@ -159,7 +159,7 @@ json collect_issues()
         issues.push_back(make_issue("error", true, "build_volume",
                                     "An object is laid over the boundary of the plate or exceeds the height limit."));
 
-    Print& print = plater.fff_print();
+    Print& print = plater.get_partplate_list().get_current_fff_print();
     if (!print.empty()) {
         // Same call as BackgroundSlicingProcess::validate().
         print.is_BBL_printer() = wxGetApp().preset_bundle->is_bbl_vendor();

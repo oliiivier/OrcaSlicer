@@ -83,7 +83,7 @@ json describe_materials()
 
     // Filament slots used by the current plate, known once the print has been applied.
     std::set<unsigned int> used;
-    const Print&           print = plater.fff_print();
+    const Print&           print = plater.get_partplate_list().get_current_fff_print();
     if (!print.empty())
         for (unsigned int e : print.extruders())
             used.insert(e + 1);

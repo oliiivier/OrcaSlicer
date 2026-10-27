@@ -111,8 +111,8 @@ std::string check_range(const ConfigOptionDef& def, const ConfigOption& opt)
     std::vector<double> values;
     switch (def.type) {
     case coFloat:
-    case coInt:
     case coPercent: values.push_back(opt.getFloat()); break;
+    case coInt: values.push_back(opt.getInt()); break;
     case coFloats:
     case coPercents:
         if (const auto* vec = dynamic_cast<const ConfigOptionVector<double>*>(&opt))
@@ -127,7 +127,8 @@ std::string check_range(const ConfigOptionDef& def, const ConfigOption& opt)
 
     for (double v : values)
         if (v < def.min || v > def.max)
-            return "value " + std::to_string(v) + " is outside [" + std::to_string(def.min) + ", " + std::to_string(def.max) + "]";
+            // json::dump is locale independent, unlike std::to_string.
+            return "value " + json(v).dump() + " is outside [" + json(def.min).dump() + ", " + json(def.max).dump() + "]";
     return {};
 }
 

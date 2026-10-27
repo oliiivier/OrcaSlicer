@@ -29,7 +29,7 @@ json slice_results(GUI::Plater& plater)
 {
     GUI::PartPlate*             plate  = plater.get_partplate_list().get_curr_plate();
     const GCodeProcessorResult* result = plate->get_slice_result();
-    const Print&                print  = plater.fff_print();
+    const Print&                print  = plater.get_partplate_list().get_current_fff_print();
 
     json out = { { "sliced", true }, { "plate", plater.get_partplate_list().get_curr_plate_index() + 1 } };
     if (result != nullptr) {
