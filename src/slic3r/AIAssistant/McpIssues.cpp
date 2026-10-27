@@ -1,5 +1,6 @@
 #include "McpIssues.hpp"
 #include "McpDocs.hpp"
+#include "McpPrinter.hpp"
 #include "McpToolUtils.hpp"
 
 #include "libslic3r/Model.hpp"
@@ -172,6 +173,7 @@ json collect_issues()
 
     add_plate_blockers(plater, plate, issues);
     add_slicing_results(print, issues);
+    add_printer_issues(issues);
 
     std::stable_sort(issues.begin(), issues.end(), [](const json& a, const json& b) {
         return a["severity"] == "error" && b["severity"] != "error";

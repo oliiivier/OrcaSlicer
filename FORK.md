@@ -69,13 +69,18 @@ dans Claude Code, Gemini CLI ou Claude Desktop. Le serveur écoute uniquement su
 | `McpMaterials` | Têtes, emplacements de filament, filaments mixtes, attribution par élément |
 | `McpSlicing` | Slicing du plateau et résumé du résultat (`slice`) |
 | `McpRender` | Rendu PNG du plateau depuis une vue nommée (`render_view`) |
+| `McpPrinter` | Lecture seule de l'imprimante connectée (`get_printer_status`, écarts projet/imprimante) |
 | `McpDocs` | Documentation des réglages livrée avec l'application (`describe_setting`, `read_documentation`) |
 | `McpService` | Cycle de vie du serveur (démarrage, arrêt à la fermeture) |
 | `McpSettings` | Section `[ai_assistant]` de la configuration de l'application |
 | `McpDialog` | Fenêtre de réglages |
 
 Outils : `get_issues`, `get_project`, `get_config`, `describe_setting`, `read_documentation`, `apply_changes`,
-`slice`, `render_view`.
+`slice`, `render_view`, `get_printer_status`.
+
+Accès à l'imprimante : désactivé par défaut (case à cocher dans la fenêtre MCP), en lecture seule, via la
+connexion Snapmaker Connect déjà ouverte par l'application (`query.device.objects`). Numéros de série, réseau,
+comptes et secrets sont retirés avant envoi au modèle. Aucune commande n'est jamais envoyée à l'imprimante.
 
 La documentation vient de `doc/` (wiki OrcaSlicer) : `scripts/fork/build-setting-docs.py` relie chaque réglage
 à sa section grâce aux liens d'aide de `Tab.cpp` et produit `resources/ai_assistant/setting_docs.json`, livré

@@ -29,6 +29,8 @@ McpSettings McpSettings::load()
         } catch (const std::exception&) {}
     }
     cfg->get(SECTION, "mcp_token", s.token);
+    if (cfg->get(SECTION, "mcp_printer_access", value))
+        s.printer_access = value == "1";
 
     if (s.token.empty()) {
         s.token = generate_token();
@@ -46,6 +48,7 @@ void McpSettings::save() const
     cfg->set(SECTION, "mcp_enabled", enabled ? "1" : "0");
     cfg->set(SECTION, "mcp_port", std::to_string(port));
     cfg->set(SECTION, "mcp_token", token);
+    cfg->set(SECTION, "mcp_printer_access", printer_access ? "1" : "0");
 }
 
 std::string McpSettings::generate_token()

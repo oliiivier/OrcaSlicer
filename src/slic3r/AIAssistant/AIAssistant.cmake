@@ -19,6 +19,8 @@ if (SNAPMAKER_AI_ASSISTANT)
         ${_ai_dir}/McpIssues.hpp
         ${_ai_dir}/McpMaterials.cpp
         ${_ai_dir}/McpMaterials.hpp
+        ${_ai_dir}/McpPrinter.cpp
+        ${_ai_dir}/McpPrinter.hpp
         ${_ai_dir}/McpRender.cpp
         ${_ai_dir}/McpRender.hpp
         ${_ai_dir}/McpServer.cpp

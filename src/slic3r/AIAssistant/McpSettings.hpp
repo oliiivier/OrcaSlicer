@@ -14,6 +14,8 @@ struct McpSettings
     unsigned short port { DEFAULT_PORT };
     // Bearer token required from MCP clients. Generated on first load.
     std::string    token;
+    // Lets the tools read the state of the connected printer (never control it).
+    bool           printer_access { false };
 
     static McpSettings load();
     void               save() const;

@@ -60,6 +60,9 @@ McpDialog::McpDialog(wxWindow* parent)
 
     m_enabled = new wxCheckBox(this, wxID_ANY, _L("Enable MCP server"));
     m_enabled->SetValue(settings.enabled);
+    m_printer_access = new wxCheckBox(this, wxID_ANY, _L("Allow reading the state of the connected printer (loaded filaments, "
+                                                         "nozzles, print status and errors). The printer is never controlled."));
+    m_printer_access->SetValue(settings.printer_access);
 
     m_port = new wxSpinCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, wxDefaultSize, wxSP_ARROW_KEYS, 1025, 65535,
                             settings.port);
@@ -85,6 +88,7 @@ McpDialog::McpDialog(wxWindow* parent)
     auto* sizer = new wxBoxSizer(wxVERTICAL);
     sizer->Add(intro, 0, wxALL, FromDIP(10));
     sizer->Add(m_enabled, 0, wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(10));
+    sizer->Add(m_printer_access, 0, wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(10));
     sizer->Add(grid, 0, wxEXPAND | wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(10));
     sizer->Add(m_status, 0, wxLEFT | wxRIGHT | wxBOTTOM, FromDIP(10));
     sizer->Add(new wxStaticText(this, wxID_ANY, _L("Client configuration")), 0, wxLEFT | wxRIGHT, FromDIP(10));
@@ -98,6 +102,12 @@ McpDialog::McpDialog(wxWindow* parent)
     SetEscapeId(wxID_CLOSE);
 
     m_enabled->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent&) { apply_and_refresh(); });
+    // Read by the tools at each call: no server restart needed.
+    m_printer_access->Bind(wxEVT_CHECKBOX, [this](wxCommandEvent&) {
+        McpSettings s    = McpSettings::load();
+        s.printer_access = m_printer_access->GetValue();
+        s.save();
+    });
     m_port->Bind(wxEVT_SPINCTRL, [this](wxCommandEvent&) { apply_and_refresh(); });
     regenerate->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) {
         m_token->SetValue(from_u8(McpSettings::generate_token()));

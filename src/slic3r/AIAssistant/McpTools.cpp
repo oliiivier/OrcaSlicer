@@ -3,6 +3,7 @@
 #include "McpDocs.hpp"
 #include "McpIssues.hpp"
 #include "McpMaterials.hpp"
+#include "McpPrinter.hpp"
 #include "McpRender.hpp"
 #include "McpSlicing.hpp"
 #include "McpToolUtils.hpp"
@@ -243,6 +244,19 @@ const std::vector<Tool>& tools()
             { "required", { "reason", "changes" } } },
           // The user has to read and confirm the changes.
           10min },
+        { "get_printer_status",
+          "Read-only state of the printer connected in the slicer (if the user allowed it): filament loaded, type, "
+          "color and nozzle of each toolhead, print state and progress, last firmware error, temperatures, and the "
+          "names of the firmware objects. Pass 'objects' to read some of them in full (e.g. sensors) for diagnosis. "
+          "The printer cannot be controlled through this server.",
+          read_only(&printer_status),
+          { { "type", "object" },
+            { "properties",
+              { { "objects",
+                  { { "type", "array" },
+                    { "items", { { "type", "string" } } },
+                    { "description", "Firmware object names from available_objects." } } } } } },
+          60s },
         { "read_documentation",
           "Official user documentation bundled with this slicer version (settings, calibration guides, multi-material, "
           "printer features). Without arguments lists the pages; with 'page' (and optionally 'section', an anchor from "
@@ -308,6 +322,10 @@ const char* INSTRUCTIONS =
     "object (0 = the object's default filament). Mixed filaments are virtual IDs after the physical slots.\n"
     "Issues fixed in the slicer UI rather than in settings (object placement, filament assignment to slots, plate "
     "type) must be explained to the user step by step.\n"
+    "Printer: get_printer_status reads the connected printer when the user allowed it; get_issues then also reports "
+    "differences between the project and the printer (missing filament, other material or nozzle on a used "
+    "toolhead). After a failed print, start from last_error and the print state, then inspect the related firmware "
+    "objects. You cannot start, stop or control a print, heat or move the printer: tell the user what to do.\n"
     "When the user describes a visual problem (missing supports, stringing, wrong colors...), use render_view to "
     "look at the model from the relevant side and slice to get the supports and per-feature results; the user may "
     "also paste a screenshot of the preview. Slice again after changes to confirm the fix.";

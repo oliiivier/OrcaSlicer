@@ -22,6 +22,7 @@ private:
     void refresh();
 
     wxCheckBox*   m_enabled { nullptr };
+    wxCheckBox*   m_printer_access { nullptr };
     wxSpinCtrl*   m_port { nullptr };
     wxTextCtrl*   m_token { nullptr };
     wxStaticText* m_status { nullptr };
