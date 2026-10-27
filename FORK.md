@@ -11,7 +11,6 @@ avec un minimum de conflits.
 |----------------------|-----------------------------------------------------------------------|
 | `main`               | Miroir exact de `upstream/main`. **Aucun commit du fork dessus.**     |
 | `ai-assistant`       | Branche par défaut du fork : upstream + fonctionnalités du fork.      |
-| `sync/upstream-*`    | Branches temporaires créées par le workflow de synchronisation.       |
 | `feat/*`             | Développement des fonctionnalités, PR vers `ai-assistant`.            |
 
 ## Règles pour limiter les conflits
@@ -19,10 +18,10 @@ avec un minimum de conflits.
 1. Tout le code du fork vit dans des dossiers qui n'existent pas upstream :
    - `src/slic3r/AIAssistant/` (C++ et `AIAssistant.cmake`)
    - `resources/web/ai_assistant/` (interface web)
-   - `.github/workflows/fork-*.yml`
+   - `scripts/fork/`
 2. Les fichiers upstream ne sont touchés qu'aux **points d'accroche** ci-dessous, toujours entourés de
    `#ifdef SNAPMAKER_AI_ASSISTANT // fork`. Si un nouveau point est nécessaire, l'ajouter à cette liste.
-3. Toujours intégrer upstream par **merge** (jamais de rebase de `ai-assistant`, jamais de squash des PR de sync).
+3. Toujours intégrer upstream par **merge** (jamais de rebase de `ai-assistant`, jamais de squash des fusions upstream).
 
 ### Points d'accroche dans le code upstream
 
@@ -34,32 +33,25 @@ avec un minimum de conflits.
 Lister les écarts réels avec upstream (doit rester court) :
 
 ```bash
-git diff upstream/main...ai-assistant --stat -- . ':!src/slic3r/AIAssistant' ':!resources/web/ai_assistant' ':!.github/workflows/fork-*' ':!FORK.md'
+git diff upstream/main...ai-assistant --stat -- . ':!src/slic3r/AIAssistant' ':!resources/web/ai_assistant' ':!scripts/fork' ':!FORK.md'
 ```
 
 ## Synchronisation avec upstream
 
-### Automatique
-
-`.github/workflows/fork-sync-upstream.yml` tourne chaque lundi (et à la demande depuis l'onglet Actions) :
-- remet `main` à l'identique de `upstream/main` ;
-- fusionne upstream dans une branche `sync/upstream-AAAAMMJJ` et ouvre une PR vers `ai-assistant` ;
-- en cas de conflit, ouvre une issue listant les fichiers concernés.
-
-Configuration requise sur GitHub :
-- `ai-assistant` comme branche par défaut (les workflows planifiés ne tournent que depuis la branche par défaut) ;
-- un secret `FORK_SYNC_TOKEN` : PAT fine-grained sur ce dépôt avec les droits *Contents*, *Pull requests*,
-  *Issues* et *Workflows* en écriture.
-
-### Manuelle
+GitHub Actions est **désactivé** sur ce fork (réglage du dépôt, pas une modification de fichier) :
+les workflows hérités d'upstream (`.github/workflows/`) restent dans l'arbre, intacts, mais ne tournent pas,
+y compris ceux qu'upstream ajoutera plus tard. La synchronisation et la compilation se font en local :
 
 ```bash
-git fetch upstream
-git switch main && git merge --ff-only upstream/main && git push origin main
-git switch ai-assistant && git merge upstream/main
-# résoudre les conflits éventuels (normalement limités aux points d'accroche), compiler, puis
-git push origin ai-assistant
+scripts/fork/sync-upstream.sh        # fusionne upstream/main dans ai-assistant et remet main sur upstream/main
+scripts/fork/sync-upstream.sh -b     # idem puis compile (dépendances déjà compilées)
+scripts/fork/sync-upstream.sh -b -p  # idem puis pousse main et ai-assistant sur origin
 ```
+
+En cas de conflit, le script s'arrête en listant les fichiers concernés (normalement seulement les points
+d'accroche) : les résoudre, `git commit`, puis relancer le script.
+
+Réactiver Actions si besoin : `gh api -X PUT repos/oliiivier/OrcaSlicer/actions/permissions -F enabled=true`.
 
 ## Compilation
 
