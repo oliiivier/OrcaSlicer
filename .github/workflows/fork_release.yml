@@ -1,0 +1,86 @@
+# Fork-only (see FORK.md): builds the slicer for Linux, Windows and macOS with the upstream
+# build workflows, then publishes the packages as a pre-release of this fork. Started by
+# hand only: Actions -> Fork release -> Run workflow, or `gh workflow run fork_release.yml`.
+name: Fork release
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag, e.g. v2.4.1-ai.1'
+        required: true
+        type: string
+
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.tag }}
+  cancel-in-progress: false
+
+jobs:
+  build:
+    name: Build
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-24.04
+          - os: windows-2022
+          - os: macos-15
+            arch: arm64
+    uses: ./.github/workflows/build_check_cache.yml
+    with:
+      os: ${{ matrix.os }}
+      arch: ${{ matrix.arch }}
+      build-deps-only: false
+    secrets: inherit
+
+  release:
+    name: Publish the pre-release
+    needs: [build]
+    # The upstream workflows end with a Sentry upload that fails without its secrets:
+    # publish whatever packages were built.
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-24.04
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Download the packages
+        uses: actions/download-artifact@v4
+        with:
+          pattern: Snapmaker_Orca_{Linux,Mac,Windows}*
+          path: packages
+
+      - name: Collect the release assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets
+          shopt -s nullglob
+          for dir in packages/*/; do
+            name=$(basename "$dir")
+            if [[ "$name" == *_portable ]]; then
+              (cd "$dir" && zip -qr "$GITHUB_WORKSPACE/assets/$name.zip" .)
+            else
+              cp "$dir"* assets/
+            fi
+          done
+          ls -l assets
+          if [ -z "$(ls -A assets)" ]; then
+            echo "No package was built" >&2
+            exit 1
+          fi
+
+      - name: Create the pre-release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if gh release view "$TAG" >/dev/null 2>&1; then
+            gh release upload "$TAG" assets/* --clobber
+          else
+            gh release create "$TAG" assets/* --prerelease --target "$GITHUB_SHA" \
+              --title "Snapmaker Orca + assistant IA $TAG" --notes-file scripts/fork/release-notes.md
+          fi

@@ -20,6 +20,7 @@ avec un minimum de conflits.
    - `src/slic3r/AIAssistant/` (C++ et `AIAssistant.cmake`)
    - `resources/ai_assistant/` (documentation générée pour le serveur MCP)
    - `resources/web/ai_assistant/` (page du chat) et `resources/images/topbar_claude.svg`
+   - `.github/workflows/fork_release.yml` (builds de la release du fork)
    - `scripts/fork/`
 2. Les fichiers upstream ne sont touchés qu'aux **points d'accroche** ci-dessous, toujours entourés de
    `#ifdef SNAPMAKER_AI_ASSISTANT // fork`. Si un nouveau point est nécessaire, l'ajouter à cette liste.
@@ -39,7 +40,8 @@ Lister les écarts réels avec upstream (doit rester court) :
 
 ```bash
 git diff upstream/main...ai-assistant --stat -- . ':!src/slic3r/AIAssistant' ':!resources/ai_assistant' \
-    ':!resources/web/ai_assistant' ':!resources/images/topbar_claude.svg' ':!scripts/fork' ':!FORK.md'
+    ':!resources/web/ai_assistant' ':!resources/images/topbar_claude.svg' ':!scripts/fork' ':!FORK.md' \
+    ':!.github/workflows/fork_release.yml'
 ```
 
 ## Synchronisation avec upstream
@@ -58,6 +60,20 @@ En cas de conflit, le script s'arrête en listant les fichiers concernés (norma
 d'accroche) : les résoudre, `git commit`, puis relancer le script.
 
 Réactiver Actions si besoin : `gh api -X PUT repos/oliiivier/OrcaSlicer/actions/permissions -F enabled=true`.
+
+## Release (builds Linux, Windows, macOS)
+
+```bash
+scripts/fork/release.sh v2.4.1-ai.1   # publie la tête poussée de ai-assistant en pré-release
+```
+
+Le script active Actions le temps de la release seulement : il désactive tous les workflows sauf
+`fork_release.yml` (y compris ceux qu'upstream a ajoutés depuis), lance celui-ci, attend la fin (plusieurs
+heures : les dépendances sont recompilées, le fork n'a pas de cache) puis désactive Actions. `fork_release.yml`
+réutilise les workflows de build d'upstream, qui ne publient rien hors de leur `main`, et attache AppImage,
+installeur et zip Windows, DMG macOS à la pré-release, avec `scripts/fork/release-notes.md` pour texte. Les
+paquets ne sont pas signés (pas de certificat dans le fork) et la publication des symboles Sentry échoue sans
+ses secrets, sans bloquer la release.
 
 ## Serveur MCP
 
