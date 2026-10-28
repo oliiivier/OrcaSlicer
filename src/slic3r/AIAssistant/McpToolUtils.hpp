@@ -39,5 +39,8 @@ nlohmann::json setting_summary(const ConfigOptionDef& def);
 // a JSON array (slot or toolhead order) instead of a comma-separated string.
 nlohmann::json option_value(const ConfigOption& opt);
 
+// Base64 of binary data, for the image content of MCP tool results.
+std::string base64(const void* data, size_t size);
+
 } // namespace AIAssistant
 } // namespace Slic3r

@@ -5,6 +5,8 @@
 #include "McpIssues.hpp"
 #include "McpMaterials.hpp"
 #include "McpPrinter.hpp"
+#include "McpPrinterControl.hpp"
+#include "McpPrinterLive.hpp"
 #include "McpRender.hpp"
 #include "McpSlicing.hpp"
 #include "McpToolUtils.hpp"
@@ -177,6 +179,9 @@ struct Tool
     std::chrono::milliseconds timeout;
     // Time during which a call answering ToolRetry is repeated.
     std::chrono::milliseconds retry_for { 5s };
+    // Run on the GUI thread with the retry state when the calls stop before the
+    // tool returned (retry window over, slicer busy, shutdown).
+    std::function<void(json& state)> abandon {};
 };
 
 const std::vector<Tool>& tools()
@@ -249,7 +254,7 @@ const std::vector<Tool>& tools()
           "Read-only state of the printer connected in the slicer (if the user allowed it): filament loaded, type, "
           "color and nozzle of each toolhead, print state and progress, last firmware error, temperatures, and the "
           "names of the firmware objects. Pass 'objects' to read some of them in full (e.g. sensors) for diagnosis. "
-          "The printer cannot be controlled through this server.",
+          "Never changes anything on the printer.",
           simple(&printer_status),
           { { "type", "object" },
             { "properties",
@@ -314,6 +319,44 @@ const std::vector<Tool>& tools()
           { { "type", "object" }, { "properties", json::object() } },
           60s,
           10min },
+        { "printer_snapshot",
+          "Picture from the camera of the connected printer, taken now (if the user allowed printer access): check "
+          "the first layer, a failure (spaghetti, detached part, blob) or what the user describes. Changes "
+          "nothing on the printer.",
+          [](const json& args, ToolContext&) { return json { { MCP_CONTENT, printer_snapshot(args) } }; },
+          { { "type", "object" }, { "properties", json::object() } },
+          30s },
+        { "watch_print",
+          "Waits until the print state changes (until=state_change, e.g. printing -> paused or error), the print ends "
+          "(until=end) or a new layer starts (until=layer), at most timeout_s seconds, then reports the state, layer, "
+          "progress and any firmware error. Use it to follow a print without polling. Other tools wait meanwhile, so "
+          "keep timeout_s short when the user is waiting.",
+          [](const json& args, ToolContext& ctx) { return watch_print(args, ctx.state); },
+          { { "type", "object" },
+            { "properties",
+              { { "until", { { "type", "string" }, { "enum", { "state_change", "end", "layer" } }, { "default", "state_change" } } },
+                { "timeout_s", { { "type", "integer" }, { "minimum", 10 }, { "maximum", 600 }, { "default", 120 } } } } } },
+          30s,
+          11min },
+        { "unload_filament",
+          "Unloads the filament of printer toolheads, like the unload button of the printer screen: the printer heats "
+          "each nozzle, retracts the filament and turns the heaters off at the end. Needs the 'printer control' "
+          "permission, an idle printer (refused while printing or paused) and the user's confirmation in the slicer. "
+          "Empty toolheads and soft filaments (TPU) are skipped. Takes about 1.5 minutes per toolhead; reports each "
+          "toolhead as unloaded, skipped or failed. Call get_printer_status first to see what is loaded.",
+          [](const json& args, ToolContext& ctx) { return unload_filament(args, ctx.abandoned, ctx.state); },
+          { { "type", "object" },
+            { "properties",
+              { { "toolheads",
+                  { { "type", "array" },
+                    { "items", { { "type", "integer" }, { "minimum", 1 } } },
+                    { "minItems", 1 },
+                    { "description", "Toolheads to unload, numbered from 1 as on the printer" } } },
+                { "reason", { { "type", "string" }, { "description", "Why, shown to the user in the confirmation" } } } } },
+            { "required", { "toolheads" } } },
+          10min,
+          30min,
+          &unload_filament_abandoned },
         { "render_view",
           "PNG image of the objects of the current plate seen from a viewpoint, colored by filament, with a legend. "
           "Shows the model, not the supports or toolpaths: use it to check orientation, overhangs, placement and "
@@ -363,7 +406,8 @@ const char* INSTRUCTIONS =
     "Printer: get_printer_status reads the connected printer when the user allowed it; get_issues then also reports "
     "differences between the project and the printer (missing filament, other material or nozzle on a used "
     "toolhead). After a failed print, start from last_error and the print state, then inspect the related firmware "
-    "objects. You cannot start, stop or control a print, heat or move the printer: tell the user what to do.\n"
+    "objects, and printer_snapshot to see it. watch_print follows a running print. The only command you can send is unload_filament, when the user allowed printer control; you cannot "
+    "start, stop or control a print, or heat or move the printer otherwise: tell the user what to do.\n"
     "Experience: before diagnosing, search_experiences for similar cases and read_documentation for guides of kind "
     "'experience' (reviewed lessons from real prints). Say where each recommendation comes from: official "
     "documentation, reviewed guide, or an unreviewed past case of the journal. At the end of a diagnosis, offer to "
@@ -510,14 +554,23 @@ json McpTools::call_tool(const std::string& name, const json& arguments)
             }
         });
 
+        // Lets a tool undo a sequence it started, once no further call will come. The
+        // state is only touched on the GUI thread, where a pending call may still run.
+        const auto give_up = [&]() {
+            if (it->abandon && wxTheApp != nullptr)
+                wxTheApp->CallAfter([abandon = it->abandon, state]() { abandon(*state); });
+        };
+
         const auto deadline = std::chrono::steady_clock::now() + it->timeout;
         while (future.wait_for(100ms) != std::future_status::ready) {
             if (*m_cancelled) {
                 *abandoned = true;
+                give_up();
                 throw std::runtime_error("The application is shutting down");
             }
             if (std::chrono::steady_clock::now() > deadline) {
                 *abandoned = true;
+                give_up();
                 throw std::runtime_error("The slicer did not answer in time (busy or waiting for the user?)");
             }
         }
@@ -525,8 +578,10 @@ json McpTools::call_tool(const std::string& name, const json& arguments)
         Outcome outcome = future.get();
         if (!outcome.retry)
             return outcome.result;
-        if (std::chrono::steady_clock::now() + RETRY_DELAY > retry_deadline)
+        if (std::chrono::steady_clock::now() + RETRY_DELAY > retry_deadline) {
+            give_up();
             return text_result(ToolRetry().what(), true);
+        }
         std::this_thread::sleep_for(RETRY_DELAY);
     }
 }

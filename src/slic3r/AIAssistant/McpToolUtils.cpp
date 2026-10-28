@@ -5,6 +5,8 @@
 #include "slic3r/GUI/GUI_App.hpp"
 #include "slic3r/GUI/Plater.hpp"
 
+#include <boost/beast/core/detail/base64.hpp>
+
 #include <climits>
 
 namespace Slic3r { namespace AIAssistant {
@@ -98,6 +100,14 @@ json option_value(const ConfigOption& opt)
     if (const auto* vec = dynamic_cast<const ConfigOptionVectorBase*>(&opt))
         return vec->vserialize();
     return opt.serialize();
+}
+
+std::string base64(const void* data, size_t size)
+{
+    namespace b64 = boost::beast::detail::base64;
+    std::string out(b64::encoded_size(size), '\0');
+    out.resize(b64::encode(out.data(), data, size));
+    return out;
 }
 
 }} // namespace Slic3r::AIAssistant

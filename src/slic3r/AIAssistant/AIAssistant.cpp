@@ -2,6 +2,7 @@
 #include "McpDialog.hpp"
 #include "McpService.hpp"
 #include "McpSettings.hpp"
+#include "PrinterAutoConnect.hpp"
 
 #include "slic3r/GUI/GUI_App.hpp"
 #include "slic3r/GUI/I18N.hpp"
@@ -34,6 +35,8 @@ static void init_once()
                 McpService::shutdown();
             evt.Skip();
         });
+
+        start_printer_auto_connect();
 
         const McpSettings settings = McpSettings::load();
         std::string       error;

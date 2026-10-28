@@ -10,7 +10,6 @@
 #include "slic3r/GUI/PartPlate.hpp"
 #include "slic3r/GUI/Plater.hpp"
 
-#include <boost/beast/core/detail/base64.hpp>
 
 #include <algorithm>
 #include <utility>
@@ -34,14 +33,6 @@ ThumbnailView parse_view(const std::string& name)
         if (name == view_name)
             return view;
     throw ToolError("unknown view '" + name + "'");
-}
-
-std::string base64(const void* data, size_t size)
-{
-    namespace b64 = boost::beast::detail::base64;
-    std::string out(b64::encoded_size(size), '\0');
-    out.resize(b64::encode(out.data(), data, size));
-    return out;
 }
 
 } // namespace

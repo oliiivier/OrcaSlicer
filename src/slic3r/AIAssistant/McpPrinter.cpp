@@ -270,6 +270,19 @@ json printer_status(const json& args)
     return out;
 }
 
+json printer_objects(std::string& reason)
+{
+    const auto result = query_objects(reason, false);
+    if (!result)
+        return nullptr;
+    const auto objects = Gateway::parse_device_object_query_result(*result);
+    if (!objects) {
+        reason = "unexpected answer from the printer";
+        return nullptr;
+    }
+    return *objects;
+}
+
 void add_printer_issues(json& issues)
 {
     std::string reason;

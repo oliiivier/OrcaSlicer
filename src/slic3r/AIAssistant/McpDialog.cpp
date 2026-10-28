@@ -73,6 +73,8 @@ wxSizer* checkbox_row(wxWindow* parent, ::CheckBox* checkbox, const wxString& te
     auto* title = label(parent, text);
     title->Wrap(wrap);
     title->Bind(wxEVT_LEFT_DOWN, [checkbox](wxMouseEvent&) {
+        if (!checkbox->IsEnabled())
+            return;
         checkbox->SetValue(!checkbox->GetValue());
         wxCommandEvent evt(wxEVT_TOGGLEBUTTON, checkbox->GetId());
         evt.SetEventObject(checkbox);
@@ -115,6 +117,11 @@ McpDialog::McpDialog(wxWindow* parent)
     m_enabled->SetValue(settings.enabled);
     m_printer_access = new ::CheckBox(this);
     m_printer_access->SetValue(settings.printer_access);
+    m_printer_control = new ::CheckBox(this);
+    m_printer_control->SetValue(settings.printer_access && settings.printer_control);
+    m_printer_control->Enable(settings.printer_access);
+    m_auto_connect = new ::CheckBox(this);
+    m_auto_connect->SetValue(settings.auto_connect_printer);
 
     m_port = new SpinInput(this, wxEmptyString, wxEmptyString, wxDefaultPosition, wxSize(FromDIP(120), -1), wxSP_ARROW_KEYS, 1025,
                            65535, settings.port);
@@ -147,6 +154,14 @@ McpDialog::McpDialog(wxWindow* parent)
                                "errors). The printer is never controlled."),
                             wrap),
                0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(8));
+    sizer->Add(checkbox_row(this, m_printer_control,
+                            _L("Allow unloading filament from the toolheads. Each request has to be confirmed here, and it is "
+                               "refused while a print is running."),
+                            wrap),
+               0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(8));
+    sizer->Add(checkbox_row(this, m_auto_connect,
+                            _L("At startup, connect to the printer when it is the only one available."), wrap),
+               0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(8));
     sizer->Add(grid, 0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, margin);
     sizer->Add(label(this, _L("Client configuration"), Label::Head_14), 0, wxLEFT | wxRIGHT | wxTOP, margin);
     sizer->Add(m_instructions, 1, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(8));
@@ -161,6 +176,24 @@ McpDialog::McpDialog(wxWindow* parent)
     m_printer_access->Bind(wxEVT_TOGGLEBUTTON, [this](wxCommandEvent& e) {
         McpSettings s    = McpSettings::load();
         s.printer_access = m_printer_access->GetValue();
+        // Control needs the printer state (idle, loaded toolheads): it goes with read access.
+        if (!s.printer_access) {
+            s.printer_control = false;
+            m_printer_control->SetValue(false);
+        }
+        m_printer_control->Enable(s.printer_access);
+        s.save();
+        e.Skip();
+    });
+    m_printer_control->Bind(wxEVT_TOGGLEBUTTON, [this](wxCommandEvent& e) {
+        McpSettings s     = McpSettings::load();
+        s.printer_control = m_printer_control->GetValue();
+        s.save();
+        e.Skip();
+    });
+    m_auto_connect->Bind(wxEVT_TOGGLEBUTTON, [this](wxCommandEvent& e) {
+        McpSettings s          = McpSettings::load();
+        s.auto_connect_printer = m_auto_connect->GetValue();
         s.save();
         e.Skip();
     });

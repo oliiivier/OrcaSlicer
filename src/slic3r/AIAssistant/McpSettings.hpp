@@ -16,6 +16,11 @@ struct McpSettings
     std::string    token;
     // Lets the tools read the state of the connected printer (never control it).
     bool           printer_access { false };
+    // Lets the tools send the few commands they support (e.g. unload filament),
+    // each one confirmed by the user. Requires printer_access.
+    bool           printer_control { false };
+    // At startup, connects to the printer when it is the only one online.
+    bool           auto_connect_printer { true };
 
     static McpSettings load();
     void               save() const;

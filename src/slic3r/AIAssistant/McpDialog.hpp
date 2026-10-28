@@ -28,6 +28,8 @@ private:
 
     ::CheckBox*   m_enabled { nullptr };
     ::CheckBox*   m_printer_access { nullptr };
+    ::CheckBox*   m_printer_control { nullptr };
+    ::CheckBox*   m_auto_connect { nullptr };
     SpinInput*    m_port { nullptr };
     TextInput*    m_token { nullptr };
     wxStaticText* m_status_dot { nullptr };

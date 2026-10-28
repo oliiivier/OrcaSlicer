@@ -70,6 +70,9 @@ dans Claude Code, Gemini CLI ou Claude Desktop. Le serveur écoute uniquement su
 | `McpSlicing` | Slicing du plateau et résumé du résultat (`slice`) |
 | `McpRender` | Rendu PNG du plateau depuis une vue nommée (`render_view`) |
 | `McpPrinter` | Lecture seule de l'imprimante connectée (`get_printer_status`, écarts projet/imprimante) |
+| `McpPrinterLive` | Lecture en direct (`printer.objects.query`), photo de la caméra (`printer_snapshot`), suivi d'impression (`watch_print`) |
+| `McpPrinterControl` | Seule commande envoyée à l'imprimante : déchargement des têtes (`unload_filament`) |
+| `PrinterAutoConnect` | Connexion automatique au démarrage quand une seule imprimante est en ligne |
 | `McpExperiences` | Journal local des retours d'expérience (`record_experience`, `report_outcome`, `search_experiences`) |
 | `McpDocs` | Documentation des réglages livrée avec l'application (`describe_setting`, `read_documentation`) |
 | `McpService` | Cycle de vie du serveur (démarrage, arrêt à la fermeture) |
@@ -77,11 +80,30 @@ dans Claude Code, Gemini CLI ou Claude Desktop. Le serveur écoute uniquement su
 | `McpDialog` | Fenêtre de réglages |
 
 Outils : `get_issues`, `get_project`, `get_config`, `describe_setting`, `read_documentation`, `apply_changes`,
-`slice`, `render_view`, `get_printer_status`, `record_experience`, `report_outcome`, `search_experiences`.
+`slice`, `render_view`, `get_printer_status`, `printer_snapshot`, `watch_print`, `unload_filament`,
+`record_experience`, `report_outcome`, `search_experiences`.
 
-Accès à l'imprimante : désactivé par défaut (case à cocher dans la fenêtre MCP), en lecture seule, via la
-connexion Snapmaker Connect déjà ouverte par l'application (`query.device.objects`). Numéros de série, réseau,
-comptes et secrets sont retirés avant envoi au modèle. Aucune commande n'est jamais envoyée à l'imprimante.
+Connexion automatique (case dans la fenêtre MCP, activée par défaut) : au démarrage, pendant 2 minutes, si
+aucune imprimante n'est connectée et qu'une seule est en ligne (`query.device.list`), le slicer s'y connecte
+(`action.device.connect`, comme l'onglet Appareil). Une seule tentative ; jamais si plusieurs sont en ligne.
+
+`apply_changes` refuse `post_process` (scripts exécutés sur l'ordinateur à l'export du G-code), même confirmé.
+
+Accès à l'imprimante, via la connexion Snapmaker Connect déjà ouverte par l'application ; deux cases à cocher
+dans la fenêtre MCP, désactivées par défaut :
+
+- **Lecture** : état (`query.device.objects`, ou `printer.objects.query` pour ce qui change vite), photo de
+  la caméra (URL de capture de la webcam déclarée à Moonraker, `server.webcams.list`, en général
+  `http://<ip>/webcam/snapshot.jpg` sur le réseau local ; pas `camera.start_monitor`, dont le flux reste
+  actif ~6 min après l'arrêt), suivi borné d'une impression. Numéros de série, réseau, comptes et secrets sont
+  retirés avant envoi au modèle.
+- **Contrôle** (exige la lecture) : uniquement `unload_filament`, refusé pendant une impression, confirmé
+  dans le slicer à chaque demande. Même séquence que l'écran de la U1 : `AUTO_FEEDING_BATCH ACTION=START`,
+  puis `ACTION=DOING STAGE=prepare EXTRUDER=n UNLOAD=1` (le firmware chauffe lui-même). L'écran de
+  l'imprimante envoie ensuite `STAGE=doing` dès `unload_heat_finish` (l'outil ne l'envoie qu'après 15 s sans
+  relais), et `ACTION=STOP` termine (chauffes coupées), y compris si l'appel est abandonné. Le firmware
+  s'arrête à `unload_finish` : le filament est sorti de la buse mais reste dans la tête, l'utilisateur le
+  retire à la main. Les filaments souples (`filament_soft`) ne sont jamais déchargés.
 
 La documentation vient de `doc/` (wiki OrcaSlicer) : `scripts/fork/build-setting-docs.py` relie chaque réglage
 à sa section grâce aux liens d'aide de `Tab.cpp` et produit `resources/ai_assistant/setting_docs.json`, livré
@@ -103,7 +125,7 @@ Prompts (commandes slash dans Claude Code / Gemini CLI) : `diagnose_print`, `fix
 
 `render_view` montre le modèle (pas les supports ni les trajectoires) ; pour l'aperçu tranché, l'utilisateur
 peut coller une capture d'écran dans le client. Le serveur traite une requête à la fois : pendant un `slice`
-(jusqu'à 10 min), les autres requêtes attendent.
+(jusqu'à 10 min), un `watch_print` ou un `unload_filament`, les autres requêtes attendent.
 
 Multi-têtes (Snapmaker U1, 4 têtes) : `get_project.materials` décrit les têtes et chaque emplacement
 (preset, type, couleur, température, tête, utilisé sur le plateau) ; les réglages par emplacement/tête sont

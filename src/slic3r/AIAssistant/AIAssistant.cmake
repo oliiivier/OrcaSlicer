@@ -23,6 +23,10 @@ if (SNAPMAKER_AI_ASSISTANT)
         ${_ai_dir}/McpMaterials.hpp
         ${_ai_dir}/McpPrinter.cpp
         ${_ai_dir}/McpPrinter.hpp
+        ${_ai_dir}/McpPrinterControl.cpp
+        ${_ai_dir}/McpPrinterControl.hpp
+        ${_ai_dir}/McpPrinterLive.cpp
+        ${_ai_dir}/McpPrinterLive.hpp
         ${_ai_dir}/McpRender.cpp
         ${_ai_dir}/McpRender.hpp
         ${_ai_dir}/McpServer.cpp
@@ -37,6 +41,8 @@ if (SNAPMAKER_AI_ASSISTANT)
         ${_ai_dir}/McpTools.hpp
         ${_ai_dir}/McpToolUtils.cpp
         ${_ai_dir}/McpToolUtils.hpp
+        ${_ai_dir}/PrinterAutoConnect.cpp
+        ${_ai_dir}/PrinterAutoConnect.hpp
     )
     target_compile_definitions(libslic3r_gui PRIVATE SNAPMAKER_AI_ASSISTANT)
     message(STATUS "AI assistant: enabled")

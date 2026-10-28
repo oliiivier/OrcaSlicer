@@ -164,6 +164,12 @@ Change parse_change(const json& item)
 
     Change c;
     c.key = item["key"].get<std::string>();
+    // Settings that run programs on this computer: never set by the assistant, even
+    // confirmed, as a crafted project or prompt could get a script approved.
+    static const std::set<std::string> forbidden = { "post_process" };
+    if (forbidden.count(c.key))
+        throw ToolError("this setting runs programs on the computer and cannot be changed by the assistant; ask the user "
+                        "to edit it in the slicer if needed");
     c.def = print_config_def.get(c.key);
     if (c.def == nullptr)
         throw ToolError("unknown setting");
