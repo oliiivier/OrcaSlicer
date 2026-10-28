@@ -338,8 +338,8 @@ void follow_unload(json& state, std::int64_t now)
     if (channel_state == "unload_finish" || boost::algorithm::starts_with(channel_state, "preload") || channel_state == "wait_insert") {
         record(state, "unloaded",
                channel_state == "wait_insert" ? std::string() :
-                                                "the filament is out of the toolhead but still in the feed module: pull it out "
-                                                "to change the spool");
+                                                "the printer retracted the filament from the nozzle: ask the user to pull it "
+                                                "out of the toolhead by hand to finish");
         const size_t next = state["next"].get<size_t>() + 1;
         state["next"]     = next;
         state["phase"]    = next < state["extruders"].size() ? "prepare" : "stop";
