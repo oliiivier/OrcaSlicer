@@ -1,4 +1,5 @@
 #include "McpChanges.hpp"
+#include "McpChangesDialog.hpp"
 #include "McpExperiences.hpp"
 #include "McpToolUtils.hpp"
 
@@ -10,7 +11,6 @@
 #include "slic3r/GUI/GUI_ObjectList.hpp"
 #include "slic3r/GUI/I18N.hpp"
 #include "slic3r/GUI/MainFrame.hpp"
-#include "slic3r/GUI/MsgDialog.hpp"
 #include "slic3r/GUI/ObjectDataViewModel.hpp"
 #include "slic3r/GUI/Plater.hpp"
 #include "slic3r/GUI/PresetComboBoxes.hpp"
@@ -43,6 +43,8 @@ struct Change
     std::string                   filament_preset;
     // Per-toolhead printer change limited to one toolhead (1-based), 0 for the whole list.
     int                           toolhead { 0 };
+    // Assistant's reason for this change, shown to the user.
+    std::string                   comment;
 };
 
 const char* preset_type_name(Preset::Type type)
@@ -176,6 +178,8 @@ Change parse_change(const json& item)
     if (c.def->readonly)
         throw ToolError("read-only setting");
     const std::string value = value_arg(item["value"]);
+    if (item.contains("comment") && item["comment"].is_string())
+        c.comment = item["comment"].get<std::string>();
 
     // Holds the inherited values for object overrides; `current` may point into it.
     DynamicPrintConfig  full;
@@ -252,19 +256,20 @@ std::string target_text(const Change& c)
     return {};
 }
 
-bool confirm(const std::vector<Change>& changes, const std::string& reason)
+// Returns the changes checked by the user, none when the dialog was cancelled.
+std::vector<bool> confirm(const std::vector<Change>& changes, const std::string& reason)
 {
-    std::string text = reason.empty() ? std::string() : reason + "\n\n";
+    std::vector<ProposedChange> proposed;
     for (const Change& c : changes) {
         const std::string label = c.def->full_label.empty() ? c.def->label : c.def->full_label;
-        text += "- " + label + " (" + c.key + ")" + target_text(c) + ": " + display_value(c.old_value) + " -> " +
-                display_value(c.value->serialize()) + "\n";
+        proposed.push_back({ _u8L(label.c_str()) + target_text(c), c.key, display_value(c.old_value),
+                             display_value(c.value->serialize()), _u8L(c.def->tooltip.c_str()), c.comment });
     }
 
-    GUI::MessageDialog dlg(wxGetApp().mainframe,
-                           from_u8(text) + "\n" + _L("Apply these changes proposed by the AI assistant?"),
-                           _L("AI Assistant"), wxYES_NO | wxICON_QUESTION);
-    return dlg.ShowModal() == wxID_YES;
+    McpChangesDialog dlg(wxGetApp().mainframe, reason, proposed);
+    if (dlg.ShowModal() != wxID_APPLY)
+        return std::vector<bool>(changes.size(), false);
+    return dlg.selected();
 }
 
 // Selects the preset of the target slot in the Filament settings, like the edit
@@ -316,6 +321,8 @@ void apply(std::vector<Change>& changes)
 json describe_applied(const Change& c)
 {
     json entry = { { "key", c.key }, { "old", c.old_value }, { "new", c.value->serialize() } };
+    if (!c.comment.empty())
+        entry["comment"] = c.comment;
     if (c.object_idx >= 0) {
         entry["object"] = wxGetApp().model().objects[c.object_idx]->name;
         return entry;
@@ -375,22 +382,46 @@ json apply_changes(const json& args, const std::atomic<bool>& abandoned)
         throw ToolError("No change applied: change the filament settings of one slot per call, and ask the user to save "
                         "that filament preset before changing another one");
 
-    if (!confirm(changes, reason))
-        return { { "applied", false }, { "message", "The user declined the changes. Ask them what they want instead." } };
+    const std::vector<bool> selected = confirm(changes, reason);
     if (abandoned)
         return { { "applied", false }, { "message", "The request timed out before the user answered" } };
 
-    apply(changes);
+    std::vector<Change> accepted;
+    json                declined = json::array();
+    for (size_t i = 0; i < changes.size(); ++i)
+        if (selected[i])
+            accepted.push_back(std::move(changes[i]));
+        else
+            declined.push_back(describe_applied(changes[i]));
+    // Declined values are kept in the journal too: the outcome of the print is judged with them.
+    json declined_log = declined;
+    for (json& d : declined_log)
+        d["declined_by_user"] = true;
+    log_applied_changes(declined_log, reason);
+    if (accepted.empty())
+        return { { "applied", false },
+                 { "declined", std::move(declined) },
+                 { "message", "The user declined all the changes. Ask them what they want instead." } };
+
+    apply(accepted);
 
     json applied = json::array();
-    for (const Change& c : changes)
+    for (const Change& c : accepted)
         applied.push_back(describe_applied(c));
     log_applied_changes(applied, reason);
-    return { { "applied", true },
-             { "changes", std::move(applied) },
-             { "message", "Applied as unsaved preset edits (object overrides can be undone with Ctrl+Z). Filament "
-                          "preset edits are lost when another filament preset is opened unless the user saves them. "
-                          "Call get_issues to check the result." } };
+    json result = { { "applied", true },
+                    { "changes", std::move(applied) },
+                    { "message", "Applied as unsaved preset edits (object overrides can be undone with Ctrl+Z). Filament "
+                                 "preset edits are lost when another filament preset is opened unless the user saves them. "
+                                 "Call get_issues to check the result." } };
+    if (!declined.empty()) {
+        result["declined"] = std::move(declined);
+        result["message"]  = result["message"].get<std::string>() +
+                            " The user unchecked the 'declined' changes: their settings keep the 'old' value. Do not "
+                            "propose them again unless asked; take them into account when following the print and "
+                            "ask the user why if it matters for the diagnosis.";
+    }
+    return result;
 }
 
 }} // namespace Slic3r::AIAssistant

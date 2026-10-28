@@ -66,6 +66,7 @@ dans Claude Code, Gemini CLI ou Claude Desktop. Le serveur écoute uniquement su
 | `McpTools` | Registre des outils et prompts, exécution sur le thread de l'interface |
 | `McpIssues` | Collecte des erreurs et avertissements du slicer (`get_issues`) |
 | `McpChanges` | Validation, confirmation et application des réglages (`apply_changes`) |
+| `McpChangesDialog` | Fenêtre de confirmation : une case par réglage, aide du réglage et commentaire du modèle au survol |
 | `McpMaterials` | Têtes, emplacements de filament, filaments mixtes, attribution par élément |
 | `McpSlicing` | Slicing du plateau et résumé du résultat (`slice`) |
 | `McpRender` | Rendu PNG du plateau depuis une vue nommée (`render_view`) |
@@ -98,6 +99,11 @@ emplacement par tête et tout suit (peinture, filament des objets, volumes et pl
 Les réglages de procédé d'origine qui diffèrent sont renvoyés pour que l'assistant restaure l'intention du
 modèle.
 
+`apply_changes` montre chaque réglage proposé avec une case cochée, l'ancienne et la nouvelle valeur et le
+commentaire du modèle (`comment`) ; le survol affiche aussi l'aide du réglage. L'utilisateur applique tout ou
+décoche des valeurs : celles-ci reviennent au modèle sous `declined` et sont notées dans le journal
+d'expériences (`declined_by_user`), pour le suivi de l'impression.
+
 `apply_changes` refuse `post_process` (scripts exécutés sur l'ordinateur à l'export du G-code), même confirmé.
 
 Accès à l'imprimante, via la connexion Snapmaker Connect déjà ouverte par l'application ; deux cases à cocher
@@ -125,7 +131,7 @@ Prompts (commandes slash dans Claude Code / Gemini CLI) : `adapt_project`, `diag
 ### Retours d'expérience
 
 1. **Journal local** (`<dossier de config>/ai_assistant/experiences/*.json`, hors dépôt) : une fiche par
-   diagnostic. Le serveur y met les faits (imprimante, matériaux, problèmes, réglages modifiés par
+   diagnostic. Le serveur y met les faits (imprimante, matériaux, problèmes, réglages modifiés ou refusés via
    `apply_changes`), le modèle le symptôme et le diagnostic, puis le résultat réel de l'impression
    (`report_outcome`, avec le rapport de l'imprimante si l'accès est activé).
 2. **Capitalisation** : prompt `capitalize_experiences` lancé dans Claude Code depuis ce dépôt. Il regroupe

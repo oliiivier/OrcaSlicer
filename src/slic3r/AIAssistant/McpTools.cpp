@@ -224,7 +224,8 @@ const std::vector<Tool>& tools()
           "(unsaved) presets, or as per-object overrides when 'object' is given. Filament settings need "
           "'filament_slot' (one slot per call; the change applies to that slot's filament preset, so to every slot "
           "using the same preset). Per-toolhead printer settings take 'toolhead' to change a single toolhead, "
-          "otherwise the value lists every toolhead. Invalid changes are all rejected with the reason.",
+          "otherwise the value lists every toolhead. Invalid changes are all rejected with the reason. The user can "
+          "uncheck some changes: the result lists them under 'declined'.",
           [](const json& args, ToolContext& ctx) { return apply_changes(args, ctx.abandoned); },
           { { "type", "object" },
             { "properties",
@@ -240,6 +241,9 @@ const std::vector<Tool>& tools()
                             { "value",
                               { { "type", { "string", "number", "boolean", "array" } },
                                 { "description", "Value in the get_config format." } } },
+                            { "comment",
+                              { { "type", "string" },
+                                { "description", "One short sentence on why this value, shown to the user next to the change." } } },
                             { "object", { { "type", "string" }, { "description", "Object name for a per-object override." } } },
                             { "filament_slot",
                               { { "type", "integer" }, { "minimum", 1 }, { "description", "1-based slot, for filament settings." } } },
@@ -405,7 +409,8 @@ const char* INSTRUCTIONS =
     "the official documentation of this slicer version, and read_documentation gives the related pages "
     "(calibration guides...). Rely on them rather than on web searches or memory of other slicers.\n"
     "3. Fix settings with apply_changes; the user confirms in the slicer. Group the changes fixing one issue in a "
-    "single call with a clear reason. Do not change settings unrelated to the issues or the user's request.\n"
+    "single call with a clear reason and a one-sentence comment on each change. The user may uncheck some: respect "
+    "the 'declined' ones. Do not change settings unrelated to the issues or the user's request.\n"
     "4. Call get_issues again after each applied change to verify, and iterate.\n"
     "Multi-material: check get_project.materials before recommending anything. On a multi-toolhead printer "
     "(toolhead_layout=multi_toolhead, e.g. Snapmaker U1 with 4 toolheads) every filament slot has its own toolhead "
@@ -447,7 +452,8 @@ const char* ADAPT_PROMPT =
     "per-feature line widths in proportion to the nozzle...). Check the limits with describe_setting. Keep my "
     "printer's values for machine-specific settings (speeds and accelerations beyond its limits, prime tower and "
     "flushing made for a single-nozzle printer, retraction, temperatures of the new filament presets).\n"
-    "4. Show me the list of restored settings with the reason for each, then apply_changes.\n"
+    "4. Call apply_changes with the restored settings, a short comment on each (I review them in the slicer and "
+    "can uncheck some).\n"
     "5. get_issues and fix errors, then slice and render_view to check.\n"
     "6. Offer to record_experience with the original printer, so that we learn from these adaptations.";
 
