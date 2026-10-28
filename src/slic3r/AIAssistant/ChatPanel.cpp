@@ -484,17 +484,15 @@ bool ChatPanel::ensure_started(Conversation& conv)
     if (conv.claude && conv.claude->is_running())
         return true;
 
-    std::string executable = wxGetApp().app_config->get("ai_assistant", "claude_path");
-    if (executable.empty())
-        executable = ClaudeProcess::find_executable();
-    if (executable.empty()) {
+    const ClaudeProcess::Launch launch = ClaudeProcess::locate(McpSettings::load().claude_path);
+    if (!launch.valid()) {
         post_status("error", _L("Claude Code was not found."));
         post({{"kind", "notice"}, {"level", "error"}, {"label", "not_found"}});
         return false;
     }
 
     ClaudeProcess::Options options;
-    options.executable     = executable;
+    options.launch         = launch;
     options.system_prompt  = SYSTEM_PROMPT;
     options.resume_session = conv.session_id;
     // An empty directory: the CLI must not pick up project files or instructions from elsewhere.

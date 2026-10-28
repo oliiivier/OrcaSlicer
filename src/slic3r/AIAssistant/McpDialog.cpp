@@ -1,4 +1,5 @@
 #include "McpDialog.hpp"
+#include "ClaudeProcess.hpp"
 #include "McpService.hpp"
 #include "McpSettings.hpp"
 
@@ -14,6 +15,7 @@
 #include "slic3r/GUI/Widgets/TextInput.hpp"
 
 #include <wx/clipbrd.h>
+#include <wx/filedlg.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
@@ -141,6 +143,18 @@ McpDialog::McpDialog(wxWindow* parent)
     grid->Add(m_token, 1, wxEXPAND | wxALIGN_CENTER_VERTICAL);
     grid->Add(regenerate, 0, wxALIGN_CENTER_VERTICAL);
 
+    m_claude_path = new TextInput(this, from_u8(settings.claude_path), wxEmptyString, wxEmptyString);
+    m_claude_path->GetTextCtrl()->SetHint(_L("Found automatically"));
+    auto* browse = new Button(this, _L("Browse..."));
+    browse->SetStyle(ButtonStyle::Regular, ButtonType::Choice);
+    grid->Add(label(this, _L("Claude Code")), 0, wxALIGN_CENTER_VERTICAL);
+    grid->Add(m_claude_path, 1, wxEXPAND | wxALIGN_CENTER_VERTICAL);
+    grid->Add(browse, 0, wxALIGN_CENTER_VERTICAL);
+    grid->AddSpacer(0);
+    m_claude_found = label(this, wxEmptyString, Label::Body_13);
+    grid->Add(m_claude_found, 1, wxEXPAND);
+    grid->AddSpacer(0);
+
     m_instructions = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, FromDIP(wxSize(600, 240)),
                                     wxTE_MULTILINE | wxTE_READONLY | wxHSCROLL | wxBORDER_SIMPLE);
     m_instructions->SetFont(wxFont(wxFontInfo(Label::Body_13.GetPointSize()).Family(wxFONTFAMILY_TELETYPE)));
@@ -214,6 +228,25 @@ McpDialog::McpDialog(wxWindow* parent)
         m_token->GetTextCtrl()->SetValue(from_u8(McpSettings::generate_token()));
         apply_and_refresh();
     });
+    // Read by the chat when it starts Claude Code.
+    m_claude_path->GetTextCtrl()->Bind(wxEVT_TEXT, [this](wxCommandEvent& e) {
+        McpSettings s = McpSettings::load();
+        s.claude_path = GUI::into_u8(m_claude_path->GetTextCtrl()->GetValue().Trim().Trim(false));
+        s.save();
+        refresh_claude();
+        e.Skip();
+    });
+    browse->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) {
+#ifdef _WIN32
+        const wxString wildcard = "Claude Code (claude.exe, claude.cmd)|claude.exe;claude.cmd|" + _L("All files") + " (*.*)|*.*";
+#else
+        const wxString wildcard = "Claude Code (claude)|claude|" + _L("All files") + " (*)|*";
+#endif
+        wxFileDialog dlg(this, _L("Choose the Claude Code executable"), wxEmptyString, wxEmptyString, wildcard,
+                         wxFD_OPEN | wxFD_FILE_MUST_EXIST);
+        if (dlg.ShowModal() == wxID_OK)
+            m_claude_path->GetTextCtrl()->SetValue(dlg.GetPath()); // saved by the wxEVT_TEXT handler
+    });
     buttons->GetButtonFromID(wxID_COPY)->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) {
         if (wxTheClipboard->Open()) {
             wxTheClipboard->SetData(new wxTextDataObject(m_instructions->GetValue()));
@@ -223,6 +256,7 @@ McpDialog::McpDialog(wxWindow* parent)
     buttons->GetOK()->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) { EndModal(wxID_OK); });
 
     refresh();
+    refresh_claude();
     CenterOnParent();
     GUI::wxGetApp().UpdateDlgDarkUI(this);
     // After UpdateDlgDarkUI, which leaves the native multiline text control white on GTK.
@@ -267,6 +301,24 @@ void McpDialog::refresh()
     m_instructions->SetValue(from_u8(connection_instructions(s)));
     Layout();
     Refresh();
+}
+
+void McpDialog::refresh_claude()
+{
+    const ClaudeProcess::Launch launch = ClaudeProcess::locate(McpSettings::load().claude_path);
+    if (launch.valid()) {
+        wxString command = from_u8(launch.program);
+        for (const std::string& arg : launch.args)
+            command += " " + from_u8(arg);
+        m_claude_found->SetLabel(wxString::Format(_L("Used by the chat: %s"), command));
+        m_claude_found->SetForegroundColour(SECONDARY_COLOR);
+    } else {
+        m_claude_found->SetLabel(_L("Claude Code not found: install it, or choose its executable."));
+        m_claude_found->SetForegroundColour(ERROR_COLOR);
+    }
+    m_claude_found->Wrap(FromDIP(440));
+    Layout();
+    Fit();
 }
 
 }} // namespace Slic3r::AIAssistant

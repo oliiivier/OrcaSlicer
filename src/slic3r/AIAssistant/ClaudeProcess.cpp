@@ -5,8 +5,18 @@
 #include <wx/filename.h>
 #include <wx/filefn.h>
 #include <wx/process.h>
+#include <wx/regex.h>
 #include <wx/stream.h>
+#include <wx/textfile.h>
+#include <wx/tokenzr.h>
 #include <wx/utils.h>
+
+#include <chrono>
+#include <cstdio>
+#include <cstdlib>
+#include <future>
+#include <memory>
+#include <thread>
 
 namespace Slic3r { namespace AIAssistant {
 
@@ -28,6 +38,122 @@ void read_stream(wxInputStream* in, std::string& out)
         out.append(buf, n);
     }
 }
+
+#ifdef _WIN32
+const wxString PATH_SEP = ";";
+#else
+const wxString PATH_SEP = ":";
+#endif
+
+wxString find_in(const wxString& path_list, const wxString& name)
+{
+    wxStringTokenizer dirs(path_list, PATH_SEP, wxTOKEN_STRTOK);
+    while (dirs.HasMoreTokens()) {
+        const wxFileName file(dirs.GetNextToken(), name);
+        if (wxFileName::IsFileExecutable(file.GetFullPath()))
+            return file.GetFullPath();
+    }
+    return {};
+}
+
+#ifdef _WIN32
+// npm installs a claude.cmd shim that runs the package's script with node, or its native
+// binary. A .cmd needs cmd.exe, which would interpret the arguments: run its target instead.
+ClaudeProcess::Launch launch_from_shim(const wxString& shim)
+{
+    wxTextFile file;
+    if (!file.Open(shim))
+        return {};
+    const wxString dir = wxFileName(shim).GetPath();
+    // e.g. "%dp0%\node_modules\@anthropic-ai\claude-code\cli.js" %*
+    wxRegEx target("%~?dp0%?\\\\([^\"%]+)", wxRE_ADVANCED);
+    for (wxString line = file.GetLastLine();; line = file.GetPrevLine()) {
+        if (target.Matches(line)) {
+            const wxString path = dir + "\\" + target.GetMatch(line, 1);
+            if (!wxFileExists(path))
+                break;
+            ClaudeProcess::Launch launch;
+            if (path.Lower().EndsWith(".exe")) {
+                launch.program = path.ToUTF8().data();
+                return launch;
+            }
+            // The shim prefers a node.exe next to it, as here.
+            wxString node = wxFileName(dir, "node.exe").GetFullPath();
+            if (!wxFileExists(node)) {
+                wxString path_list;
+                wxGetEnv("PATH", &path_list);
+                node = find_in(path_list, "node.exe");
+            }
+            if (node.empty())
+                break;
+            launch.program = node.ToUTF8().data();
+            launch.args    = {path.ToUTF8().data()};
+            return launch;
+        }
+        if (file.GetCurrentLine() == 0)
+            break;
+    }
+    BOOST_LOG_TRIVIAL(warning) << "AI chat: could not read the npm shim " << shim.ToUTF8().data();
+    return {};
+}
+
+ClaudeProcess::Launch launch_from(const wxString& path)
+{
+    if (path.Lower().EndsWith(".cmd"))
+        return launch_from_shim(path);
+    ClaudeProcess::Launch launch;
+    launch.program = path.ToUTF8().data();
+    return launch;
+}
+#else
+// The PATH of the user's interactive login shell, which reads the files that set it up
+// (.zprofile, .bashrc, config.fish, nvm...). Asked once; empty if the shell does not answer.
+std::string login_shell_path()
+{
+    static bool        asked = false;
+    static std::string path;
+    if (asked)
+        return path;
+    asked = true;
+
+    const char* shell = std::getenv("SHELL");
+    const std::string command = std::string("'") + (shell && *shell ? shell : "/bin/sh") +
+                                "' -l -i -c 'echo __ORCA_ENV__; /usr/bin/env' </dev/null 2>/dev/null";
+    // A shell may hang on its startup files: it is waited for a few seconds only.
+    auto result = std::make_shared<std::promise<std::string>>();
+    std::future<std::string> output = result->get_future();
+    std::thread([command, result]() {
+        std::string out;
+        if (FILE* pipe = ::popen(command.c_str(), "r")) {
+            char   buf[4096];
+            size_t n;
+            while ((n = std::fread(buf, 1, sizeof(buf), pipe)) > 0)
+                out.append(buf, n);
+            ::pclose(pipe);
+        }
+        result->set_value(out);
+    }).detach();
+    if (output.wait_for(std::chrono::seconds(5)) != std::future_status::ready) {
+        BOOST_LOG_TRIVIAL(warning) << "AI chat: no answer from the login shell " << command;
+        return path;
+    }
+    const std::string out    = output.get();
+    const size_t      marker = out.find("__ORCA_ENV__\n");
+    if (marker == std::string::npos)
+        return path;
+    for (size_t begin = marker; begin < out.size();) {
+        size_t end = out.find('\n', begin);
+        if (end == std::string::npos)
+            end = out.size();
+        if (out.compare(begin, 5, "PATH=") == 0) {
+            path = out.substr(begin + 5, end - begin - 5);
+            break;
+        }
+        begin = end + 1;
+    }
+    return path;
+}
+#endif
 
 } // namespace
 
@@ -59,8 +185,14 @@ bool ClaudeProcess::start(const Options& options, std::string& error)
 {
     stop();
 
-    std::vector<std::wstring> args = {
-        wxString::FromUTF8(options.executable).ToStdWstring(),
+    if (!options.launch.valid()) {
+        error = "no Claude Code executable";
+        return false;
+    }
+    std::vector<std::wstring> args = {wxString::FromUTF8(options.launch.program).ToStdWstring()};
+    for (const std::string& a : options.launch.args)
+        args.push_back(wxString::FromUTF8(a).ToStdWstring());
+    args.insert(args.end(), {
         L"-p",
         L"--input-format", L"stream-json",
         L"--output-format", L"stream-json",
@@ -70,7 +202,7 @@ bool ClaudeProcess::start(const Options& options, std::string& error)
         L"--tools=",
         L"--strict-mcp-config",
         L"--permission-mode", L"dontAsk",
-    };
+    });
     if (!options.mcp_config.empty()) {
         args.push_back(L"--mcp-config");
         args.push_back(wxString::FromUTF8(options.mcp_config).ToStdWstring());
@@ -95,20 +227,24 @@ bool ClaudeProcess::start(const Options& options, std::string& error)
 
     wxExecuteEnv env; // empty env: the child inherits ours
     env.cwd = wxString::FromUTF8(options.working_dir);
+    if (!options.launch.path_env.empty()) {
+        wxGetEnvMap(&env.env);
+        env.env["PATH"] = wxString::FromUTF8(options.launch.path_env);
+    }
 
     auto* process = new Process(this);
     m_pid         = ::wxExecute(argv.data(), wxEXEC_ASYNC | wxEXEC_HIDE_CONSOLE | wxEXEC_MAKE_GROUP_LEADER, process, &env);
     if (m_pid <= 0) {
         // wxExecute deletes the process object itself when the launch fails.
         m_pid = 0;
-        error = "could not run " + options.executable;
+        error = "could not run " + options.launch.program;
         return false;
     }
     m_process = process;
     m_stdout.clear();
     m_stderr.clear();
     m_timer.Start(POLL_MS);
-    BOOST_LOG_TRIVIAL(info) << "AI chat: started " << options.executable << " (pid " << m_pid << ")";
+    BOOST_LOG_TRIVIAL(info) << "AI chat: started " << options.launch.program << " (pid " << m_pid << ")";
     return true;
 }
 
@@ -204,34 +340,59 @@ void ClaudeProcess::on_terminate(int exit_code)
     m_on_exit(exit_code, m_stderr);
 }
 
-std::string ClaudeProcess::find_executable()
+ClaudeProcess::Launch ClaudeProcess::locate(const std::string& configured_path)
 {
-#ifdef _WIN32
-    const wxString name = "claude.exe";
-#else
-    const wxString name = "claude";
-#endif
-    wxPathList path;
-    path.AddEnvList("PATH");
-    wxString found = path.FindAbsoluteValidPath(name);
-    if (!found.empty())
-        return found.ToUTF8().data();
-
+    wxString path_list;
+    wxGetEnv("PATH", &path_list);
     const wxString home = wxGetHomeDir();
-    const std::vector<wxString> dirs = {
-        home + "/.local/bin",
-        home + "/.claude/local",
-#ifdef __APPLE__
-        "/opt/homebrew/bin",
-        "/usr/local/bin",
-#endif
-    };
-    for (const wxString& dir : dirs) {
-        wxFileName file(dir, name);
-        if (file.IsFileExecutable())
-            return file.GetFullPath().ToUTF8().data();
-    }
+
+#ifdef _WIN32
+    if (!configured_path.empty())
+        return wxFileExists(wxString::FromUTF8(configured_path)) ? launch_from(wxString::FromUTF8(configured_path)) : Launch();
+
+    // Native installer, then npm.
+    for (const wxString& name : {wxString("claude.exe"), wxString("claude.cmd")})
+        if (const wxString found = find_in(path_list, name); !found.empty())
+            if (Launch launch = launch_from(found); launch.valid())
+                return launch;
+    wxString appdata;
+    wxGetEnv("APPDATA", &appdata);
+    for (const wxString& candidate : {home + "\\.local\\bin\\claude.exe", appdata + "\\npm\\claude.cmd"})
+        if (wxFileExists(candidate))
+            if (Launch launch = launch_from(candidate); launch.valid())
+                return launch;
     return {};
+#else
+    Launch launch;
+    if (!configured_path.empty()) {
+        if (!wxFileName::IsFileExecutable(wxString::FromUTF8(configured_path)))
+            return {};
+        launch.program = configured_path;
+    } else if (const wxString found = find_in(path_list, "claude"); !found.empty()) {
+        launch.program = found.ToUTF8().data();
+        return launch; // node, if needed, is on the same PATH
+    } else {
+        std::vector<wxString> dirs = {home + "/.local/bin", home + "/.claude/local"};
+#ifdef __APPLE__
+        dirs.insert(dirs.end(), {"/opt/homebrew/bin", "/usr/local/bin"});
+#endif
+        for (const wxString& dir : dirs)
+            if (const wxString found = find_in(dir, "claude"); !found.empty()) {
+                launch.program = found.ToUTF8().data();
+                break;
+            }
+    }
+
+    // Started from the desktop, the slicer may not have the PATH set up by the shell
+    // (nvm, npm prefix...): look there too, and give it to the CLI for its node.
+    const std::string shell_path = login_shell_path();
+    if (launch.program.empty() && !shell_path.empty())
+        if (const wxString found = find_in(wxString::FromUTF8(shell_path), "claude"); !found.empty())
+            launch.program = found.ToUTF8().data();
+    if (!launch.program.empty())
+        launch.path_env = shell_path;
+    return launch;
+#endif
 }
 
 }} // namespace Slic3r::AIAssistant

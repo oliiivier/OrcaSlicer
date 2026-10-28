@@ -18,9 +18,22 @@ namespace Slic3r { namespace AIAssistant {
 class ClaudeProcess : public wxEvtHandler
 {
 public:
+    // How to run the CLI.
+    struct Launch
+    {
+        std::string program;
+        // Arguments before the CLI options: the script of an npm install run with node.
+        std::vector<std::string> args;
+        // PATH for the CLI, empty to inherit the slicer's. A CLI installed with npm needs
+        // node on its PATH, which a slicer started from the desktop may not have.
+        std::string path_env;
+
+        bool valid() const { return !program.empty(); }
+    };
+
     struct Options
     {
-        std::string executable;
+        Launch      launch;
         std::string working_dir;
         // Path of an MCP configuration file, empty for none.
         std::string mcp_config;
@@ -52,9 +65,9 @@ public:
     // Asks Claude to stop the current turn; the process keeps running.
     bool interrupt();
 
-    // The claude executable: on PATH or in the usual install locations, which a GUI
-    // application started from the desktop may not have on its PATH. Empty if not found.
-    static std::string find_executable();
+    // Finds the CLI: `configured_path` when given, else on the PATH, in the usual install
+    // locations, then (macOS, Linux) on the PATH of the user's login shell. Invalid if not found.
+    static Launch locate(const std::string& configured_path);
 
 private:
     class Process;

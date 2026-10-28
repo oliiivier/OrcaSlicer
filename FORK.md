@@ -169,8 +169,10 @@ Bouton *Claude* de la barre du haut (ou *Aide → Chat with Claude*) : un chat a
 flottant ou ancré à droite de la vue 3D (bouton dans l'en-tête du chat, choix mémorisé). Il fait tourner la CLI
 Claude Code installée sur la machine (`claude -p` en stream-json, connexion faite une fois dans un terminal) et
 la relie au serveur MCP, qu'il active s'il est éteint. La CLI n'a aucun autre outil (`--tools=`, pas de shell,
-de fichiers ni de web) et tourne dans un dossier vide (`ai_assistant/chat`). Chemin de `claude` imposable par
-`claude_path` dans la section `[ai_assistant]` de la configuration.
+de fichiers ni de web) et tourne dans un dossier vide (`ai_assistant/chat`). `claude` est cherché dans le
+PATH, les emplacements d'installation habituels puis le PATH du shell de connexion (nvm, préfixe npm…) ; sous
+Windows, le raccourci `claude.cmd` de npm est lu pour lancer sa cible sans `cmd.exe`. Chemin imposable dans la
+fenêtre *AI Assistant* (`claude_path`).
 
 Onglets : une conversation (session Claude Code, reprise par `--resume`) par onglet, enregistrées avec ce
 qu'elles affichent dans `ai_assistant/chats.json`. Boutons de capture de la vue 3D (relue dans OpenGL) ou de

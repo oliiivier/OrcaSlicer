@@ -23,6 +23,8 @@ struct McpSettings
     bool           auto_connect_printer { true };
     // Offers to adapt a project made for another printer to the connected one.
     bool           suggest_adaptation { true };
+    // Claude Code executable for the chat, empty to look for it.
+    std::string    claude_path;
 
     static McpSettings load();
     void               save() const;

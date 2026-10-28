@@ -40,6 +40,7 @@ McpSettings McpSettings::load()
         s.auto_connect_printer = is_true(value);
     if (cfg->get(SECTION, "suggest_adaptation", value) && !value.empty())
         s.suggest_adaptation = is_true(value);
+    cfg->get(SECTION, "claude_path", s.claude_path);
 
     if (s.token.empty()) {
         s.token = generate_token();
@@ -61,6 +62,7 @@ void McpSettings::save() const
     cfg->set(SECTION, "mcp_printer_control", printer_control);
     cfg->set(SECTION, "auto_connect_printer", auto_connect_printer);
     cfg->set(SECTION, "suggest_adaptation", suggest_adaptation);
+    cfg->set(SECTION, "claude_path", claude_path);
 }
 
 std::string McpSettings::generate_token()

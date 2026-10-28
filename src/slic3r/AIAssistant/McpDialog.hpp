@@ -25,6 +25,8 @@ protected:
 private:
     void apply_and_refresh();
     void refresh();
+    // Shows which Claude Code executable the chat uses.
+    void refresh_claude();
 
     ::CheckBox*   m_enabled { nullptr };
     ::CheckBox*   m_printer_access { nullptr };
@@ -33,6 +35,8 @@ private:
     ::CheckBox*   m_suggest_adaptation { nullptr };
     SpinInput*    m_port { nullptr };
     TextInput*    m_token { nullptr };
+    TextInput*    m_claude_path { nullptr };
+    wxStaticText* m_claude_found { nullptr };
     wxStaticText* m_status_dot { nullptr };
     wxStaticText* m_status { nullptr };
     wxTextCtrl*   m_instructions { nullptr };
