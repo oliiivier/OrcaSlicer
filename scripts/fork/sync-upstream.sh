@@ -28,7 +28,9 @@ done
 
 cd "$(git rev-parse --show-toplevel)"
 
-if [ -n "$(git status --porcelain --untracked-files=no)" ]; then
+# build_linux.sh replaces resources/web/flutter_web with the pages of the bundled gateway: those
+# changes stay uncommitted (see FORK.md).
+if [ -n "$(git status --porcelain --untracked-files=no -- . ':!resources/web/flutter_web')" ]; then
     echo "Working tree has uncommitted changes, commit or stash them first." >&2
     exit 1
 fi
