@@ -35,6 +35,7 @@ avec un minimum de conflits.
 | `src/slic3r/GUI/BBLTopbar.cpp`  | include de `AIAssistant.hpp` + `add_topbar_button()` après *Calibration* dans `Init()`, `rescale_topbar_button()` dans `Rescale()` |
 | `src/slic3r/GUI/GLCanvas3D.cpp` | include de `ScreenCapture.hpp` + `ScreenCapture::on_canvas_frame()` juste avant `SwapBuffers()` dans `render()` |
 | `src/slic3r/GUI/GUI_ObjectList.cpp` | Linux : couleurs du slicer pour la liste des objets (le thème GTK peut être clair quand le slicer est sombre) |
+| `src/slic3r/GUI/GUI_App.cpp`    | `SplashScreen` : élargit l'écran de démarrage pour que le nom et la version tiennent (polices Linux plus larges) ; `fit_width()` dans `MakeBitmap()`, logo centré dans `Decorate()`, image affichée dès la création |
 
 Lister les écarts réels avec upstream (doit rester court) :
 

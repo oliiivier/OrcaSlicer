@@ -424,6 +424,11 @@ public:
 
         // draw logo and constant info text
         Decorate(m_main_bitmap);
+#ifdef SNAPMAKER_AI_ASSISTANT // fork
+        // Show the decorated splash now: a widened one (fit_width) is otherwise black until the
+        // first SetText().
+        set_bitmap(m_main_bitmap);
+#endif
         wxGetApp().UpdateFrameDarkUI(this);
     }
 
@@ -464,13 +469,21 @@ public:
         int height = bmp.GetHeight();
 
         const int designSize = 480;
+#ifdef SNAPMAKER_AI_ASSISTANT // fork: the splash may be wider than the square design (fit_width)
+        auto scaleX = [height, designSize](int value) { return value * height / designSize; };
+#else
         auto scaleX = [width, designSize](int value) { return value * width / designSize; };
+#endif
         auto scaleY = [height, designSize](int value) { return value * height / designSize; };
 
         // Logo icon: 140x140, centered horizontally, y=80
         BitmapCache bmpCache;
         int logoSize = scaleX(140);
+#ifdef SNAPMAKER_AI_ASSISTANT // fork
+        int logoX    = (width - logoSize) / 2;
+#else
         int logoX    = scaleX(170);
+#endif
         int logoY    = scaleY(80);
         wxBitmap* logoBmp = bmpCache.load_svg("splash_app_icon", logoSize, logoSize);
         if (logoBmp != nullptr)
@@ -511,6 +524,9 @@ public:
     {
         int width = FromDIP(480, nullptr);
         int height = FromDIP(480, nullptr);
+#ifdef SNAPMAKER_AI_ASSISTANT // fork
+        width = fit_width(width, height);
+#endif
 
         wxImage image(width, height);
         wxBitmap new_bmp(image);
@@ -522,6 +538,29 @@ public:
         memDC.DrawBitmap(new_bmp, 0, 0, true);
         return new_bmp;
     }
+
+#ifdef SNAPMAKER_AI_ASSISTANT // fork
+    // Linux fonts are wider: the width of the splash for the brand and the version tag drawn
+    // side by side by Decorate() to fit, the logo and the fonts keeping their size. Computed
+    // before the splash is created: resizing it afterwards leaves it black on GTK.
+    static int fit_width(int width, int height)
+    {
+        ConstantText text;
+        text.init();
+        text.titleFont.Scale(1.5f);
+        text.versionFont.Scale(1.5f);
+
+        // Not a wxMemoryDC: one created before the splash leaves it black on GTK.
+        wxScreenDC dc;
+        dc.SetFont(text.titleFont);
+        int needed = dc.GetTextExtent(text.title).GetWidth();
+        dc.SetFont(text.versionFont);
+        needed += dc.GetTextExtent(text.version).GetWidth();
+        // Gap between the brand and the tag (as in Decorate) and margins.
+        needed += (10 + 2 * 32) * height / 480;
+        return std::max(width, needed);
+    }
+#endif
 
     void set_bitmap(wxBitmap& bmp)
     {
