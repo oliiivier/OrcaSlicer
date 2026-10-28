@@ -61,8 +61,9 @@ Réactiver Actions si besoin : `gh api -X PUT repos/oliiivier/OrcaSlicer/actions
 
 ## Serveur MCP
 
-Menu *Aide → AI Assistant (MCP server)* : activation, port (13700 par défaut), jeton, et configuration à copier
-dans Claude Code, Gemini CLI ou Claude Desktop. Le serveur écoute uniquement sur `127.0.0.1`, exige
+Menu *Aide → AI Assistant (MCP server)* : activation, port (13700 par défaut), jeton, chemin de Claude Code pour
+le chat, et configuration à copier dans Claude Code, Gemini CLI ou Claude Desktop (inutile pour le chat intégré,
+qui se connecte seul). Le serveur écoute uniquement sur `127.0.0.1`, exige
 `Authorization: Bearer <jeton>` et refuse les requêtes venant d'un navigateur (en-têtes `Origin`/`Host`).
 
 | Fichier | Rôle |
@@ -175,8 +176,14 @@ Windows, le raccourci `claude.cmd` de npm est lu pour lancer sa cible sans `cmd.
 fenêtre *AI Assistant* (`claude_path`).
 
 Onglets : une conversation (session Claude Code, reprise par `--resume`) par onglet, enregistrées avec ce
-qu'elles affichent dans `ai_assistant/chats.json`. Boutons de capture de la vue 3D (relue dans OpenGL) ou de
-toute la fenêtre, jointe au message suivant.
+qu'elles affichent dans `ai_assistant/chats.json`. La CLI d'un onglet inactif et sans réponse en cours est
+arrêtée, puis relancée à son message suivant. Boutons de capture de la vue 3D (relue dans OpenGL) ou de toute la
+fenêtre, jointe au message suivant. La configuration MCP donnée à la CLI (avec le jeton) est écrite dans
+`ai_assistant/claude_mcp.json`, lisible par l'utilisateur seul. La page du chat est
+`resources/web/ai_assistant/chat.html`.
+
+Testé sous Linux uniquement : la recherche de `claude` sous Windows et macOS, le passage de la page entre
+fenêtre et volet, et la capture de la fenêtre entière (copie d'écran) restent à vérifier sur ces systèmes.
 
 | Fichier | Rôle |
 |---|---|
