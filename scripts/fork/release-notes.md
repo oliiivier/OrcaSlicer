@@ -17,12 +17,13 @@ Snapmaker Orca avec un assistant IA. Non signé, non officiel : ni Snapmaker ni 
 |---|---|---|
 | Linux | `.AppImage` | `chmod +x` puis lancer |
 | Windows | `.exe` (installeur) ou `_portable.zip` | SmartScreen : *Informations complémentaires → Exécuter quand même* |
-| macOS | `.dmg` | Application non notariée : après l'avoir copiée dans *Applications*, `xattr -dr com.apple.quarantine "/Applications/Snapmaker Orca.app"` |
+
+Pas de version macOS pour l'instant.
 
 ## À tester sur chaque système
 
 1. Le bouton *Claude* ouvre le chat et active le serveur MCP ; *Aide → AI Assistant* indique le Claude Code
-   utilisé (« Used by the chat: … »), surtout pour une installation npm (Windows `claude.cmd`, nvm sur macOS).
+   utilisé (« Used by the chat: … »), surtout pour une installation npm (Windows `claude.cmd`).
 2. Une question sur le projet ouvert obtient une réponse qui utilise les outils du slicer.
 3. Passage flottant ↔ ancré (bouton de l'en-tête du chat) sans page blanche ni plantage.
 4. Captures *3D view* et *Window*.

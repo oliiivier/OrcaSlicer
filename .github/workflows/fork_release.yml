@@ -24,8 +24,9 @@ jobs:
         include:
           - os: ubuntu-24.04
           - os: windows-2022
-          - os: macos-15
-            arch: arm64
+          # macOS left out for now: the macos-15 arm64 runners were never available.
+          # - os: macos-15
+          #   arch: arm64
     uses: ./.github/workflows/build_check_cache.yml
     with:
       os: ${{ matrix.os }}

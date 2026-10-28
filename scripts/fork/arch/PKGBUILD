@@ -1,0 +1,45 @@
+# Fork-only (see FORK.md): pacman package of the fork for Arch Linux and CachyOS.
+# Packages the slicer staged by ./build_linux.sh -s in build/package (the AppImage contents)
+# under /opt; scripts/fork/arch/build-package.sh builds it with makepkg.
+pkgname=snapmaker-orca-ai
+pkgver=2.4.1
+pkgrel=1
+pkgdesc="Snapmaker Orca slicer with the Claude assistant (unofficial fork build)"
+arch=('x86_64')
+url="https://github.com/oliiivier/OrcaSlicer"
+license=('AGPL-3.0-only')
+depends=('gtk3' 'webkit2gtk-4.1' 'libglvnd' 'mesa' 'glib2' 'pango' 'cairo' 'harfbuzz' 'fontconfig'
+         'gstreamer' 'gst-plugins-base-libs' 'gst-plugins-bad-libs' 'libsoup3' 'libsecret' 'libva'
+         'wayland' 'libx11' 'libxext' 'libsm' 'libice' 'dbus' 'zlib' 'zstd' 'gcc-libs' 'glibc')
+optdepends=('claude-code: chat with Claude inside the slicer (or the npm / native installer)')
+provides=('snapmaker-orca')
+conflicts=('snapmaker-orca')
+options=('!strip' '!debug')
+
+_repo="$(git -C "$startdir" rev-parse --show-toplevel)"
+_staged="$_repo/build/package"
+
+pkgver() {
+    printf "2.4.1.r%s.g%s" "$(git -C "$_repo" rev-list --count HEAD)" "$(git -C "$_repo" rev-parse --short HEAD)"
+}
+
+package() {
+    [ -x "$_staged/snapmaker-orca" ] || { echo "No slicer in $_staged: run ./build_linux.sh -s first." >&2; return 1; }
+
+    install -d "$pkgdir/opt/$pkgname"
+    cp -a "$_staged/." "$pkgdir/opt/$pkgname/"
+    # The staged launchers are not executable by others (rwxr-xr--): the files belong to root here.
+    chmod -R go=rX "$pkgdir/opt/$pkgname"
+
+    # The launcher finds its directory through readlink -f.
+    install -d "$pkgdir/usr/bin"
+    ln -s "/opt/$pkgname/snapmaker-orca" "$pkgdir/usr/bin/snapmaker-orca"
+
+    install -Dm644 "$_repo/src/dev-utils/platform/unix/Snapmaker_Orca.desktop" \
+        "$pkgdir/usr/share/applications/Snapmaker_Orca.desktop"
+    for size in 32 128 192; do
+        install -Dm644 "$_repo/resources/images/Snapmaker_Orca_${size}px.png" \
+            "$pkgdir/usr/share/icons/hicolor/${size}x${size}/apps/Snapmaker_Orca.png"
+    done
+    install -Dm644 "$_repo/LICENSE.txt" "$pkgdir/usr/share/licenses/$pkgname/LICENSE"
+}

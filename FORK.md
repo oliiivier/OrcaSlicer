@@ -61,7 +61,7 @@ d'accroche) : les résoudre, `git commit`, puis relancer le script.
 
 Réactiver Actions si besoin : `gh api -X PUT repos/oliiivier/OrcaSlicer/actions/permissions -F enabled=true`.
 
-## Release (builds Linux, Windows, macOS)
+## Release (builds Linux, Windows)
 
 ```bash
 scripts/fork/release.sh v2.4.1-ai.1   # publie la tête poussée de ai-assistant en pré-release
@@ -71,9 +71,26 @@ Le script active Actions le temps de la release seulement : il désactive tous l
 `fork_release.yml` (y compris ceux qu'upstream a ajoutés depuis), lance celui-ci, attend la fin (plusieurs
 heures : les dépendances sont recompilées, le fork n'a pas de cache) puis désactive Actions. `fork_release.yml`
 réutilise les workflows de build d'upstream, qui ne publient rien hors de leur `main`, et attache AppImage,
-installeur et zip Windows, DMG macOS à la pré-release, avec `scripts/fork/release-notes.md` pour texte. Les
+installeur et zip Windows à la pré-release (macOS retiré pour l'instant : aucun runner arm64 disponible), avec `scripts/fork/release-notes.md` pour texte. Les
 paquets ne sont pas signés (pas de certificat dans le fork) et la publication des symboles Sentry échoue sans
 ses secrets, sans bloquer la release.
+
+### Paquet pacman (Arch Linux, CachyOS)
+
+```bash
+./build_linux.sh -s                    # compile le slicer (build/package)
+scripts/fork/arch/build-package.sh     # paquet build/snapmaker-orca-ai-<version>-x86_64.pkg.tar.zst
+sudo pacman -U build/snapmaker-orca-ai-*.pkg.tar.zst
+```
+
+`scripts/fork/arch/PKGBUILD` empaquette la compilation locale (le contenu de l'AppImage) dans
+`/opt/snapmaker-orca-ai` avec `/usr/bin/snapmaker-orca`, le raccourci et les icônes ; la version suit le commit
+(`2.4.1.r<n>.g<hash>`). Il fournit `snapmaker-orca` et remplace donc un paquet AppImage d'upstream déjà installé.
+
+`build_linux.sh` télécharge la gateway `snapmaker_control` et remplace `resources/web/flutter_web` par les
+pages Snapmaker Connect de la même version (`.github/connect-bundle.lock.json`) : ces fichiers suivis par git
+apparaissent alors modifiés, il ne faut **pas** les restaurer (l'ancienne version ne gère plus la connexion au
+compte Snapmaker). `build-package.sh` refuse un `build/package` dont les pages ne sont pas de la bonne version.
 
 ## Serveur MCP
 
