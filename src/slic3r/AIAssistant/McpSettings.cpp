@@ -11,6 +11,9 @@ namespace Slic3r { namespace AIAssistant {
 
 static const char* SECTION = "ai_assistant";
 
+// AppConfig stores booleans as "true"/"false"; "1"/"0" were written by older builds.
+static bool is_true(const std::string& value) { return value == "true" || value == "1"; }
+
 McpSettings McpSettings::load()
 {
     McpSettings s;
@@ -20,7 +23,7 @@ McpSettings McpSettings::load()
 
     std::string value;
     if (cfg->get(SECTION, "mcp_enabled", value))
-        s.enabled = value == "1";
+        s.enabled = is_true(value);
     if (cfg->get(SECTION, "mcp_port", value) && !value.empty()) {
         try {
             const int port = std::stoi(value);
@@ -30,7 +33,7 @@ McpSettings McpSettings::load()
     }
     cfg->get(SECTION, "mcp_token", s.token);
     if (cfg->get(SECTION, "mcp_printer_access", value))
-        s.printer_access = value == "1";
+        s.printer_access = is_true(value);
 
     if (s.token.empty()) {
         s.token = generate_token();
@@ -45,10 +48,10 @@ void McpSettings::save() const
     if (cfg == nullptr)
         return;
 
-    cfg->set(SECTION, "mcp_enabled", enabled ? "1" : "0");
+    cfg->set(SECTION, "mcp_enabled", enabled);
     cfg->set(SECTION, "mcp_port", std::to_string(port));
     cfg->set(SECTION, "mcp_token", token);
-    cfg->set(SECTION, "mcp_printer_access", printer_access ? "1" : "0");
+    cfg->set(SECTION, "mcp_printer_access", printer_access);
 }
 
 std::string McpSettings::generate_token()

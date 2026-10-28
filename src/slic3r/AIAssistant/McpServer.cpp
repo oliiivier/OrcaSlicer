@@ -10,6 +10,12 @@
 #include <stdexcept>
 #include <thread>
 
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <fcntl.h>
+#endif
+
 namespace Slic3r { namespace AIAssistant {
 
 namespace asio  = boost::asio;
@@ -28,6 +34,17 @@ static constexpr int INVALID_REQUEST  = -32600;
 static constexpr int METHOD_NOT_FOUND = -32601;
 static constexpr int INVALID_PARAMS   = -32602;
 static constexpr int INTERNAL_ERROR   = -32603;
+
+// Child processes (WebKit's web processes, started after the server) must not
+// inherit the server sockets: they would keep the port in use after a stop.
+template<class Socket> static void not_inherited(Socket& socket)
+{
+#ifdef _WIN32
+    ::SetHandleInformation(reinterpret_cast<HANDLE>(socket.native_handle()), HANDLE_FLAG_INHERIT, 0);
+#else
+    ::fcntl(socket.native_handle(), F_SETFD, FD_CLOEXEC);
+#endif
+}
 
 static json rpc_error(const json& id, int code, const std::string& message)
 {
@@ -173,8 +190,10 @@ void McpServer::Impl::do_accept(McpServer& server)
     acceptor.async_accept([this, &server](beast::error_code ec, tcp::socket socket) {
         if (ec == asio::error::operation_aborted)
             return;
-        if (!ec)
+        if (!ec) {
+            not_inherited(socket);
             std::make_shared<McpSession>(std::move(socket), server)->run();
+        }
         do_accept(server);
     });
 }
@@ -202,6 +221,12 @@ bool McpServer::start(std::string& error)
     try {
         const tcp::endpoint endpoint { asio::ip::make_address("127.0.0.1"), m_port };
         impl->acceptor.open(endpoint.protocol());
+        not_inherited(impl->acceptor);
+#ifndef _WIN32
+        // Rebind right after a stop despite the connections left in TIME_WAIT. Not on
+        // Windows, where this option would let another program bind the same port.
+        impl->acceptor.set_option(tcp::acceptor::reuse_address(true));
+#endif
         impl->acceptor.bind(endpoint);
         impl->acceptor.listen();
     } catch (const boost::system::system_error& e) {

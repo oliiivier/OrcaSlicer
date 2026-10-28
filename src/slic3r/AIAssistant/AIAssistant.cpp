@@ -42,15 +42,25 @@ static void init_once()
     });
 }
 
+static wxString menu_label()
+{
+    return McpService::is_running() ? _L("AI Assistant (MCP server): running") : _L("AI Assistant (MCP server): stopped");
+}
+
 void append_menu_items(wxMenu* menu)
 {
     init_once();
 
     menu->AppendSeparator();
-    ::append_menu_item(
-        menu, wxID_ANY, _L("AI Assistant (MCP server)"), _L("Let Claude, Gemini or another MCP client analyze and fix the print settings"),
+    wxMenuItem* item = ::append_menu_item(
+        menu, wxID_ANY, menu_label(), _L("Let Claude, Gemini or another MCP client analyze and fix the print settings"),
         [](wxCommandEvent&) { show_settings(); }, "", nullptr,
         []() { return wxGetApp().plater() != nullptr && !wxGetApp().is_gcode_viewer(); });
+    // The server state, refreshed each time the menu is opened.
+    menu->Bind(wxEVT_MENU_OPEN, [item](wxMenuEvent& evt) {
+        item->SetItemLabel(menu_label());
+        evt.Skip();
+    });
 }
 
 void show_settings()
