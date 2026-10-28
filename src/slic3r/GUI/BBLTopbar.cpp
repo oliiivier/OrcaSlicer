@@ -10,6 +10,9 @@
 #include "MainFrame.hpp"
 #include "WebViewDialog.hpp"
 #include "PartPlate.hpp"
+#ifdef SNAPMAKER_AI_ASSISTANT // fork
+#include "slic3r/AIAssistant/AIAssistant.hpp"
+#endif
 
 #include <boost/log/trivial.hpp>
 
@@ -253,6 +256,11 @@ void BBLTopbar::Init(wxFrame* parent)
     m_calib_item                   = this->AddTool(ID_CALIB, _L("Calibration"), calib_bitmap);
     m_calib_item->SetDisabledBitmap(calib_bitmap_inactive);
 
+#ifdef SNAPMAKER_AI_ASSISTANT // fork
+    this->AddSpacer(FromDIP(10));
+    Slic3r::AIAssistant::add_topbar_button(this);
+#endif
+
     this->AddSpacer(FromDIP(10));
     this->AddStretchSpacer(1);
 
@@ -495,6 +503,10 @@ void BBLTopbar::Rescale() {
     item = this->FindTool(ID_CALIB);
     item->SetBitmap(create_scaled_bitmap("calib_sf", nullptr, TOPBAR_ICON_SIZE));
     item->SetDisabledBitmap(create_scaled_bitmap("calib_sf_inactive", nullptr, TOPBAR_ICON_SIZE));
+
+#ifdef SNAPMAKER_AI_ASSISTANT // fork
+    Slic3r::AIAssistant::rescale_topbar_button(this);
+#endif
 
     item = this->FindTool(ID_TITLE);
 

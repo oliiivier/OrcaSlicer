@@ -1,5 +1,8 @@
 #include "libslic3r/libslic3r.h"
 #include "GLCanvas3D.hpp"
+#ifdef SNAPMAKER_AI_ASSISTANT // fork
+#include "slic3r/AIAssistant/ScreenCapture.hpp"
+#endif
 
 #include <igl/unproject.h>
 
@@ -3186,6 +3189,9 @@ void GLCanvas3D::render(bool only_init)
 
     wxGetApp().imgui()->render();
 
+#ifdef SNAPMAKER_AI_ASSISTANT // fork
+    AIAssistant::ScreenCapture::on_canvas_frame(*this);
+#endif
     m_canvas->SwapBuffers();
     m_render_stats.increment_fps_counter();
 }

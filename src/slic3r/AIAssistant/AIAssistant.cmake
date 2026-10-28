@@ -9,6 +9,10 @@ if (SNAPMAKER_AI_ASSISTANT)
     target_sources(libslic3r_gui PRIVATE
         ${_ai_dir}/AIAssistant.cpp
         ${_ai_dir}/AIAssistant.hpp
+        ${_ai_dir}/ChatPanel.cpp
+        ${_ai_dir}/ChatPanel.hpp
+        ${_ai_dir}/ClaudeProcess.cpp
+        ${_ai_dir}/ClaudeProcess.hpp
         ${_ai_dir}/McpChanges.cpp
         ${_ai_dir}/McpChanges.hpp
         ${_ai_dir}/McpChangesDialog.cpp
@@ -47,6 +51,8 @@ if (SNAPMAKER_AI_ASSISTANT)
         ${_ai_dir}/PrinterAutoConnect.hpp
         ${_ai_dir}/ProjectAdapt.cpp
         ${_ai_dir}/ProjectAdapt.hpp
+        ${_ai_dir}/ScreenCapture.cpp
+        ${_ai_dir}/ScreenCapture.hpp
     )
     target_compile_definitions(libslic3r_gui PRIVATE SNAPMAKER_AI_ASSISTANT)
     message(STATUS "AI assistant: enabled")

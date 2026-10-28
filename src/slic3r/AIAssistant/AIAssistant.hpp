@@ -3,6 +3,7 @@
 // Public entry points of the AI assistant module.
 // This is the only header upstream code is allowed to know about; keep it tiny.
 
+class wxAuiToolBar;
 class wxMenu;
 
 namespace Slic3r { namespace AIAssistant {
@@ -14,5 +15,10 @@ void append_menu_items(wxMenu* menu);
 
 // Opens the MCP server settings.
 void show_settings();
+
+// Adds the chat button to the top bar (called from BBLTopbar::Init), and reloads its
+// icon for the new scale (BBLTopbar::Rescale).
+void add_topbar_button(wxAuiToolBar* bar);
+void rescale_topbar_button(wxAuiToolBar* bar);
 
 }} // namespace Slic3r::AIAssistant

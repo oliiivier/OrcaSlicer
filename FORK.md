@@ -19,6 +19,7 @@ avec un minimum de conflits.
 1. Tout le code du fork vit dans des dossiers qui n'existent pas upstream :
    - `src/slic3r/AIAssistant/` (C++ et `AIAssistant.cmake`)
    - `resources/ai_assistant/` (documentation générée pour le serveur MCP)
+   - `resources/web/ai_assistant/` (page du chat) et `resources/images/topbar_claude.svg`
    - `scripts/fork/`
 2. Les fichiers upstream ne sont touchés qu'aux **points d'accroche** ci-dessous, toujours entourés de
    `#ifdef SNAPMAKER_AI_ASSISTANT // fork`. Si un nouveau point est nécessaire, l'ajouter à cette liste.
@@ -30,11 +31,15 @@ avec un minimum de conflits.
 |---------------------------------|---------------------------------------------------------------|
 | `src/slic3r/CMakeLists.txt`     | `include(AIAssistant/AIAssistant.cmake OPTIONAL)` après `encoding_check(libslic3r_gui)` |
 | `src/slic3r/GUI/MainFrame.cpp`  | include de `AIAssistant.hpp` + appel `append_menu_items()` à la fin de `generate_help_menu()` |
+| `src/slic3r/GUI/BBLTopbar.cpp`  | include de `AIAssistant.hpp` + `add_topbar_button()` après *Calibration* dans `Init()`, `rescale_topbar_button()` dans `Rescale()` |
+| `src/slic3r/GUI/GLCanvas3D.cpp` | include de `ScreenCapture.hpp` + `ScreenCapture::on_canvas_frame()` juste avant `SwapBuffers()` dans `render()` |
+| `src/slic3r/GUI/GUI_ObjectList.cpp` | Linux : couleurs du slicer pour la liste des objets (le thème GTK peut être clair quand le slicer est sombre) |
 
 Lister les écarts réels avec upstream (doit rester court) :
 
 ```bash
-git diff upstream/main...ai-assistant --stat -- . ':!src/slic3r/AIAssistant' ':!resources/ai_assistant' ':!scripts/fork' ':!FORK.md'
+git diff upstream/main...ai-assistant --stat -- . ':!src/slic3r/AIAssistant' ':!resources/ai_assistant' \
+    ':!resources/web/ai_assistant' ':!resources/images/topbar_claude.svg' ':!scripts/fork' ':!FORK.md'
 ```
 
 ## Synchronisation avec upstream
@@ -153,6 +158,25 @@ faire enregistrer le précédent avant de passer à un autre emplacement.
 Les instructions envoyées au client imposent l'ordre : erreurs bloquantes, puis avertissements, puis
 optimisations. Toute modification passe par une confirmation dans le slicer ; les surcharges par objet
 s'annulent avec Ctrl+Z, les modifications de presets restent des éditions non enregistrées.
+
+## Chat Claude
+
+Bouton *Claude* de la barre du haut (ou *Aide → Chat with Claude*) : un chat avec Claude dans le slicer,
+flottant ou ancré à droite de la vue 3D (bouton dans l'en-tête du chat, choix mémorisé). Il fait tourner la CLI
+Claude Code installée sur la machine (`claude -p` en stream-json, connexion faite une fois dans un terminal) et
+la relie au serveur MCP, qu'il active s'il est éteint. La CLI n'a aucun autre outil (`--tools=`, pas de shell,
+de fichiers ni de web) et tourne dans un dossier vide (`ai_assistant/chat`). Chemin de `claude` imposable par
+`claude_path` dans la section `[ai_assistant]` de la configuration.
+
+Onglets : une conversation (session Claude Code, reprise par `--resume`) par onglet, enregistrées avec ce
+qu'elles affichent dans `ai_assistant/chats.json`. Boutons de capture de la vue 3D (relue dans OpenGL) ou de
+toute la fenêtre, jointe au message suivant.
+
+| Fichier | Rôle |
+|---|---|
+| `ClaudeProcess` | Lance la CLI, écrit et lit les messages JSON ligne par ligne, interruption |
+| `ChatPanel` | Page du chat, onglets et sessions, fenêtre flottante ou volet wxAUI du `Plater` |
+| `ScreenCapture` | Capture de la vue 3D et de la fenêtre principale |
 
 ## Compilation
 

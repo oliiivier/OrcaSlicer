@@ -1,4 +1,5 @@
 #include "AIAssistant.hpp"
+#include "ChatPanel.hpp"
 #include "McpDialog.hpp"
 #include "McpService.hpp"
 #include "McpSettings.hpp"
@@ -11,6 +12,7 @@
 #include "slic3r/GUI/wxExtensions.hpp"
 
 #include <boost/log/trivial.hpp>
+#include <wx/aui/auibar.h>
 #include <wx/menu.h>
 
 namespace Slic3r { namespace AIAssistant {
@@ -57,6 +59,10 @@ void append_menu_items(wxMenu* menu)
     init_once();
 
     menu->AppendSeparator();
+    ::append_menu_item(
+        menu, wxID_ANY, _L("Chat with Claude"), _L("Ask Claude about this project and let it propose setting changes (requires Claude Code)"),
+        [](wxCommandEvent&) { ChatPanel::show(); }, "", nullptr,
+        []() { return wxGetApp().plater() != nullptr && !wxGetApp().is_gcode_viewer(); });
     wxMenuItem* item = ::append_menu_item(
         menu, wxID_ANY, menu_label(), _L("Let Claude, Gemini or another MCP client analyze and fix the print settings"),
         [](wxCommandEvent&) { show_settings(); }, "", nullptr,
@@ -72,6 +78,24 @@ void show_settings()
 {
     McpDialog dlg(wxGetApp().mainframe);
     dlg.ShowModal();
+}
+
+// Next to the top bar's own ids (3100-3200, BBLTopbar.cpp).
+static const int ID_TOPBAR_CHAT = 3190;
+static const int TOPBAR_ICON_SIZE = 18;
+
+void add_topbar_button(wxAuiToolBar* bar)
+{
+    wxAuiToolBarItem* item = bar->AddTool(ID_TOPBAR_CHAT, _L("Claude"), create_scaled_bitmap("topbar_claude", nullptr, TOPBAR_ICON_SIZE));
+    item->SetShortHelp(_L("Chat with Claude about this project"));
+    // The top bar reports clicks on its tools as drop-down events.
+    bar->Bind(wxEVT_AUITOOLBAR_TOOL_DROPDOWN, [](wxAuiToolBarEvent&) { ChatPanel::toggle(); }, ID_TOPBAR_CHAT);
+}
+
+void rescale_topbar_button(wxAuiToolBar* bar)
+{
+    if (wxAuiToolBarItem* item = bar->FindTool(ID_TOPBAR_CHAT))
+        item->SetBitmap(create_scaled_bitmap("topbar_claude", nullptr, TOPBAR_ICON_SIZE));
 }
 
 }} // namespace Slic3r::AIAssistant

@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Claude</title>
+<style>
+:root {
+  --bg: #ffffff;
+  --panel: #f6f6f6;
+  --border: #e2e2e2;
+  --text: #262e30;
+  --muted: #8c8c8c;
+  --accent: #009688;
+  --accent-text: #ffffff;
+  --user-bg: #e6f4f2;
+  --code-bg: #f1f1f1;
+  --warn-bg: #fff6e5;
+  --warn-border: #f0a020;
+  --error: #e14747;
+}
+body.dark {
+  --bg: #2d2d31;
+  --panel: #36363c;
+  --border: #4a4a51;
+  --text: #e8e8e8;
+  --muted: #9a9aa0;
+  --user-bg: #1f4440;
+  --code-bg: #232327;
+  --warn-bg: #3d3424;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; height: 100%; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 -apple-system, "Segoe UI", "HarmonyOS Sans SC", Roboto, "Noto Sans", sans-serif;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+  background: var(--panel);
+}
+header .title { font-weight: 600; flex: 1; }
+header .state { font-size: 12px; color: var(--muted); }
+button {
+  font: inherit;
+  color: var(--text);
+  background: transparent;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 3px 10px;
+  cursor: pointer;
+}
+button:hover { border-color: var(--accent); }
+button.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-text); }
+button.primary:disabled { opacity: 0.5; cursor: default; }
+#tabs {
+  display: flex;
+  align-items: stretch;
+  gap: 2px;
+  padding: 4px 8px 0;
+  background: var(--panel);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.tab {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 170px;
+  padding: 4px 6px 4px 10px;
+  border: 1px solid transparent;
+  border-bottom: none;
+  border-radius: 6px 6px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+  cursor: pointer;
+  flex-shrink: 0;
+}
+.tab:hover { color: var(--text); }
+.tab.active { background: var(--bg); border-color: var(--border); color: var(--text); margin-bottom: -1px; }
+.tab .name { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.tab .busy-dot { width: 6px; height: 6px; border-radius: 3px; background: var(--accent); animation: blink 1s infinite; flex-shrink: 0; }
+.tab .close { border: none; padding: 0 3px; line-height: 14px; font-size: 14px; color: var(--muted); visibility: hidden; }
+.tab:hover .close, .tab.active .close { visibility: visible; }
+.tab .close:hover { color: var(--error); }
+#new-tab { border: none; padding: 0 8px; font-size: 16px; color: var(--muted); flex-shrink: 0; }
+#new-tab:hover { color: var(--accent); }
+#notices:empty { display: none; }
+.notice {
+  margin: 8px 12px 0;
+  padding: 8px 10px;
+  border-left: 3px solid var(--warn-border);
+  background: var(--warn-bg);
+  border-radius: 4px;
+  font-size: 13px;
+}
+.notice.error { border-left-color: var(--error); }
+.notice a { color: var(--accent); cursor: pointer; }
+#log {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+}
+.welcome { color: var(--muted); font-size: 13px; margin: 4px 0 12px; }
+.msg { margin: 0 0 12px; overflow-wrap: anywhere; }
+.msg.user {
+  background: var(--user-bg);
+  border-radius: 10px;
+  padding: 8px 12px;
+  margin-left: 32px;
+  white-space: pre-wrap;
+}
+.msg.user img { max-width: 100%; max-height: 160px; border-radius: 6px; display: block; margin-top: 6px; }
+.msg.assistant > .text > :first-child { margin-top: 0; }
+.msg.assistant > .text > :last-child { margin-bottom: 0; }
+.msg.error { color: var(--error); font-size: 13px; }
+.msg.info { color: var(--muted); font-size: 13px; font-style: italic; }
+.text p, .text ul, .text ol, .text pre, .text table, .text blockquote { margin: 0 0 8px; }
+.text h1, .text h2, .text h3, .text h4 { font-size: 15px; margin: 12px 0 6px; }
+.text ul, .text ol { padding-left: 22px; }
+.text code { background: var(--code-bg); border-radius: 4px; padding: 0 4px; font: 12.5px/1.4 Menlo, Consolas, monospace; }
+.text pre { background: var(--code-bg); border-radius: 6px; padding: 8px; overflow-x: auto; }
+.text pre code { padding: 0; background: none; }
+.text table { border-collapse: collapse; display: block; overflow-x: auto; font-size: 13px; }
+.text th, .text td { border: 1px solid var(--border); padding: 3px 8px; text-align: left; }
+.text blockquote { border-left: 3px solid var(--border); padding-left: 10px; color: var(--muted); }
+.text a { color: var(--accent); cursor: pointer; }
+.tool {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  color: var(--muted);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1px 10px;
+  margin: 2px 4px 6px 0;
+}
+.tool .icon { width: 10px; text-align: center; }
+.tool.running .icon::before { content: "\25CF"; color: var(--accent); animation: blink 1s infinite; }
+.tool.done .icon::before { content: "\2713"; color: var(--accent); }
+.tool.error .icon::before { content: "\2717"; color: var(--error); }
+.tool-error { color: var(--error); font-size: 12px; margin: -2px 0 6px; }
+.tool-images img { max-width: 100%; border-radius: 6px; border: 1px solid var(--border); margin: 0 0 8px; cursor: zoom-in; }
+.thinking { color: var(--muted); font-size: 13px; margin: 0 0 12px; }
+.thinking::after { content: ""; animation: dots 1.4s steps(4) infinite; }
+@keyframes blink { 50% { opacity: 0.3; } }
+@keyframes dots { 0% { content: ""; } 25% { content: "."; } 50% { content: ".."; } 75% { content: "..."; } }
+footer {
+  border-top: 1px solid var(--border);
+  padding: 8px 12px 12px;
+  background: var(--panel);
+}
+#attachments { display: flex; flex-wrap: wrap; gap: 6px; }
+#attachments:not(:empty) { margin-bottom: 6px; }
+.attachment { position: relative; }
+.attachment img { height: 56px; border-radius: 4px; border: 1px solid var(--border); display: block; }
+.attachment button {
+  position: absolute; top: -6px; right: -6px;
+  padding: 0; width: 18px; height: 18px; line-height: 14px;
+  border-radius: 9px; background: var(--panel); font-size: 12px;
+}
+.input-row { display: flex; gap: 8px; align-items: flex-end; }
+textarea {
+  flex: 1;
+  resize: none;
+  min-height: 40px;
+  max-height: 200px;
+  font: inherit;
+  color: var(--text);
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 8px 10px;
+  outline: none;
+}
+textarea:focus { border-color: var(--accent); }
+textarea:focus::placeholder { color: transparent; }
+body.docked .grip { display: none; }
+header svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.5; vertical-align: -2px; }
+.tools-row { display: flex; gap: 6px; margin-bottom: 6px; }
+.tools-row button { display: inline-flex; align-items: center; gap: 5px; font-size: 12px; padding: 2px 8px; color: var(--muted); }
+.tools-row button:hover { color: var(--text); }
+.tools-row button:disabled { opacity: 0.5; cursor: default; }
+.tools-row svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; }
+.grip { position: fixed; z-index: 10; }
+.grip.left { left: 0; top: 0; bottom: 14px; width: 5px; cursor: ew-resize; }
+.grip.bottom_left { left: 0; bottom: 0; width: 14px; height: 14px; cursor: nesw-resize; }
+.grip.bottom_right { right: 0; bottom: 0; width: 14px; height: 14px; cursor: nwse-resize; }
+#overlay {
+  position: fixed; inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  display: none;
+  align-items: center; justify-content: center;
+  cursor: zoom-out;
+}
+#overlay img { max-width: 96%; max-height: 96%; }
+</style>
+</head>
+<body>
+<header>
+  <span class="title" id="title">Claude</span>
+  <span class="state" id="state"></span>
+  <button id="dock" title=""></button>
+  <button id="settings" title="">&#9881;</button>
+</header>
+<nav id="tabs"><button id="new-tab">+</button></nav>
+<div id="notices"></div>
+<div id="log"><div class="welcome" id="welcome"></div></div>
+<footer>
+  <div class="tools-row">
+    <button id="capture-view"><svg viewBox="0 0 16 16"><path d="M8 1.5l5.5 3v7L8 14.5l-5.5-3v-7z M2.5 4.5L8 7.5l5.5-3 M8 7.5v7"/></svg><span></span></button>
+    <button id="capture-window"><svg viewBox="0 0 16 16"><rect x="1.5" y="2.5" width="13" height="11" rx="1.5"/><path d="M1.5 5.5h13"/></svg><span></span></button>
+  </div>
+  <div id="attachments"></div>
+  <div class="input-row">
+    <textarea id="input" rows="2"></textarea>
+    <button class="primary" id="send"></button>
+  </div>
+</footer>
+<div id="overlay"><img alt=""></div>
+<div class="grip left" data-edge="left"></div>
+<div class="grip bottom_left" data-edge="bottom_left"></div>
+<div class="grip bottom_right" data-edge="bottom_right"></div>
+<script>
+(function () {
+  "use strict";
+
+  var labels = {};
+  var busy = false;
+  var turn = null;         // { el, text, textEl, raw, tools: {id: element} }
+  var thinkingEl = null;
+  var attachments = [];    // [{ media_type, data }]
+  var serverRunning = true;
+  var docked = false;
+  var renderPending = false;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var log = $("log"), input = $("input"), sendBtn = $("send");
+
+  function L(key) { return labels[key] || key; }
+
+  function postToSlicer(obj) {
+    if (window.wx && window.wx.postMessage)
+      window.wx.postMessage(JSON.stringify(obj));
+  }
+
+  function scrollToEnd() {
+    var nearEnd = log.scrollHeight - log.scrollTop - log.clientHeight < 120;
+    if (nearEnd)
+      log.scrollTop = log.scrollHeight;
+  }
+
+  // ---- Markdown: a small subset, enough for chat answers. The source is escaped first.
+  function escapeHtml(s) {
+    return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+  }
+
+  function inline(s) {
+    var codes = [];
+    s = s.replace(/`([^`]+)`/g, function (_, c) { codes.push(c); return "\u0000" + (codes.length - 1) + "\u0000"; });
+    s = s.replace(/\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)/g, '<a data-url="$2">$1</a>');
+    s = s.replace(/(^|[\s(])(https?:\/\/[^\s<)]*[^\s<).,;:!?])/g, '$1<a data-url="$2">$2</a>');
+    s = s.replace(/\*\*([^*]+)\*\*/g, "<strong>$1</strong>");
+    s = s.replace(/(^|[^*\w])\*([^*\s][^*]*)\*/g, "$1<em>$2</em>");
+    s = s.replace(/\u0000(\d+)\u0000/g, function (_, i) { return "<code>" + codes[+i] + "</code>"; });
+    return s;
+  }
+
+  function splitRow(line) {
+    return line.trim().replace(/^\|/, "").replace(/\|$/, "").split("|").map(function (c) { return c.trim(); });
+  }
+
+  function markdown(src) {
+    var lines = escapeHtml(src).split("\n");
+    var out = [], i = 0;
+    while (i < lines.length) {
+      var line = lines[i];
+      var m;
+      if (/^\s*```/.test(line)) {
+        var code = [];
+        for (i++; i < lines.length && !/^\s*```/.test(lines[i]); i++)
+          code.push(lines[i]);
+        i++;
+        out.push("<pre><code>" + code.join("\n") + "</code></pre>");
+      } else if ((m = /^(#{1,4})\s+(.*)$/.exec(line))) {
+        out.push("<h" + m[1].length + ">" + inline(m[2]) + "</h" + m[1].length + ">");
+        i++;
+      } else if (/^\s*\|.*\|\s*$/.test(line) && i + 1 < lines.length && /^\s*\|?[\s:|-]+\|?\s*$/.test(lines[i + 1]) && lines[i + 1].indexOf("-") >= 0) {
+        var head = splitRow(line);
+        var html = "<table><thead><tr>" + head.map(function (c) { return "<th>" + inline(c) + "</th>"; }).join("") + "</tr></thead><tbody>";
+        for (i += 2; i < lines.length && /^\s*\|.*\|\s*$/.test(lines[i]); i++)
+          html += "<tr>" + splitRow(lines[i]).map(function (c) { return "<td>" + inline(c) + "</td>"; }).join("") + "</tr>";
+        out.push(html + "</tbody></table>");
+      } else if (/^\s*([-*+]|\d+[.)])\s+/.test(line)) {
+        var ordered = /^\s*\d+[.)]\s+/.test(line);
+        var items = [];
+        while (i < lines.length && (/^\s*([-*+]|\d+[.)])\s+/.test(lines[i]) || (/^\s{2,}\S/.test(lines[i]) && items.length))) {
+          var item = /^\s*([-*+]|\d+[.)])\s+(.*)$/.exec(lines[i]);
+          var nested = /^\s{2,}/.test(lines[i]);
+          if (item && !nested)
+            items.push(inline(item[2]));
+          else // continuation or nested item, kept on the previous one
+            items[items.length - 1] += "<br>" + inline(item ? "• " + item[2] : lines[i].trim());
+          i++;
+        }
+        var tag = ordered ? "ol" : "ul";
+        out.push("<" + tag + ">" + items.map(function (t) { return "<li>" + t + "</li>"; }).join("") + "</" + tag + ">");
+      } else if (/^&gt;\s?/.test(line)) {
+        var quote = [];
+        for (; i < lines.length && /^&gt;\s?/.test(lines[i]); i++)
+          quote.push(inline(lines[i].replace(/^&gt;\s?/, "")));
+        out.push("<blockquote>" + quote.join("<br>") + "</blockquote>");
+      } else if (/^\s*$/.test(line)) {
+        i++;
+      } else {
+        var para = [];
+        for (; i < lines.length && !/^\s*$/.test(lines[i]) && !/^\s*(```|#{1,4}\s|[-*+]\s|\d+[.)]\s|\|)/.test(lines[i]); i++)
+          para.push(inline(lines[i]));
+        if (!para.length) { para.push(inline(line)); i++; }
+        out.push("<p>" + para.join("<br>") + "</p>");
+      }
+    }
+    return out.join("");
+  }
+
+  // ---- Conversation
+  function ensureTurn() {
+    if (!turn) {
+      var el = document.createElement("div");
+      el.className = "msg assistant";
+      log.appendChild(el);
+      turn = { el: el, textEl: null, raw: "", tools: {} };
+    }
+    return turn;
+  }
+
+  function showThinking(show) {
+    if (show && !thinkingEl) {
+      thinkingEl = document.createElement("div");
+      thinkingEl.className = "thinking";
+      thinkingEl.textContent = L("thinking");
+    }
+    if (thinkingEl) {
+      if (show) {
+        log.appendChild(thinkingEl); // keep it last
+      } else if (thinkingEl.parentNode) {
+        thinkingEl.parentNode.removeChild(thinkingEl);
+      }
+    }
+    scrollToEnd();
+  }
+
+  function renderText() {
+    renderPending = false;
+    if (turn && turn.textEl)
+      turn.textEl.innerHTML = markdown(turn.raw);
+    scrollToEnd();
+  }
+
+  function addInfo(cls, text) {
+    var el = document.createElement("div");
+    el.className = "msg " + cls;
+    el.textContent = text;
+    log.appendChild(el);
+    scrollToEnd();
+  }
+
+  function toolLabel(name) {
+    return name.replace(/^mcp__.*?__/, "").replace(/_/g, " ");
+  }
+
+  function setBusy(b) {
+    busy = b;
+    sendBtn.textContent = busy ? L("stop") : L("send");
+    sendBtn.disabled = false;
+    showThinking(busy);
+    if (!busy)
+      turn = null;
+  }
+
+  function addNotice(level, html) {
+    var el = document.createElement("div");
+    el.className = "notice " + level;
+    el.innerHTML = html;
+    $("notices").appendChild(el);
+    return el;
+  }
+
+  function refreshServerNotice() {
+    var existing = document.querySelector(".notice.server");
+    if (existing)
+      existing.parentNode.removeChild(existing);
+    if (!serverRunning)
+      addNotice("server", escapeHtml(L("server_off")) + ' <a data-action="settings">' + escapeHtml(L("settings")) + "</a>");
+  }
+
+  function renderUser(text, images) {
+    var el = document.createElement("div");
+    el.className = "msg user";
+    el.textContent = text;
+    (images || []).forEach(function (a) {
+      var img = document.createElement("img");
+      img.src = "data:" + a.media_type + ";base64," + a.data;
+      el.appendChild(img);
+    });
+    log.appendChild(el);
+  }
+
+  function clearLog() {
+    log.innerHTML = "";
+    var w = document.createElement("div");
+    w.className = "welcome";
+    w.textContent = L("welcome");
+    log.appendChild(w);
+    turn = null;
+    thinkingEl = null;
+  }
+
+  function renderTabs(tabs, active) {
+    var bar = $("tabs"), plus = $("new-tab");
+    Array.prototype.slice.call(bar.querySelectorAll(".tab")).forEach(function (t) { bar.removeChild(t); });
+    tabs.forEach(function (t) {
+      var el = document.createElement("div");
+      el.className = "tab" + (t.id === active ? " active" : "");
+      el.title = t.title || L("new_tab_title");
+      if (t.busy) {
+        var dot = document.createElement("span");
+        dot.className = "busy-dot";
+        el.appendChild(dot);
+      }
+      var name = document.createElement("span");
+      name.className = "name";
+      name.textContent = t.title || L("new_tab_title");
+      el.appendChild(name);
+      var close = document.createElement("button");
+      close.className = "close";
+      close.textContent = "\u00d7";
+      close.title = L("close_tab");
+      close.onclick = function (ev) {
+        ev.stopPropagation();
+        postToSlicer({ command: "close_tab", id: t.id });
+      };
+      el.appendChild(close);
+      el.onclick = function () { if (t.id !== active) postToSlicer({ command: "select_tab", id: t.id }); };
+      bar.insertBefore(el, plus);
+      if (t.id === active)
+        el.scrollIntoView({ block: "nearest", inline: "nearest" });
+    });
+  }
+
+  function send() {
+    if (busy) {
+      postToSlicer({ command: "interrupt" });
+      return;
+    }
+    var text = input.value.trim();
+    if (!text && !attachments.length)
+      return;
+    renderUser(text, attachments);
+    log.scrollTop = log.scrollHeight;
+    postToSlicer({ command: "send", text: text, images: attachments });
+    input.value = "";
+    attachments = [];
+    renderAttachments();
+    autoGrow();
+  }
+
+  // ---- Pasted / dropped images
+  function addImageFile(file) {
+    if (!file || !/^image\/(png|jpeg|gif|webp)$/.test(file.type))
+      return;
+    var reader = new FileReader();
+    reader.onload = function () {
+      var url = String(reader.result);
+      attachments.push({ media_type: file.type, data: url.substring(url.indexOf(",") + 1) });
+      renderAttachments();
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function renderAttachments() {
+    var box = $("attachments");
+    box.innerHTML = "";
+    attachments.forEach(function (a, idx) {
+      var wrap = document.createElement("div");
+      wrap.className = "attachment";
+      var img = document.createElement("img");
+      img.src = "data:" + a.media_type + ";base64," + a.data;
+      var rm = document.createElement("button");
+      rm.textContent = "×";
+      rm.title = L("remove");
+      rm.onclick = function () { attachments.splice(idx, 1); renderAttachments(); };
+      wrap.appendChild(img);
+      wrap.appendChild(rm);
+      box.appendChild(wrap);
+    });
+  }
+
+  function autoGrow() {
+    input.style.height = "auto";
+    input.style.height = Math.min(input.scrollHeight + 2, 200) + "px";
+  }
+
+  // ---- Events from the slicer
+  function receive(e) {
+    switch (e.kind) {
+    case "init":
+      labels = e.labels || {};
+      document.body.classList.toggle("dark", !!e.dark);
+      $("title").textContent = L("title");
+      $("welcome").textContent = L("welcome");
+      input.placeholder = L("placeholder");
+      $("new-tab").title = L("new_chat");
+      $("settings").title = L("settings");
+      $("capture-view").lastChild.textContent = L("capture_view");
+      $("capture-view").title = L("capture_view_tip");
+      $("capture-window").lastChild.textContent = L("capture_window");
+      $("capture-window").title = L("capture_window_tip");
+      setBusy(busy);
+      showThinking(false);
+      break;
+    case "layout":
+      docked = !!e.docked;
+      document.body.classList.toggle("docked", docked);
+      // The icon shows where the button moves the chat to.
+      $("dock").innerHTML = docked
+        ? '<svg viewBox="0 0 16 16"><rect x="4.5" y="1.5" width="10" height="9" rx="1"/><path d="M2.5 5.5v9h9"/></svg>'
+        : '<svg viewBox="0 0 16 16"><rect x="1.5" y="2.5" width="13" height="11" rx="1"/><path d="M10 2.5v11"/></svg>';
+      $("dock").title = docked ? L("undock") : L("dock");
+      break;
+    case "server":
+      serverRunning = !!e.running;
+      refreshServerNotice();
+      break;
+    case "status":
+      $("state").textContent = e.state === "starting" ? L("starting") : (e.text || "");
+      if (e.state === "busy")
+        setBusy(true);
+      else if (e.state === "ready" || e.state === "stopped" || e.state === "error")
+        setBusy(false);
+      if (e.state === "error" && e.text)
+        addInfo("error", e.text);
+      break;
+    case "notice":
+      if (e.label === "not_found")
+        addNotice("error", escapeHtml(L("not_found")).replace(/(https:\/\/\S+?)\)/, '<a data-url="$1">$1</a>)'));
+      else
+        addNotice(e.level || "warning", escapeHtml(L(e.label)) + ' <a data-action="settings">' + escapeHtml(L("settings")) + "</a>");
+      break;
+    case "tabs":
+      renderTabs(e.tabs || [], e.active);
+      break;
+    case "replay":
+      clearLog();
+      busy = false;
+      (e.events || []).forEach(receive);
+      renderText();
+      setBusy(!!e.busy);
+      log.scrollTop = log.scrollHeight;
+      input.focus();
+      break;
+    case "user":
+      renderUser(e.text, e.images);
+      break;
+    case "thinking":
+      showThinking(true);
+      break;
+    case "text_start":
+      var t = ensureTurn();
+      t.textEl = document.createElement("div");
+      t.textEl.className = "text";
+      t.el.appendChild(t.textEl);
+      t.raw = "";
+      showThinking(false);
+      break;
+    case "text_delta":
+      var cur = ensureTurn();
+      if (!cur.textEl) receive({ kind: "text_start" });
+      cur.raw += e.text;
+      if (!renderPending) {
+        renderPending = true;
+        requestAnimationFrame(renderText);
+      }
+      break;
+    case "block_stop":
+      renderText();
+      if (busy) showThinking(true);
+      break;
+    case "tool_start":
+      var tt = ensureTurn();
+      tt.textEl = null;
+      var chip = document.createElement("div");
+      chip.className = "tool running";
+      chip.innerHTML = '<span class="icon"></span><span></span>';
+      chip.lastChild.textContent = toolLabel(e.name);
+      tt.el.appendChild(chip);
+      tt.tools[e.id] = chip;
+      showThinking(true);
+      break;
+    case "tool_result":
+      var owner = turn && turn.tools[e.id];
+      if (!owner) break;
+      owner.className = "tool " + (e.is_error ? "error" : "done");
+      if (e.is_error && e.text) {
+        var err = document.createElement("div");
+        err.className = "tool-error";
+        err.textContent = e.text;
+        owner.insertAdjacentElement("afterend", err);
+      }
+      if (e.images && e.images.length) {
+        var box = document.createElement("div");
+        box.className = "tool-images";
+        e.images.forEach(function (im) {
+          var img = document.createElement("img");
+          img.src = "data:" + im.media_type + ";base64," + im.data;
+          box.appendChild(img);
+        });
+        owner.insertAdjacentElement("afterend", box);
+      }
+      scrollToEnd();
+      break;
+    case "turn_end":
+      if (e.subtype === "error_during_execution" && !e.text)
+        addInfo("info", L("interrupted"));
+      else if (e.is_error)
+        addInfo("error", (e.text || e.subtype) + "\n" + L("login_hint"));
+      setBusy(false);
+      break;
+    case "attach":
+      attachments.push({ media_type: e.media_type, data: e.data });
+      renderAttachments();
+      setCapturing(false);
+      input.focus();
+      break;
+    case "capture_failed":
+      addInfo("error", L("capture_failed"));
+      setCapturing(false);
+      break;
+    case "exited":
+      addInfo("info", L("exited") + (e.text ? "\n" + e.text : ""));
+      setBusy(false);
+      break;
+    }
+  }
+
+  window.chatApp = { receive: receive };
+
+  function setCapturing(on) {
+    $("capture-view").disabled = on;
+    $("capture-window").disabled = on;
+  }
+
+  function capture(target) {
+    setCapturing(true);
+    postToSlicer({ command: "capture", target: target });
+  }
+
+  // ---- UI wiring
+  sendBtn.onclick = send;
+  input.addEventListener("keydown", function (ev) {
+    if (ev.key === "Enter" && !ev.shiftKey && !ev.isComposing) {
+      ev.preventDefault();
+      if (!busy) send();
+    }
+  });
+  input.addEventListener("input", autoGrow);
+  input.addEventListener("paste", function (ev) {
+    var items = (ev.clipboardData && ev.clipboardData.items) || [];
+    for (var k = 0; k < items.length; k++)
+      if (items[k].kind === "file") {
+        addImageFile(items[k].getAsFile());
+        ev.preventDefault();
+      }
+  });
+  document.addEventListener("dragover", function (ev) { ev.preventDefault(); });
+  document.addEventListener("drop", function (ev) {
+    ev.preventDefault();
+    var files = (ev.dataTransfer && ev.dataTransfer.files) || [];
+    for (var k = 0; k < files.length; k++)
+      addImageFile(files[k]);
+  });
+  $("dock").onclick = function () { postToSlicer({ command: "dock", docked: !docked }); };
+  $("new-tab").onclick = function () { postToSlicer({ command: "new_tab" }); };
+  $("settings").onclick = function () { postToSlicer({ command: "open_settings" }); };
+  document.addEventListener("click", function (ev) {
+    var a = ev.target.closest && ev.target.closest("a");
+    if (a && a.dataset.url) {
+      ev.preventDefault();
+      postToSlicer({ command: "open_url", url: a.dataset.url });
+    } else if (a && a.dataset.action === "settings") {
+      postToSlicer({ command: "open_settings" });
+    } else if (ev.target.tagName === "IMG" && ev.target.closest(".tool-images, .msg.user")) {
+      $("overlay").firstChild.src = ev.target.src;
+      $("overlay").style.display = "flex";
+    }
+  });
+  $("capture-view").onclick = function () { capture("view"); };
+  $("capture-window").onclick = function () { capture("window"); };
+  Array.prototype.forEach.call(document.querySelectorAll(".grip"), function (grip) {
+    grip.addEventListener("mousedown", function (ev) {
+      if (ev.button !== 0) return;
+      ev.preventDefault();
+      postToSlicer({ command: "resize", edge: grip.dataset.edge });
+    });
+  });
+  $("overlay").onclick = function () { this.style.display = "none"; };
+
+  // The script message handler is added after the page starts loading.
+  (function announce() {
+    if (window.wx && window.wx.postMessage)
+      postToSlicer({ command: "ready" });
+    else
+      setTimeout(announce, 100);
+  })();
+  input.focus();
+})();
+</script>
+</body>
+</html>

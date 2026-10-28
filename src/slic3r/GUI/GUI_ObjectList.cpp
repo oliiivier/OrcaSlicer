@@ -139,6 +139,16 @@ public:
     }
 };
 
+#if defined(SNAPMAKER_AI_ASSISTANT) && defined(__linux__) // fork
+// The native list follows the GTK theme, which may be light while the slicer is dark:
+// use the slicer colors, like the rest of the sidebar.
+static void apply_linux_colors(wxDataViewCtrl* list)
+{
+    list->SetBackgroundColour(StateColor::darkModeColorFor(*wxWHITE));
+    list->SetForegroundColour(StateColor::darkModeColorFor(wxColour("#262E30")));
+}
+#endif
+
 ObjectList::ObjectList(wxWindow* parent) :
     wxDataViewCtrl(parent, wxID_ANY, wxDefaultPosition, wxDefaultSize, wxDV_MULTIPLE | wxNO_BORDER | wxDV_NO_HEADER) // ORCA: Remove border and header
 {
@@ -148,6 +158,9 @@ ObjectList::ObjectList(wxWindow* parent) :
     // Temporary fix for incorrect dark mode application regarding list item's text color.
     // See: https://github.com/SoftFever/Snapmaker_Orca/issues/2086
     this->SetForegroundColour(*wxBLACK);
+#endif
+#if defined(SNAPMAKER_AI_ASSISTANT) && defined(__linux__) // fork
+    apply_linux_colors(this);
 #endif
 
     SetFont(Label::sysFont(13));
@@ -5806,6 +5819,9 @@ void ObjectList::msw_rescale()
 void ObjectList::sys_color_changed()
 {
     wxGetApp().UpdateDVCDarkUI(this, true);
+#if defined(SNAPMAKER_AI_ASSISTANT) && defined(__linux__) // fork
+    apply_linux_colors(this);
+#endif
     
     msw_rescale();
 
