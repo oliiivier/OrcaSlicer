@@ -40,7 +40,9 @@ static constexpr int INTERNAL_ERROR   = -32603;
 template<class Socket> static void not_inherited(Socket& socket)
 {
 #ifdef _WIN32
-    ::SetHandleInformation(reinterpret_cast<HANDLE>(socket.native_handle()), HANDLE_FLAG_INHERIT, 0);
+    // On Windows, native_handle_type is a class that converts to SOCKET.
+    const SOCKET handle = socket.native_handle();
+    ::SetHandleInformation(reinterpret_cast<HANDLE>(handle), HANDLE_FLAG_INHERIT, 0);
 #else
     ::fcntl(socket.native_handle(), F_SETFD, FD_CLOEXEC);
 #endif
