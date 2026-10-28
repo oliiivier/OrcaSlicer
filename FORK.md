@@ -90,12 +90,16 @@ Outils : `get_issues`, `get_project`, `get_config`, `describe_setting`, `read_do
 `slice`, `render_view`, `adapt_to_printer`, `get_printer_status`, `printer_snapshot`, `watch_print`, `unload_filament`,
 `record_experience`, `report_outcome`, `search_experiences`.
 
+Prompts : `adapt_project`, `diagnose_print`, `fix_issues`, `optimize_settings`, `capitalize_experiences`. Dans
+Claude Code ils s'appellent `/mcp__snapmaker-orca__<prompt>` (taper `/` puis le nom) et ne sont chargés qu'au
+démarrage : relancer Claude Code si le slicer n'était pas ouvert à ce moment.
+
 Connexion automatique (case dans la fenêtre MCP, activée par défaut) : au démarrage, pendant 2 minutes, si
 aucune imprimante n'est connectée et qu'une seule est en ligne (`query.device.list`), le slicer s'y connecte
 (`action.device.connect`, comme l'onglet Appareil). Une seule tentative ; jamais si plusieurs sont en ligne.
 
 Adaptation d'un projet prévu pour une autre imprimante (3MF MakerWorld…) : outil `adapt_to_printer` et
-prompt `/adapt_project`, plus une notification dans le slicer quand le projet ouvert vise un autre modèle que
+prompt `adapt_project`, plus une notification dans le slicer quand le projet ouvert vise un autre modèle que
 l'imprimante connectée (case dans la fenêtre MCP, activée par défaut ; surveillance par minuterie, sans point
 d'accroche). Après confirmation : preset de l'imprimante connectée avec sa buse, procédé à la hauteur de couche
 la plus proche, et chaque emplacement de filament déplacé vers la tête chargée la plus proche (même matériau,
