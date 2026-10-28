@@ -43,6 +43,8 @@ if (SNAPMAKER_AI_ASSISTANT)
         ${_ai_dir}/McpToolUtils.hpp
         ${_ai_dir}/PrinterAutoConnect.cpp
         ${_ai_dir}/PrinterAutoConnect.hpp
+        ${_ai_dir}/ProjectAdapt.cpp
+        ${_ai_dir}/ProjectAdapt.hpp
     )
     target_compile_definitions(libslic3r_gui PRIVATE SNAPMAKER_AI_ASSISTANT)
     message(STATUS "AI assistant: enabled")

@@ -10,6 +10,7 @@
 #include "McpRender.hpp"
 #include "McpSlicing.hpp"
 #include "McpToolUtils.hpp"
+#include "ProjectAdapt.hpp"
 
 #include "libslic3r/Model.hpp"
 #include "libslic3r/PresetBundle.hpp"
@@ -338,6 +339,24 @@ const std::vector<Tool>& tools()
                 { "timeout_s", { { "type", "integer" }, { "minimum", 10 }, { "maximum", 600 }, { "default", 120 } } } } } },
           30s,
           11min },
+        { "adapt_to_printer",
+          "Adapts a project made for another printer (e.g. a 3MF downloaded from MakerWorld) to the connected "
+          "printer, after the user's confirmation: printer preset with the printer's nozzle, process preset with the "
+          "closest layer height, and for each filament slot the preset and color of the closest loaded toolhead (same "
+          "material first, then closest color; filament_mapping overrides it). Returns the original process settings "
+          "that the switch changed (changed_settings): restore the designer's intent from them with apply_changes. "
+          "Needs a connected printer.",
+          [](const json& args, ToolContext& ctx) { return adapt_to_printer(args, ctx.abandoned); },
+          { { "type", "object" },
+            { "properties",
+              { { "filament_mapping",
+                  { { "type", "array" },
+                    { "items",
+                      { { "type", "object" },
+                        { "properties", { { "slot", { { "type", "integer" }, { "minimum", 1 } } }, { "toolhead", { { "type", "integer" }, { "minimum", 1 } } } } },
+                        { "required", { "slot", "toolhead" } } } },
+                    { "description", "Optional: toolhead for some filament slots instead of the closest one" } } } } } },
+          10min },
         { "unload_filament",
           "Unloads the filament of printer toolheads, like the unload button of the printer screen: the printer heats "
           "each nozzle, retracts the filament and turns the heaters off at the end. Needs the 'printer control' "
@@ -416,6 +435,22 @@ const char* INSTRUCTIONS =
     "look at the model from the relevant side and slice to get the supports and per-feature results; the user may "
     "also paste a screenshot of the preview. Slice again after changes to confirm the fix.";
 
+const char* ADAPT_PROMPT =
+    "The project open in my slicer was made for another printer (often a 3MF from MakerWorld). Adapt it to my "
+    "connected printer:\n"
+    "1. get_project and get_printer_status: note the original printer, the filaments of each slot and what is loaded "
+    "in each toolhead.\n"
+    "2. Call adapt_to_printer (I confirm in the slicer). If a slot clearly belongs to another toolhead than the "
+    "closest one (e.g. support material), pass filament_mapping.\n"
+    "3. From changed_settings, decide which original values express the designer's intent and suit my printer "
+    "(layer height, wall loops, top/bottom shells, infill density and pattern, supports, brim, seam, ironing, "
+    "per-feature line widths in proportion to the nozzle...). Check the limits with describe_setting. Keep my "
+    "printer's values for machine-specific settings (speeds and accelerations beyond its limits, prime tower and "
+    "flushing made for a single-nozzle printer, retraction, temperatures of the new filament presets).\n"
+    "4. Show me the list of restored settings with the reason for each, then apply_changes.\n"
+    "5. get_issues and fix errors, then slice and render_view to check.\n"
+    "6. Offer to record_experience with the original printer, so that we learn from these adaptations.";
+
 const char* CAPITALIZE_PROMPT =
     "Turn my confirmed print experiences into guides of this repository.\n"
     "1. Call search_experiences with status=confirmed and limit=500. Skip records that already have capitalized_in.\n"
@@ -464,6 +499,9 @@ json McpTools::list_prompts() const
           { { "name", "capitalize_experiences" },
             { "description", "Turn confirmed experiences of the journal into reviewed guides of the repository "
                              "(run from Claude Code in the fork's working copy)." } },
+          { { "name", "adapt_project" },
+            { "description", "Adapt a project made for another printer (e.g. a MakerWorld 3MF) to the connected printer "
+                             "and restore the designer's settings where they suit it." } },
           { { "name", "fix_issues" },
             { "description", "Find the problems reported by the slicer and fix them, blocking errors first." } },
           { { "name", "optimize_settings" },
@@ -495,6 +533,8 @@ json McpTools::get_prompt(const std::string& name, const json& arguments)
                                   "slot prints the feature. Explain the cause, then propose the fix with "
                                   "apply_changes and slice again to confirm it.");
     }
+    if (name == "adapt_project")
+        return prompt_message("Adapt project to my printer", ADAPT_PROMPT);
     if (name == "optimize_settings") {
         const std::string goal = arguments.value("goal", std::string());
         if (goal.empty())

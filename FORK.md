@@ -73,6 +73,7 @@ dans Claude Code, Gemini CLI ou Claude Desktop. Le serveur écoute uniquement su
 | `McpPrinterLive` | Lecture en direct (`printer.objects.query`), photo de la caméra (`printer_snapshot`), suivi d'impression (`watch_print`) |
 | `McpPrinterControl` | Seule commande envoyée à l'imprimante : déchargement des têtes (`unload_filament`) |
 | `PrinterAutoConnect` | Connexion automatique au démarrage quand une seule imprimante est en ligne |
+| `ProjectAdapt` | Adaptation d'un projet à l'imprimante connectée (`adapt_to_printer`) et notification |
 | `McpExperiences` | Journal local des retours d'expérience (`record_experience`, `report_outcome`, `search_experiences`) |
 | `McpDocs` | Documentation des réglages livrée avec l'application (`describe_setting`, `read_documentation`) |
 | `McpService` | Cycle de vie du serveur (démarrage, arrêt à la fermeture) |
@@ -80,12 +81,22 @@ dans Claude Code, Gemini CLI ou Claude Desktop. Le serveur écoute uniquement su
 | `McpDialog` | Fenêtre de réglages |
 
 Outils : `get_issues`, `get_project`, `get_config`, `describe_setting`, `read_documentation`, `apply_changes`,
-`slice`, `render_view`, `get_printer_status`, `printer_snapshot`, `watch_print`, `unload_filament`,
+`slice`, `render_view`, `adapt_to_printer`, `get_printer_status`, `printer_snapshot`, `watch_print`, `unload_filament`,
 `record_experience`, `report_outcome`, `search_experiences`.
 
 Connexion automatique (case dans la fenêtre MCP, activée par défaut) : au démarrage, pendant 2 minutes, si
 aucune imprimante n'est connectée et qu'une seule est en ligne (`query.device.list`), le slicer s'y connecte
 (`action.device.connect`, comme l'onglet Appareil). Une seule tentative ; jamais si plusieurs sont en ligne.
+
+Adaptation d'un projet prévu pour une autre imprimante (3MF MakerWorld…) : outil `adapt_to_printer` et
+prompt `/adapt_project`, plus une notification dans le slicer quand le projet ouvert vise un autre modèle que
+l'imprimante connectée (case dans la fenêtre MCP, activée par défaut ; surveillance par minuterie, sans point
+d'accroche). Après confirmation : preset de l'imprimante connectée avec sa buse, procédé à la hauteur de couche
+la plus proche, et chaque emplacement de filament déplacé vers la tête chargée la plus proche (même matériau,
+puis couleur la plus proche). Sur la U1 l'emplacement N imprime par défaut avec la tête N : le projet prend un
+emplacement par tête et tout suit (peinture, filament des objets, volumes et plages, filaments par fonction).
+Les réglages de procédé d'origine qui diffèrent sont renvoyés pour que l'assistant restaure l'intention du
+modèle.
 
 `apply_changes` refuse `post_process` (scripts exécutés sur l'ordinateur à l'export du G-code), même confirmé.
 
@@ -108,8 +119,8 @@ dans la fenêtre MCP, désactivées par défaut :
 La documentation vient de `doc/` (wiki OrcaSlicer) : `scripts/fork/build-setting-docs.py` relie chaque réglage
 à sa section grâce aux liens d'aide de `Tab.cpp` et produit `resources/ai_assistant/setting_docs.json`, livré
 avec l'application (aucun accès réseau). `sync-upstream.sh` le régénère et le commite après chaque fusion.
-Prompts (commandes slash dans Claude Code / Gemini CLI) : `diagnose_print`, `fix_issues`, `optimize_settings`,
-`capitalize_experiences`.
+Prompts (commandes slash dans Claude Code / Gemini CLI) : `adapt_project`, `diagnose_print`, `fix_issues`,
+`optimize_settings`, `capitalize_experiences`.
 
 ### Retours d'expérience
 

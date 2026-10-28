@@ -38,6 +38,8 @@ McpSettings McpSettings::load()
         s.printer_control = is_true(value);
     if (cfg->get(SECTION, "auto_connect_printer", value) && !value.empty())
         s.auto_connect_printer = is_true(value);
+    if (cfg->get(SECTION, "suggest_adaptation", value) && !value.empty())
+        s.suggest_adaptation = is_true(value);
 
     if (s.token.empty()) {
         s.token = generate_token();
@@ -58,6 +60,7 @@ void McpSettings::save() const
     cfg->set(SECTION, "mcp_printer_access", printer_access);
     cfg->set(SECTION, "mcp_printer_control", printer_control);
     cfg->set(SECTION, "auto_connect_printer", auto_connect_printer);
+    cfg->set(SECTION, "suggest_adaptation", suggest_adaptation);
 }
 
 std::string McpSettings::generate_token()

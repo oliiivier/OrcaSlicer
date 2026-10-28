@@ -21,6 +21,8 @@ struct McpSettings
     bool           printer_control { false };
     // At startup, connects to the printer when it is the only one online.
     bool           auto_connect_printer { true };
+    // Offers to adapt a project made for another printer to the connected one.
+    bool           suggest_adaptation { true };
 
     static McpSettings load();
     void               save() const;

@@ -122,6 +122,8 @@ McpDialog::McpDialog(wxWindow* parent)
     m_printer_control->Enable(settings.printer_access);
     m_auto_connect = new ::CheckBox(this);
     m_auto_connect->SetValue(settings.auto_connect_printer);
+    m_suggest_adaptation = new ::CheckBox(this);
+    m_suggest_adaptation->SetValue(settings.suggest_adaptation);
 
     m_port = new SpinInput(this, wxEmptyString, wxEmptyString, wxDefaultPosition, wxSize(FromDIP(120), -1), wxSP_ARROW_KEYS, 1025,
                            65535, settings.port);
@@ -162,6 +164,10 @@ McpDialog::McpDialog(wxWindow* parent)
     sizer->Add(checkbox_row(this, m_auto_connect,
                             _L("At startup, connect to the printer when it is the only one available."), wrap),
                0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(8));
+    sizer->Add(checkbox_row(this, m_suggest_adaptation,
+                            _L("Offer to adapt projects made for another printer (e.g. downloaded 3MF files) to the connected one."),
+                            wrap),
+               0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(8));
     sizer->Add(grid, 0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, margin);
     sizer->Add(label(this, _L("Client configuration"), Label::Head_14), 0, wxLEFT | wxRIGHT | wxTOP, margin);
     sizer->Add(m_instructions, 1, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(8));
@@ -194,6 +200,12 @@ McpDialog::McpDialog(wxWindow* parent)
     m_auto_connect->Bind(wxEVT_TOGGLEBUTTON, [this](wxCommandEvent& e) {
         McpSettings s          = McpSettings::load();
         s.auto_connect_printer = m_auto_connect->GetValue();
+        s.save();
+        e.Skip();
+    });
+    m_suggest_adaptation->Bind(wxEVT_TOGGLEBUTTON, [this](wxCommandEvent& e) {
+        McpSettings s        = McpSettings::load();
+        s.suggest_adaptation = m_suggest_adaptation->GetValue();
         s.save();
         e.Skip();
     });
