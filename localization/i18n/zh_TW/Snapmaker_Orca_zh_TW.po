@@ -18746,3 +18746,22 @@ msgstr "啟用內支撐肋以增強擦料塔的穩定性。"
 
 msgid "Enable tower interface features"
 msgstr "啟用料塔接觸層最佳化"
+
+msgid "The existing file is replaced."
+msgstr "現有檔案將被取代。"
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the G-code of the current plate to %s. "
+"Export it?"
+msgstr "AI 助理請求將目前列印板的 G-code 匯出到 %s。是否匯出？"
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the sliced current plate (3MF with its "
+"G-code) to %s. Export it?"
+msgstr "AI 助理請求將已切片的目前列印板（含 G-code 的 3MF）匯出到 %s。是否匯出？"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
+msgstr "AI 助理請求將物件以 STL 格式匯出到 %s。是否匯出？"

@@ -19543,6 +19543,25 @@ msgid ""
 "operations?"
 msgstr "L'assistent d'IA demana canviar les safates del projecte. Voleu aplicar aquestes operacions?"
 
+msgid "The existing file is replaced."
+msgstr "Se substitueix el fitxer existent."
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the G-code of the current plate to %s. "
+"Export it?"
+msgstr "L'assistent d'IA demana exportar el G-code de la placa actual a %s. Voleu exportar-lo?"
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the sliced current plate (3MF with its "
+"G-code) to %s. Export it?"
+msgstr "L'assistent d'IA demana exportar la placa actual laminada (3MF amb el seu G-code) a %s. Voleu exportar-la?"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
+msgstr "L'assistent d'IA demana exportar els objectes com a STL a %s. Voleu exportar-los?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

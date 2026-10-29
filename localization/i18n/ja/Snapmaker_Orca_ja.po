@@ -17342,6 +17342,25 @@ msgid ""
 "operations?"
 msgstr "AIアシスタントがプロジェクトのプレートの変更を求めています。これらの操作を適用しますか?"
 
+msgid "The existing file is replaced."
+msgstr "既存のファイルは置き換えられます。"
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the G-code of the current plate to %s. "
+"Export it?"
+msgstr "AIアシスタントが現在のプレートのGコードを %s にエクスポートしようとしています。エクスポートしますか？"
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the sliced current plate (3MF with its "
+"G-code) to %s. Export it?"
+msgstr "AIアシスタントがスライス済みの現在のプレート（Gコード付き3MF）を %s にエクスポートしようとしています。エクスポートしますか？"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
+msgstr "AIアシスタントがオブジェクトをSTLとして %s にエクスポートしようとしています。エクスポートしますか？"
+
 #~ msgid "Alt + Mouse wheel"
 #~ msgstr "Alt + マウスホイール"
 

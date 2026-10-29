@@ -16801,3 +16801,22 @@ msgid ""
 "The AI assistant asks to change the plates of the project. Apply these "
 "operations?"
 msgstr ""
+
+msgid "The existing file is replaced."
+msgstr ""
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the G-code of the current plate to %s. "
+"Export it?"
+msgstr ""
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the sliced current plate (3MF with its "
+"G-code) to %s. Export it?"
+msgstr ""
+
+#, c-format, boost-format
+msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
+msgstr ""

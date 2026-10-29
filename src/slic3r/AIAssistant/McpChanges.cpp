@@ -208,10 +208,10 @@ Change parse_change(const json& item)
             throw ToolError("'toolhead' must be between 1 and " + std::to_string(vec->size()));
         std::unique_ptr<ConfigOption> single(c.def->create_empty_option());
         if (!single->deserialize(value) || static_cast<ConfigOptionVectorBase*>(single.get())->size() != 1)
-            throw ToolError("invalid value '" + value + "' for one toolhead, see describe_setting");
+            throw ToolError("invalid value '" + value + "' for one toolhead, see get_docs (setting)");
         vec->set_at(single.get(), size_t(c.toolhead - 1), 0);
     } else if (!c.value->deserialize(value)) {
-        throw ToolError("invalid value '" + value + "', see describe_setting");
+        throw ToolError("invalid value '" + value + "', see get_docs (setting)");
     }
 
     if (c.filament_slot > 0)

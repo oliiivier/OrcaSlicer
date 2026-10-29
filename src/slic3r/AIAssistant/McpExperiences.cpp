@@ -220,7 +220,7 @@ json record_experience(const json& args)
     return { { "id", record["id"] },
              { "status", status_of(record) },
              { "changes_attached", record["changes"].size() },
-             { "message", "Saved in the local journal. After the user has printed, record the real result with report_outcome." } };
+             { "message", "Saved in the local journal. After the user has printed, record the real result with experiences (report)." } };
 }
 
 json report_outcome(const json& args)

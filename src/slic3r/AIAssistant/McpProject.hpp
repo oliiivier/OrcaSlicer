@@ -18,9 +18,10 @@ nlohmann::json new_project(const nlohmann::json& args, const std::atomic<bool>& 
 nlohmann::json open_project(const nlohmann::json& args, const std::atomic<bool>& abandoned);
 // Adds models from files (args.paths, or the user picks them) to the current plate.
 nlohmann::json import_models(const nlohmann::json& args, const std::atomic<bool>& abandoned);
+// Saves the project to its file, to args.path, or with the slicer's save dialog.
 nlohmann::json save_project(const nlohmann::json& args, const std::atomic<bool>& abandoned);
 // Exports the G-code or the sliced 3MF of the current plate, or the STL of the
-// objects, with the slicer's save dialog.
+// objects, to args.path or with the slicer's save dialog.
 nlohmann::json export_file(const nlohmann::json& args, const std::atomic<bool>& abandoned);
 
 // Selects, adds, deletes, renames plates and changes their settings (bed type,

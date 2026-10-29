@@ -16,7 +16,7 @@ nlohmann::json setting_documentation(const std::string& key);
 // What the model can rely on for a setting without documentation page.
 std::string no_documentation_note(bool has_tooltip);
 
-// "read_documentation" tool: without a page, lists the pages; with a page (and
+// get_docs (page): without a page, lists the pages; with a page (and
 // optionally a section anchor), returns its text.
 nlohmann::json read_documentation(const nlohmann::json& args);
 

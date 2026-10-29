@@ -19683,6 +19683,25 @@ msgid ""
 "operations?"
 msgstr "O assistente de IA pede para alterar as placas do projeto. Aplicar estas operações?"
 
+msgid "The existing file is replaced."
+msgstr "O arquivo existente será substituído."
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the G-code of the current plate to %s. "
+"Export it?"
+msgstr "O assistente de IA pede para exportar o G-code da placa atual para %s. Exportar?"
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the sliced current plate (3MF with its "
+"G-code) to %s. Export it?"
+msgstr "O assistente de IA pede para exportar a placa atual fatiada (3MF com seu G-code) para %s. Exportar?"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
+msgstr "O assistente de IA pede para exportar os objetos como STL para %s. Exportar?"
+
 #~ msgid "Enable filament ramming."
 #~ msgstr "Ativar moldeamento de ponta de filamento."
 

@@ -19377,6 +19377,25 @@ msgid ""
 "operations?"
 msgstr "ШІ-асистент просить змінити пластини проєкту. Застосувати ці операції?"
 
+msgid "The existing file is replaced."
+msgstr "Наявний файл буде замінено."
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the G-code of the current plate to %s. "
+"Export it?"
+msgstr "ШІ-асистент просить експортувати G-код поточної пластини до %s. Експортувати?"
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the sliced current plate (3MF with its "
+"G-code) to %s. Export it?"
+msgstr "ШІ-асистент просить експортувати нарізану поточну пластину (3MF з G-кодом) до %s. Експортувати?"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
+msgstr "ШІ-асистент просить експортувати об'єкти як STL до %s. Експортувати?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

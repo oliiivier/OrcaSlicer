@@ -661,6 +661,10 @@ header svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke
       tt.tools[e.id] = chip;
       showThinking(true);
       break;
+    case "tool_action":
+      var named = turn && turn.tools[e.id];
+      if (named) named.lastChild.textContent += " \u00b7 " + e.action.replace(/_/g, " ");
+      break;
     case "tool_result":
       var owner = turn && turn.tools[e.id];
       if (!owner) break;

@@ -18088,6 +18088,25 @@ msgid ""
 "operations?"
 msgstr "De AI-assistent vraagt om de printbedden van het project te wijzigen. Deze bewerkingen toepassen?"
 
+msgid "The existing file is replaced."
+msgstr "Het bestaande bestand wordt vervangen."
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the G-code of the current plate to %s. "
+"Export it?"
+msgstr "De AI-assistent vraagt de G-code van de huidige plaat te exporteren naar %s. Exporteren?"
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the sliced current plate (3MF with its "
+"G-code) to %s. Export it?"
+msgstr "De AI-assistent vraagt de geslicete huidige plaat (3MF met G-code) te exporteren naar %s. Exporteren?"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
+msgstr "De AI-assistent vraagt de objecten als STL te exporteren naar %s. Exporteren?"
+
 #~ msgid "Alt + Mouse wheel"
 #~ msgstr "Alt + muiswiel"
 

@@ -18108,6 +18108,25 @@ msgid ""
 "operations?"
 msgstr "AI asistent žádá o změnu podložek projektu. Použít tyto operace?"
 
+msgid "The existing file is replaced."
+msgstr "Stávající soubor bude nahrazen."
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the G-code of the current plate to %s. "
+"Export it?"
+msgstr "Asistent AI žádá o export G-code aktuální podložky do %s. Exportovat?"
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the sliced current plate (3MF with its "
+"G-code) to %s. Export it?"
+msgstr "Asistent AI žádá o export slicované aktuální podložky (3MF s G-code) do %s. Exportovat?"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
+msgstr "Asistent AI žádá o export objektů jako STL do %s. Exportovat?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

@@ -11,6 +11,7 @@ instance and writes a report. The test mode answers every confirmation by itself
     python3 -I scripts/fork/mcp-test.py                 # every scenario without tag
     python3 -I scripts/fork/mcp-test.py objects plates  # some scenarios, by file name
     python3 -I scripts/fork/mcp-test.py --tags printer  # also the scenarios needing a real printer
+    python3 -I scripts/fork/mcp-test.py 90-printer --tags printer  # scenario names before --tags
 
 Scenario file: { "description", "confirm": "yes" | "no", "tags": [...], "steps": [step...] }.
 A step: { "call": tool, "args": {...}, "expect": {...}, "error": bool, "error_contains": text,

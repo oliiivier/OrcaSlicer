@@ -2,20 +2,139 @@
   "description": "Reading tools on an empty project, and the printer tools refused without printer access.",
   "confirm": "yes",
   "steps": [
-    { "call": "new_project", "args": {}, "expect": { "done": true } },
-    { "call": "get_issues", "args": {}, "expect": { "plate": 1, "summary": "$any", "issues": "$any" } },
-    { "call": "get_project", "args": {}, "expect": { "objects": [], "plates": [{ "plate": 1, "current": true }], "materials": "$any" } },
-    { "call": "get_config", "args": { "keys": ["layer_height", "no_such_setting"] },
-      "expect": { "values": { "layer_height": "$any" }, "unknown_keys": ["no_such_setting"] } },
-    { "call": "get_config", "args": { "search": "wall_loops" }, "expect": { "values": { "wall_loops": "$any" } } },
-    { "call": "describe_setting", "args": { "keys": ["wall_loops"] },
-      "expect": { "wall_loops": { "label": "$any", "current": "$any", "documentation": "$any" } } },
-    { "call": "describe_setting", "args": {}, "error": true },
-    { "call": "read_documentation", "args": {}, "expect": { "pages": "$any" } },
-    { "call": "get_printer_status", "args": {}, "expect": { "connected": false } },
-    { "call": "printer_snapshot", "args": {}, "error": true },
-    { "call": "unload_filament", "args": { "toolheads": [1] }, "error": true, "error_contains": "printer control is disabled" },
-    { "call": "control_print", "args": { "action": "pause" }, "error": true },
-    { "call": "start_print", "args": {}, "error": true, "error_contains": "printer control is disabled" }
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "new"
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "get_issues",
+      "args": {},
+      "expect": {
+        "plate": 1,
+        "summary": "$any",
+        "issues": "$any"
+      }
+    },
+    {
+      "call": "get_project",
+      "args": {},
+      "expect": {
+        "objects": [],
+        "plates": [
+          {
+            "plate": 1,
+            "current": true
+          }
+        ],
+        "materials": "$any"
+      }
+    },
+    {
+      "call": "get_config",
+      "args": {
+        "keys": [
+          "layer_height",
+          "no_such_setting"
+        ]
+      },
+      "expect": {
+        "values": {
+          "layer_height": "$any"
+        },
+        "unknown_keys": [
+          "no_such_setting"
+        ]
+      }
+    },
+    {
+      "call": "get_config",
+      "args": {
+        "search": "wall_loops"
+      },
+      "expect": {
+        "values": {
+          "wall_loops": "$any"
+        }
+      }
+    },
+    {
+      "call": "get_docs",
+      "args": {
+        "action": "setting",
+        "keys": [
+          "wall_loops"
+        ]
+      },
+      "expect": {
+        "wall_loops": {
+          "label": "$any",
+          "current": "$any",
+          "documentation": "$any"
+        }
+      }
+    },
+    {
+      "call": "get_docs",
+      "args": {
+        "action": "setting"
+      },
+      "error": true
+    },
+    {
+      "call": "get_docs",
+      "args": {
+        "action": "page"
+      },
+      "expect": {
+        "pages": "$any"
+      }
+    },
+    {
+      "call": "get_printer",
+      "args": {
+        "action": "status"
+      },
+      "expect": {
+        "connected": false
+      }
+    },
+    {
+      "call": "get_printer",
+      "args": {
+        "action": "snapshot"
+      },
+      "error": true
+    },
+    {
+      "call": "control_printer",
+      "args": {
+        "action": "unload_filament",
+        "toolheads": [
+          1
+        ]
+      },
+      "error": true,
+      "error_contains": "printer control is disabled"
+    },
+    {
+      "call": "control_printer",
+      "args": {
+        "action": "pause"
+      },
+      "error": true
+    },
+    {
+      "call": "control_printer",
+      "args": {
+        "action": "start_print"
+      },
+      "error": true,
+      "error_contains": "printer control is disabled"
+    }
   ]
 }

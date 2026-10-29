@@ -1,9 +1,28 @@
 {
   "description": "Snapmaker wiki and support site, live.",
   "confirm": "yes",
-  "tags": ["network"],
+  "tags": [
+    "network"
+  ],
   "steps": [
-    { "call": "search_manufacturer_docs", "args": { "query": "U1 unload filament" }, "expect": { "results": "$any" } },
-    { "call": "read_manufacturer_page", "args": { "url": "https://example.com/" }, "error": true }
+    {
+      "call": "manufacturer_docs",
+      "args": {
+        "action": "search",
+        "query": "U1 unload filament"
+      },
+      "expect": {
+        "query": "U1 unload filament",
+        "support": "$any"
+      }
+    },
+    {
+      "call": "manufacturer_docs",
+      "args": {
+        "action": "read",
+        "url": "https://example.com/"
+      },
+      "error": true
+    }
   ]
 }

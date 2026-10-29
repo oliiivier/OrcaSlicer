@@ -17784,6 +17784,25 @@ msgid ""
 "operations?"
 msgstr "Az MI-asszisztens a projekt tálcáinak módosítását kéri. Alkalmazza ezeket a műveleteket?"
 
+msgid "The existing file is replaced."
+msgstr "A meglévő fájl felülíródik."
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the G-code of the current plate to %s. "
+"Export it?"
+msgstr "Az MI-asszisztens az aktuális tálca G-kódjának exportálását kéri ide: %s. Exportálja?"
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the sliced current plate (3MF with its "
+"G-code) to %s. Export it?"
+msgstr "Az MI-asszisztens a szeletelt aktuális tálca (3MF a G-kódjával) exportálását kéri ide: %s. Exportálja?"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
+msgstr "Az MI-asszisztens az objektumok STL-ként való exportálását kéri ide: %s. Exportálja?"
+
 #~ msgid "Alt + Mouse wheel"
 #~ msgstr "Alt + Egérgörgő"
 

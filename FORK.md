@@ -123,29 +123,38 @@ ces jetons ; seul un bac à sable (Flatpak, firejail...) l'en empêche.
 | `McpIssues` | Collecte des erreurs et avertissements du slicer (`get_issues`) |
 | `McpChanges` | Validation, confirmation et application des réglages (`apply_changes`) |
 | `McpChangesDialog` | Fenêtre de confirmation : une case par réglage, aide du réglage et commentaire du modèle au survol |
-| `McpManufacturerDocs` | Documentation Snapmaker en ligne : wiki et site de support (`search_manufacturer_docs`, `read_manufacturer_page`) |
+| `McpManufacturerDocs` | Documentation Snapmaker en ligne : wiki et site de support (`manufacturer_docs`) |
 | `McpMaterials` | Têtes, emplacements de filament, filaments mixtes, attribution par élément |
-| `McpNotes` | Instructions de l'utilisateur et dossier de notes Markdown partagé (`list_notes`, `read_note`, `write_note`) |
+| `McpNotes` | Instructions de l'utilisateur et dossier de notes Markdown partagé (`notes`) |
 | `McpObjects` | Opérations de l'onglet Préparer sur les objets, après confirmation (`edit_objects`) |
 | `McpSlicing` | Slicing de la plaque courante ou de toutes les plaques et résumé du résultat (`slice`) |
-| `McpProject` | Fichiers, plaques et lancement d'impression (`new_project`, `open_project`, `import_models`, `save_project`, `export_file`, `edit_plates`, `start_print`) |
-| `McpRender` | Rendu PNG du plateau depuis une vue nommée (`render_view`) |
-| `McpPrinter` | Lecture seule de l'imprimante connectée (`get_printer_status`, écarts projet/imprimante) |
-| `McpPrinterLive` | Lecture en direct (`printer.objects.query`), photo de la caméra (`printer_snapshot`), suivi d'impression (`watch_print`) |
-| `McpPrinterControl` | Commandes envoyées à l'imprimante : déchargement des têtes (`unload_filament`), pause, reprise et arrêt (`control_print`) |
+| `McpProject` | Fichiers, plaques et lancement d'impression (`edit_project`, `edit_plates`, `control_printer` start_print) |
+| `McpRender` | Rendu PNG du plateau depuis une vue nommée (`get_view`) |
+| `McpPrinter` | Lecture seule de l'imprimante connectée (`get_printer` status, écarts projet/imprimante) |
+| `McpPrinterLive` | Lecture en direct (`printer.objects.query`), photo de la caméra et suivi d'impression (`get_printer` snapshot, watch) |
+| `McpPrinterControl` | Commandes envoyées à l'imprimante (`control_printer`) : déchargement des têtes, pause, reprise et arrêt |
 | `PrinterAutoConnect` | Connexion automatique au démarrage quand une seule imprimante est en ligne |
 | `ProjectAdapt` | Adaptation d'un projet à l'imprimante connectée (`adapt_to_printer`) et notification |
-| `McpExperiences` | Journal local des retours d'expérience (`record_experience`, `report_outcome`, `search_experiences`) |
-| `McpDocs` | Documentation des réglages livrée avec l'application (`describe_setting`, `read_documentation`) |
+| `McpExperiences` | Journal local des retours d'expérience (`experiences`) |
+| `McpDocs` | Documentation des réglages livrée avec l'application (`get_docs`) |
 | `McpService` | Cycle de vie du serveur (démarrage, arrêt à la fermeture) |
 | `McpSettings` | Section `[ai_assistant]` de la configuration de l'application |
 | `McpDialog` | Fenêtre de réglages |
 
-Outils : `get_issues`, `get_project`, `get_config`, `describe_setting`, `read_documentation`, `apply_changes`,
-`edit_objects`, `edit_plates`, `new_project`, `open_project`, `import_models`, `save_project`, `export_file`,
-`list_notes`, `read_note`, `write_note`, `search_manufacturer_docs`, `read_manufacturer_page`, `slice`, `render_view`,
-`adapt_to_printer`, `get_printer_status`, `printer_snapshot`, `watch_print`, `start_print`, `control_print`, `unload_filament`,
-`record_experience`, `report_outcome`, `search_experiences`.
+Outils (regroupés par domaine, le paramètre `action` choisit l'opération) : `get_issues`, `get_project`,
+`get_config`, `get_docs` (setting, page), `apply_changes`, `edit_objects`, `edit_plates`, `edit_project` (new,
+open, import, save, export), `adapt_to_printer`, `slice`, `get_view` (model), `get_printer` (status, snapshot,
+watch), `control_printer` (start_print, pause, resume, cancel, unload_filament), `notes` (list, read, write),
+`experiences` (search, record, report), `manufacturer_docs` (search, read). Le chat affiche l'action à côté du
+nom de l'outil.
+
+Noms changés depuis la version à 30 outils : `describe_setting` / `read_documentation` → `get_docs`,
+`render_view` → `get_view`, `get_printer_status` / `printer_snapshot` / `watch_print` → `get_printer`,
+`start_print` / `control_print` / `unload_filament` → `control_printer`, `list_notes` / `read_note` / `write_note`
+→ `notes`, `record_experience` / `report_outcome` / `search_experiences` → `experiences`,
+`search_manufacturer_docs` / `read_manufacturer_page` → `manufacturer_docs`, `new_project` / `open_project` /
+`import_models` / `save_project` / `export_file` → `edit_project`. Les instructions écrites par l'utilisateur
+(fenêtre MCP) qui citent d'anciens noms ne sont pas réécrites : les mettre à jour à la main.
 
 Prompts : `adapt_project`, `diagnose_print`, `fix_issues`, `optimize_settings`, `capitalize_experiences`. Dans
 Claude Code ils s'appellent `/mcp__snapmaker-orca__<prompt>` (taper `/` puis le nom) et ne sont chargés qu'au
@@ -205,15 +214,16 @@ gizmos ; un gizmo ouvert bloque l'outil. La sélection est vidée avant les opé
 remplacent un objet ou une pièce (la liste des objets la redessinerait sur des volumes supprimés). Pièces
 coupées : `<nom>_A` (haut), `<nom>_B` (bas).
 
-Fichiers et plaques : les outils appellent les commandes du slicer, avec ses propres dialogues. Nouveau projet,
-ouverture d'un chemin donné, import de fichiers donnés et enregistrement dans le fichier courant sont confirmés
-par une question ; sans chemin, ou pour *Enregistrer sous* et les exports (G-code ou 3MF tranché de la plaque
-courante, STL des objets), le dialogue de fichier du slicer sert de confirmation. Le slicer demande lui-même
-d'enregistrer un projet modifié avant de le fermer. Les chemins donnés doivent être absolus (`~` accepté) et
-désigner un fichier existant d'un type connu. `edit_plates` sélectionne (sans confirmation), ajoute, supprime
-(une plaque vide seulement : sinon ses objets partiraient hors des plaques), renomme les plaques et règle leur
-type de plateau et leur ordre d'impression, comme la fenêtre de réglages de la plaque. `get_project` liste les
-plaques ; `slice` avec `all_plates` agit comme *Trancher tout*.
+Fichiers et plaques : `edit_project` appelle les commandes du slicer. Nouveau projet, ouverture, import et
+enregistrement d'un chemin donné, exports vers un chemin donné (G-code de la plaque courante copié tel que
+tranché, sans les scripts de post-traitement ; 3MF tranché de la plaque courante ; STL de tous les objets en
+un maillage) sont confirmés par une question ; un fichier existant n'est remplacé qu'avec `overwrite: true`.
+Sans chemin, ou pour *Enregistrer sous* (`save_as`), le dialogue de fichier du slicer sert de confirmation. Le
+slicer demande lui-même d'enregistrer un projet modifié avant de le fermer. Les chemins donnés doivent être
+absolus (`~` accepté). `edit_plates` sélectionne (sans confirmation), ajoute, supprime (une plaque vide
+seulement : sinon ses objets partiraient hors des plaques), renomme les plaques et règle leur type de plateau
+et leur ordre d'impression, comme la fenêtre de réglages de la plaque. `get_project` liste les plaques ;
+`slice` avec `all_plates` agit comme *Trancher tout*.
 
 Accès à l'imprimante, via la connexion Snapmaker Connect déjà ouverte par l'application ; deux cases à cocher
 dans la fenêtre MCP, désactivées par défaut :
@@ -223,7 +233,7 @@ dans la fenêtre MCP, désactivées par défaut :
   `http://<ip>/webcam/snapshot.jpg` sur le réseau local ; pas `camera.start_monitor`, dont le flux reste
   actif ~6 min après l'arrêt), suivi borné d'une impression. Numéros de série, réseau, comptes et secrets sont
   retirés avant envoi au modèle.
-- **Contrôle** (exige la lecture), confirmé dans le slicer à chaque demande : `start_print` ouvre le dialogue
+- **Contrôle** (exige la lecture), `control_printer`, confirmé dans le slicer à chaque demande : `start_print` ouvre le dialogue
   d'impression du slicer pour la plaque tranchée (comme le bouton *Imprimer la plaque* : l'utilisateur vérifie
   le nom et la correspondance des filaments, puis lance) ; `control_print` met en pause, reprend ou arrête
   l'impression (`printer.print.pause`, `resume`, `cancel`) puis attend le nouvel état ; `unload_filament`,
@@ -267,16 +277,15 @@ Plan de réalisation et regroupement des outils : [`src/slic3r/AIAssistant/PLAN.
 1. **Journal local** (`<dossier de config>/ai_assistant/experiences/*.json`, hors dépôt) : une fiche par
    diagnostic. Le serveur y met les faits (imprimante, matériaux, problèmes, réglages modifiés ou refusés via
    `apply_changes`), le modèle le symptôme et le diagnostic, puis le résultat réel de l'impression
-   (`report_outcome`, avec le rapport de l'imprimante si l'accès est activé).
+   (`experiences` report, avec le rapport de l'imprimante si l'accès est activé).
 2. **Capitalisation** : prompt `capitalize_experiences` lancé dans Claude Code depuis ce dépôt. Il regroupe
    les fiches confirmées et rédige `resources/ai_assistant/guides/exp_*.md` (format et règles :
    `resources/ai_assistant/guides/README.md`), puis attend la relecture du diff.
 3. **Injection** : après relecture, commit. Les guides sont livrés dans `setting_docs.json` et servis par
-   `read_documentation` (type `experience`).
+   `get_docs` page (type `experience`).
 
-`render_view` montre le modèle (pas les supports ni les trajectoires) ; pour l'aperçu tranché, l'utilisateur
-peut coller une capture d'écran dans le client. Le serveur traite les requêtes en parallèle (8 fils) :
-un `slice` (jusqu'à 10 min), un `watch_print` ou un `unload_filament` ne bloque pas les autres outils ; leur
+`get_view` (model) montre le modèle (pas les supports ni les trajectoires). Le serveur traite les requêtes en
+parallèle (8 fils) : un `slice` (jusqu'à 10 min), un suivi d'impression ou un déchargement ne bloque pas les autres outils ; leur
 exécution reste sérialisée sur le fil de l'interface. Claude Code abandonne un appel MCP après 60 s par
 défaut : le chat intégré passe `"timeout"` (31 min) dans sa config MCP, un client externe doit être lancé avec
 `MCP_TOOL_TIMEOUT` (valeur affichée dans les paramètres MCP).

@@ -44,7 +44,7 @@ using nlohmann::json;
 namespace {
 
 const char* SERVER_NAME = "snapmaker-orca";
-// Tool result images (render_view, printer_snapshot) larger than this are not shown in the chat.
+// Tool result images (get_view, get_printer snapshot) larger than this are not shown in the chat.
 constexpr size_t MAX_IMAGE_BASE64 = 4 * 1024 * 1024;
 // Screenshots are scaled down to this size: Claude would scale larger ones down anyway.
 constexpr int SCREENSHOT_MAX_EDGE = 1600;
@@ -712,6 +712,13 @@ void ChatPanel::on_claude_message(Conversation& conv, const json& msg)
         } else if (etype == "content_block_stop") {
             post_to(conv, {{"kind", "block_stop"}});
         }
+    } else if (type == "assistant" && msg.contains("message") && msg["message"].contains("content") &&
+               msg["message"]["content"].is_array()) {
+        // The complete tool calls: the action of a tool grouping several is shown next to its name.
+        for (const json& block : msg["message"]["content"])
+            if (block.value("type", "") == "tool_use" && block.contains("input") && block["input"].is_object() &&
+                block["input"].contains("action") && block["input"]["action"].is_string())
+                post_to(conv, {{"kind", "tool_action"}, {"id", block.value("id", "")}, {"action", block["input"]["action"]}});
     } else if (type == "user" && msg.contains("message") && msg["message"].contains("content") &&
                msg["message"]["content"].is_array()) {
         for (const json& block : msg["message"]["content"]) {

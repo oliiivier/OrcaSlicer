@@ -19456,6 +19456,25 @@ msgid ""
 "operations?"
 msgstr "Yapay zekâ asistanı projenin plakalarını değiştirmek istiyor. Bu işlemler uygulansın mı?"
 
+msgid "The existing file is replaced."
+msgstr "Mevcut dosyanın yerine yazılır."
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the G-code of the current plate to %s. "
+"Export it?"
+msgstr "Yapay zekâ asistanı geçerli plakanın G-kodunu %s konumuna dışa aktarmak istiyor. Dışa aktarılsın mı?"
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the sliced current plate (3MF with its "
+"G-code) to %s. Export it?"
+msgstr "Yapay zekâ asistanı dilimlenmiş geçerli plakayı (G-kodlu 3MF) %s konumuna dışa aktarmak istiyor. Dışa aktarılsın mı?"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
+msgstr "Yapay zekâ asistanı nesneleri STL olarak %s konumuna dışa aktarmak istiyor. Dışa aktarılsın mı?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

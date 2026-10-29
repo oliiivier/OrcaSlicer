@@ -160,7 +160,7 @@ toi, traductions des nouveaux textes, mise à jour de `FORK.md`, commit.
 | Phase | Contenu |
 |---|---|
 | 0 ✓ | Base commune (confirmation, résultats, références), instructions par domaine, mode test et banc d'essai, scénarios des outils actuels |
-| 1 | Regroupement vers la liste cible (sans fonction nouvelle) ; `path` pour les exports ; mise à jour des guides et notes qui citent d'anciens noms |
+| 1 ✓ | Regroupement vers la liste cible (sans fonction nouvelle) ; `path` pour les exports ; mise à jour des guides et notes qui citent d'anciens noms |
 | 2 | Préréglages et filaments (sauf chargement) |
 | 3 | Plages de hauteur, événements par couche, annulation |
 | 4 | Aperçu tranché, calibrations |
@@ -177,4 +177,5 @@ toi, traductions des nouveaux textes, mise à jour de `FORK.md`, commit.
 - **Imprimante.** Pause, reprise et arrêt (`printer.print.*`) ne sont pas encore vérifiés sur une vraie
   impression ; le chargement du filament demande une étude préalable.
 - **Coût de contexte.** Fusionner réduit le nombre d'outils mais allonge certaines descriptions : on
-  mesure la taille totale de `tools/list` avant et après la phase 1.
+  mesure la taille totale de `tools/list` avant et après la phase 1. Mesuré : 30 outils, 19 907 octets
+  (instructions 6 015) avant ; 16 outils, 18 299 octets (instructions 5 804) après.

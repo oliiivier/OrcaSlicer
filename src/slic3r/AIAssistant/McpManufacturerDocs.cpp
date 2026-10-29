@@ -363,7 +363,7 @@ json search_manufacturer_docs(const json& args, json& state)
     return { { "query", query },
              { "wiki", wiki_results(r[0]) },
              { "support", support_results(r[1]) },
-             { "note", "Read a page with read_manufacturer_page. Cite its URL and update date to the user." } };
+             { "note", "Read a page with manufacturer_docs (read). Cite its URL and update date to the user." } };
 }
 
 json read_manufacturer_page(const json& args, json& state)

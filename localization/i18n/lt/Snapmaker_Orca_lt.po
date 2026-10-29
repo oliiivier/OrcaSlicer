@@ -19249,6 +19249,25 @@ msgid ""
 "operations?"
 msgstr "DI asistentas prašo pakeisti projekto plokštes. Taikyti šias operacijas?"
 
+msgid "The existing file is replaced."
+msgstr "Esamas failas bus pakeistas."
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the G-code of the current plate to %s. "
+"Export it?"
+msgstr "DI asistentas prašo eksportuoti dabartinės plokštės G-kodą į %s. Eksportuoti?"
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the sliced current plate (3MF with its "
+"G-code) to %s. Export it?"
+msgstr "DI asistentas prašo eksportuoti supjaustytą dabartinę plokštę (3MF su G-kodu) į %s. Eksportuoti?"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
+msgstr "DI asistentas prašo eksportuoti objektus kaip STL į %s. Eksportuoti?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

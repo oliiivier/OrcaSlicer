@@ -4,9 +4,11 @@
 #include "McpSettings.hpp"
 #include "McpToolUtils.hpp"
 
+#include "libslic3r/Format/STL.hpp"
 #include "libslic3r/Format/bbs_3mf.hpp"
 #include "libslic3r/Model.hpp"
 #include "libslic3r/PrintConfig.hpp"
+#include "libslic3r/Utils.hpp"
 #include "slic3r/GUI/Event.hpp"
 #include "slic3r/GUI/GLToolbar.hpp"
 #include "slic3r/GUI/GUI.hpp"
@@ -67,6 +69,15 @@ json project_summary(GUI::Plater& plater)
                  { "objects", std::move(objects) },
                  { "plates", plates_summary() } };
     return out;
+}
+
+// Confirmation line telling that the file at `path` exists and will be replaced.
+std::vector<std::string> replaced_file_line(const fs::path& path)
+{
+    boost::system::error_code ec;
+    if (!fs::exists(path, ec))
+        return {};
+    return { _u8L("The existing file is replaced.") };
 }
 
 int plate_number(GUI::PartPlate& plate) { return plate.get_index() + 1; }
@@ -260,13 +271,32 @@ json import_models(const json& args, const std::atomic<bool>& abandoned)
 
 json save_project(const json& args, const std::atomic<bool>& abandoned)
 {
-    GUI::Plater&   plater  = require_plater();
+    GUI::Plater&      plater = require_plater();
+    const std::string reason = args.value("reason", std::string());
+    if (args.contains("path")) {
+        const fs::path path = output_file(args["path"], ".3mf", args.value("overwrite", false));
+        if (!confirm(reason, replaced_file_line(path),
+                     wxString::Format(_L("The AI assistant asks to save the project to %s. Save it?"), from_u8(path.string()))))
+            return declined();
+        if (abandoned)
+            return timed_out();
+        // As Plater::save_project() once the file is chosen.
+        if (plater.export_3mf(path, SaveStrategy::SplitModel | SaveStrategy::ShareMesh | SaveStrategy::FullPathSources) < 0)
+            throw ToolError("The slicer could not write '" + path.string() + "'");
+        plater.set_project_filename(from_u8(path.string()));
+        plater.up_to_date(true, false);
+        plater.up_to_date(true, true);
+        wxGetApp().update_saved_preset_from_current_preset();
+        plater.reset_project_dirty_after_save();
+        plater.update_title_dirty_status();
+        return done({ { "file", path.string() } });
+    }
+
     const wxString file    = plater.get_project_filename(".3mf");
     const bool     save_as = args.value("save_as", false) || file.empty();
     // Saving as goes through the slicer's file dialog, which is the confirmation.
     if (!save_as) {
-        if (!confirm(args.value("reason", std::string()), {},
-                     wxString::Format(_L("The AI assistant asks to save the project to %s. Save it?"), file)))
+        if (!confirm(reason, {}, wxString::Format(_L("The AI assistant asks to save the project to %s. Save it?"), file)))
             return declined();
         if (abandoned)
             return timed_out();
@@ -277,27 +307,60 @@ json save_project(const json& args, const std::atomic<bool>& abandoned)
     return done({ { "file", into_u8(plater.get_project_filename(".3mf")) } });
 }
 
-json export_file(const json& args, const std::atomic<bool>& /* abandoned */)
+json export_file(const json& args, const std::atomic<bool>& abandoned)
 {
     GUI::Plater&      plater = require_plater();
     const std::string format = args.value("format", std::string());
     if (format != "gcode" && format != "sliced_3mf" && format != "stl")
-        throw ToolError("'format' must be gcode, sliced_3mf or stl (save_project writes the 3MF project)");
+        throw ToolError("'format' must be gcode, sliced_3mf or stl (save writes the 3MF project)");
     if (plater.model().objects.empty())
         throw ToolError("The project has no object to export");
-    // The slicer's save dialog is the confirmation; it writes the file in the background.
-    if (format == "gcode" || format == "sliced_3mf") {
-        if (!plater.get_partplate_list().get_curr_plate()->is_slice_result_valid())
-            throw ToolError("The current plate is not sliced: call slice first");
+    GUI::PartPlate* plate = plater.get_partplate_list().get_curr_plate();
+    if (format != "stl" && !plate->is_slice_result_valid())
+        throw ToolError("The current plate is not sliced: call slice first");
+
+    if (!args.contains("path")) {
+        // The slicer's save dialog is the confirmation; it writes the file in the background.
         if (format == "gcode")
             plater.export_gcode(false);
-        else
+        else if (format == "sliced_3mf")
             plater.export_gcode_3mf(false);
-    } else {
-        plater.export_stl(false, false, false);
+        else
+            plater.export_stl(false, false, false);
+        return { { "done", true },
+                 { "message", "The slicer showed its save dialog: the file is written unless the user cancelled it" } };
     }
-    return { { "done", true },
-             { "message", "The slicer showed its save dialog: the file is written unless the user cancelled it" } };
+
+    const std::string ext  = format == "gcode" ? ".gcode" : format == "stl" ? ".stl" : ".3mf";
+    const fs::path    path = output_file(args["path"], ext, args.value("overwrite", false));
+    const wxString    question =
+        format == "gcode"      ? _L("The AI assistant asks to export the G-code of the current plate to %s. Export it?") :
+        format == "sliced_3mf" ? _L("The AI assistant asks to export the sliced current plate (3MF with its G-code) to %s. Export it?") :
+                                 _L("The AI assistant asks to export the objects as STL to %s. Export them?");
+    if (!confirm(args.value("reason", std::string()), replaced_file_line(path), wxString::Format(question, from_u8(path.string()))))
+        return declined();
+    if (abandoned)
+        return timed_out();
+
+    if (format == "gcode") {
+        // The G-code of the plate as sliced, like the export without post-processing scripts.
+        std::string error;
+        if (copy_file(plate->get_tmp_gcode_path(), path.string(), error) != SUCCESS)
+            throw ToolError("Could not write '" + path.string() + "': " + error);
+    } else if (format == "sliced_3mf") {
+        // As Plater::export_gcode_3mf() once the file is chosen.
+        if (plater.export_3mf(path, SaveStrategy::Silence | SaveStrategy::SplitModel | SaveStrategy::WithGcode | SaveStrategy::SkipModel,
+                              plate->get_index()) < 0)
+            throw ToolError("The slicer could not write '" + path.string() + "'");
+    } else {
+        // As Plater::export_stl(): one mesh holding every object and instance.
+        TriangleMesh mesh;
+        for (const ModelObject* obj : plater.model().objects)
+            mesh.merge(GUI::Plater::combine_mesh_fff(*obj, -1));
+        if (!store_stl(path.string().c_str(), &mesh, true))
+            throw ToolError("Could not write '" + path.string() + "'");
+    }
+    return done({ { "file", path.string() } });
 }
 
 json edit_plates(const json& args, const std::atomic<bool>& abandoned)
@@ -363,7 +426,7 @@ json start_print(const json& /* args */)
     return { { "opened", true },
              { "plate", plate->get_index() + 1 },
              { "message", "The slicer shows its print dialog for this plate: the user checks the file name and the filament "
-                          "mapping, then starts the print. Follow it with get_printer_status and watch_print." } };
+                          "mapping, then starts the print. Follow it with get_printer (status, then watch)." } };
 }
 
 }} // namespace Slic3r::AIAssistant

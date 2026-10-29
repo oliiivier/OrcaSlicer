@@ -13,7 +13,7 @@ using nlohmann::json;
 
 namespace {
 
-// Keeps tool results readable; read_documentation can return the rest.
+// Keeps tool results readable; get_docs (page) can return the rest.
 constexpr size_t SETTING_DOC_MAX_CHARS = 4000;
 constexpr size_t PAGE_MAX_CHARS        = 30000;
 
@@ -37,7 +37,7 @@ const json& find_page(const std::string& name)
     const json& pages = docs()["pages"];
     const auto  it    = pages.find(name);
     if (it == pages.end())
-        throw ToolError("No documentation page '" + name + "', call read_documentation without arguments to list them");
+        throw ToolError("No documentation page '" + name + "', call get_docs (page) without a page to list them");
     return *it;
 }
 
@@ -99,7 +99,7 @@ json setting_documentation(const std::string& key)
     if (!anchor.empty())
         out["section"] = anchor;
     if (truncated)
-        out["truncated"] = "use read_documentation for the full text";
+        out["truncated"] = "use get_docs (page) for the full text";
     return out;
 }
 

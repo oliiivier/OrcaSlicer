@@ -6,15 +6,18 @@
   ],
   "steps": [
     {
-      "call": "new_project",
-      "args": {},
+      "call": "edit_project",
+      "args": {
+        "action": "new"
+      },
       "expect": {
         "done": true
       }
     },
     {
-      "call": "import_models",
+      "call": "edit_project",
       "args": {
+        "action": "import",
         "paths": [
           "${MODELS}/OrcaCube_v2.3mf"
         ]
@@ -55,8 +58,10 @@
       }
     },
     {
-      "call": "new_project",
-      "args": {},
+      "call": "edit_project",
+      "args": {
+        "action": "new"
+      },
       "expect": {
         "done": true
       }

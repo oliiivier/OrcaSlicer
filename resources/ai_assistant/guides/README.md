@@ -4,7 +4,7 @@ Lessons learned from real prints, written from the confirmed records of the loca
 experience journal (MCP prompt `capitalize_experiences`) and reviewed before being
 committed. `scripts/fork/build-setting-docs.py` bundles every `*.md` file of this
 directory except this README into `../setting_docs.json`; the MCP server serves
-them with `read_documentation` as pages of kind `experience`.
+them with `get_docs` (action `page`) as pages of kind `experience`.
 
 ## Files
 

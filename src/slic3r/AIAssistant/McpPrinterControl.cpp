@@ -468,7 +468,7 @@ json follow_print_control(json& state)
     if (now > state["deadline_ms"].get<std::int64_t>())
         return { { "done", false },
                  { "print_state", print.empty() ? std::string("unknown") : print },
-                 { "message", "The printer did not reach the expected state in time: check it with get_printer_status" } };
+                 { "message", "The printer did not reach the expected state in time: check it with get_printer (status)" } };
     throw ToolRetry();
 }
 

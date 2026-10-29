@@ -19916,6 +19916,25 @@ msgid ""
 "operations?"
 msgstr "Der KI-Assistent möchte die Platten des Projekts ändern. Diese Operationen anwenden?"
 
+msgid "The existing file is replaced."
+msgstr "Die vorhandene Datei wird ersetzt."
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the G-code of the current plate to %s. "
+"Export it?"
+msgstr "Der KI-Assistent möchte den G-Code der aktuellen Platte nach %s exportieren. Exportieren?"
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the sliced current plate (3MF with its "
+"G-code) to %s. Export it?"
+msgstr "Der KI-Assistent möchte die geslicte aktuelle Platte (3MF mit ihrem G-Code) nach %s exportieren. Exportieren?"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
+msgstr "Der KI-Assistent möchte die Objekte als STL nach %s exportieren. Exportieren?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

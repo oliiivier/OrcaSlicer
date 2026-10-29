@@ -158,7 +158,7 @@ json read_note(const json& args)
     const fs::path            path = note_path(args.value("name", std::string()));
     boost::system::error_code ec;
     if (!fs::is_regular_file(path, ec))
-        throw ToolError("No note named '" + args.value("name", std::string()) + "' (see list_notes)");
+        throw ToolError("No note named '" + args.value("name", std::string()) + "' (list them with notes, action list)");
     if (fs::file_size(path, ec) > MAX_NOTE)
         throw ToolError("This note is too large to be read (over 1 MB)");
     return { { "name", path.lexically_relative(notes_dir()).generic_string() },

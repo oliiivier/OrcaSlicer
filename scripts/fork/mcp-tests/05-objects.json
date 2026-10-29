@@ -3,15 +3,18 @@
   "confirm": "yes",
   "steps": [
     {
-      "call": "new_project",
-      "args": {},
+      "call": "edit_project",
+      "args": {
+        "action": "new"
+      },
       "expect": {
         "done": true
       }
     },
     {
-      "call": "import_models",
+      "call": "edit_project",
       "args": {
+        "action": "import",
         "paths": [
           "${MODELS}/OrcaToleranceTest.stl"
         ]
@@ -182,8 +185,10 @@
       "error": true
     },
     {
-      "call": "new_project",
-      "args": {},
+      "call": "edit_project",
+      "args": {
+        "action": "new"
+      },
       "expect": {
         "done": true
       }

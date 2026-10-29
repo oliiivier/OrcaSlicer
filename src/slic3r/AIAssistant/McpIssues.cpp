@@ -40,7 +40,7 @@ void attach_setting(json& issue, const std::string& key)
             summary["current"] = option_value(*opt);
         // The full text would make the issue list long: only say whether it exists.
         summary["documentation"] = setting_documentation(key).is_null() ? no_documentation_note(!def->tooltip.empty()) :
-                                                                          "available: call describe_setting";
+                                                                          "available: call get_docs (setting)";
         issue["setting_info"] = std::move(summary);
     }
 }

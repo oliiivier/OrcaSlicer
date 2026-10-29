@@ -16204,3 +16204,22 @@ msgstr "  • 接触面图案 → 交叠直线\n"
 #, c-format, boost-format
 msgid "  • Interface spacing: %.2f → 0 mm\n"
 msgstr "  • 接触面间距：%.2f → 0 mm\n"
+
+msgid "The existing file is replaced."
+msgstr "现有文件将被替换。"
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the G-code of the current plate to %s. "
+"Export it?"
+msgstr "AI 助手请求将当前打印板的 G-code 导出到 %s。是否导出？"
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the sliced current plate (3MF with its "
+"G-code) to %s. Export it?"
+msgstr "AI 助手请求将已切片的当前打印板（含 G-code 的 3MF）导出到 %s。是否导出？"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
+msgstr "AI 助手请求将对象以 STL 格式导出到 %s。是否导出？"

@@ -2,17 +2,129 @@
   "description": "Setting changes: presets and per-object overrides.",
   "confirm": "yes",
   "steps": [
-    { "call": "new_project", "args": {}, "expect": { "done": true } },
-    { "call": "apply_changes", "args": { "reason": "bench", "changes": [{ "key": "wall_loops", "value": 4, "comment": "bench" }] },
-      "expect": { "done": true, "changes": [{ "key": "wall_loops" }] } },
-    { "call": "get_config", "args": { "keys": ["wall_loops"] }, "expect": { "values": { "wall_loops": "4" } } },
-    { "call": "apply_changes", "args": { "reason": "bench", "changes": [{ "key": "wall_loops", "value": 4 }] },
-      "expect": { "done": false, "unchanged": ["wall_loops"] } },
-    { "call": "apply_changes", "args": { "reason": "bench", "changes": [{ "key": "no_such_setting", "value": 1 }] }, "error": true },
-    { "call": "import_models", "args": { "paths": ["${MODELS}/OrcaToleranceTest.stl"] }, "expect": { "done": true } },
-    { "call": "apply_changes", "args": { "reason": "bench", "changes": [{ "key": "sparse_infill_density", "value": "40%", "object": "OrcaToleranceTest.stl" }] },
-      "expect": { "done": true } },
-    { "call": "get_project", "args": {}, "expect": { "objects": [{ "setting_overrides": { "sparse_infill_density": "40%" } }] } },
-    { "call": "new_project", "args": {}, "expect": { "done": true } }
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "new"
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "apply_changes",
+      "args": {
+        "reason": "bench",
+        "changes": [
+          {
+            "key": "wall_loops",
+            "value": 4,
+            "comment": "bench"
+          }
+        ]
+      },
+      "expect": {
+        "done": true,
+        "changes": [
+          {
+            "key": "wall_loops"
+          }
+        ]
+      }
+    },
+    {
+      "call": "get_config",
+      "args": {
+        "keys": [
+          "wall_loops"
+        ]
+      },
+      "expect": {
+        "values": {
+          "wall_loops": "4"
+        }
+      }
+    },
+    {
+      "call": "apply_changes",
+      "args": {
+        "reason": "bench",
+        "changes": [
+          {
+            "key": "wall_loops",
+            "value": 4
+          }
+        ]
+      },
+      "expect": {
+        "done": false,
+        "unchanged": [
+          "wall_loops"
+        ]
+      }
+    },
+    {
+      "call": "apply_changes",
+      "args": {
+        "reason": "bench",
+        "changes": [
+          {
+            "key": "no_such_setting",
+            "value": 1
+          }
+        ]
+      },
+      "error": true
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "import",
+        "paths": [
+          "${MODELS}/OrcaToleranceTest.stl"
+        ]
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "apply_changes",
+      "args": {
+        "reason": "bench",
+        "changes": [
+          {
+            "key": "sparse_infill_density",
+            "value": "40%",
+            "object": "OrcaToleranceTest.stl"
+          }
+        ]
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "get_project",
+      "args": {},
+      "expect": {
+        "objects": [
+          {
+            "setting_overrides": {
+              "sparse_infill_density": "40%"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "new"
+      },
+      "expect": {
+        "done": true
+      }
+    }
   ]
 }

@@ -1,17 +1,20 @@
 {
-  "description": "Project files: new, import, view and slice (opening and saving to a given path: phase 1).",
+  "description": "Project files: new, import, export and save to a path, open, view and slice.",
   "confirm": "yes",
   "steps": [
     {
-      "call": "new_project",
-      "args": {},
+      "call": "edit_project",
+      "args": {
+        "action": "new"
+      },
       "expect": {
         "done": true
       }
     },
     {
-      "call": "import_models",
+      "call": "edit_project",
       "args": {
+        "action": "import",
         "paths": [
           "${MODELS}/OrcaToleranceTest.stl"
         ],
@@ -27,8 +30,9 @@
       }
     },
     {
-      "call": "import_models",
+      "call": "edit_project",
       "args": {
+        "action": "import",
         "paths": [
           "relative.stl"
         ]
@@ -36,8 +40,9 @@
       "error": true
     },
     {
-      "call": "import_models",
+      "call": "edit_project",
       "args": {
+        "action": "import",
         "paths": [
           "${MODELS}/missing.stl"
         ]
@@ -57,8 +62,9 @@
       }
     },
     {
-      "call": "render_view",
+      "call": "get_view",
       "args": {
+        "action": "model",
         "view": "iso",
         "size": 256
       },
@@ -74,22 +80,191 @@
       }
     },
     {
-      "call": "open_project",
+      "call": "edit_project",
       "args": {
+        "action": "export",
+        "format": "gcode",
+        "path": "${MODELS}/plate.gcode"
+      },
+      "expect": {
+        "done": true,
+        "file": "${MODELS}/plate.gcode"
+      }
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "export",
+        "format": "gcode",
+        "path": "${MODELS}/plate.gcode"
+      },
+      "error": true,
+      "error_contains": "already exists"
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "export",
+        "format": "gcode",
+        "path": "${MODELS}/plate.gcode",
+        "overwrite": true
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "export",
+        "format": "sliced_3mf",
+        "path": "${MODELS}/plate.gcode.3mf"
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "export",
+        "format": "stl",
+        "path": "/nonexistent-folder/x.stl"
+      },
+      "error": true
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "export",
+        "format": "stl",
+        "path": "${MODELS}/objects.obj"
+      },
+      "error": true,
+      "error_contains": "must end with .stl"
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "export",
+        "format": "stl",
+        "path": "${MODELS}/objects.stl"
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "import",
+        "paths": [
+          "${MODELS}/objects.stl"
+        ]
+      },
+      "expect": {
+        "done": true,
+        "added": [
+          {
+            "index": 2
+          }
+        ]
+      },
+      "note": "the exported STL reads back"
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "save",
+        "path": "${MODELS}/bench-project.3mf"
+      },
+      "expect": {
+        "done": true,
+        "file": "${MODELS}/bench-project.3mf"
+      }
+    },
+    {
+      "call": "get_project",
+      "args": {},
+      "expect": {
+        "project_name": "bench-project",
+        "objects": [
+          {
+            "index": 2
+          }
+        ]
+      }
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "new"
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "open",
+        "path": "${MODELS}/bench-project.3mf"
+      },
+      "expect": {
+        "done": true,
+        "project": {
+          "objects": [
+            "OrcaToleranceTest.stl"
+          ]
+        }
+      }
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "save"
+      },
+      "expect": {
+        "done": true,
+        "file": "${MODELS}/bench-project.3mf"
+      },
+      "note": "to its own file"
+    },
+    {
+      "call": "get_view",
+      "args": {},
+      "image": true,
+      "note": "default action"
+    },
+    {
+      "call": "get_docs",
+      "args": {
+        "action": "nope"
+      },
+      "error": true,
+      "error_contains": "'action' must be one of"
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "open",
         "path": "${MODELS}/nothing.3mf"
       },
       "error": true
     },
     {
-      "call": "export_file",
+      "call": "edit_project",
       "args": {
+        "action": "export",
         "format": "pdf"
       },
       "error": true
     },
     {
-      "call": "new_project",
-      "args": {},
+      "call": "edit_project",
+      "args": {
+        "action": "new"
+      },
       "expect": {
         "done": true
       }

@@ -241,7 +241,7 @@ bool McpServer::start(std::string& error)
     }
 
     impl->do_accept(*this);
-    // A tool call blocks its thread until it returns (watch_print waits minutes): several
+    // A tool call blocks its thread until it returns (get_printer watch waits minutes): several
     // threads let the other calls through meanwhile. Each connection still handles one
     // request at a time, so its handlers never run concurrently.
     for (int i = 0; i < WORKER_THREADS; ++i)

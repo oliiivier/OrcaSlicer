@@ -412,7 +412,7 @@ json apply(const Plan& plan)
                "Restore the original values that express the designer's intent (layer height, walls, infill, supports, "
                "brim, seam, ironing...) when they suit the new printer, with apply_changes; keep the new printer's "
                "values for machine-specific settings (speeds and accelerations beyond its limits, prime tower or "
-               "flushing made for another printer). Then get_issues, slice and render_view." } };
+               "flushing made for another printer). Then get_issues, slice and get_view." } };
 }
 
 class AdaptationWatch : public wxEvtHandler

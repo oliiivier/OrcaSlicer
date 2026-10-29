@@ -17692,6 +17692,25 @@ msgid ""
 "operations?"
 msgstr "AI-assistenten ber om att ändra projektets plattor. Tillämpa dessa åtgärder?"
 
+msgid "The existing file is replaced."
+msgstr "Den befintliga filen ersätts."
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the G-code of the current plate to %s. "
+"Export it?"
+msgstr "AI-assistenten vill exportera G-koden för den aktuella plattan till %s. Exportera den?"
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the sliced current plate (3MF with its "
+"G-code) to %s. Export it?"
+msgstr "AI-assistenten vill exportera den slicade aktuella plattan (3MF med G-kod) till %s. Exportera den?"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
+msgstr "AI-assistenten vill exportera objekten som STL till %s. Exportera dem?"
+
 #~ msgid "Alt + Mouse wheel"
 #~ msgstr "Alt + mushjul"
 

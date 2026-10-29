@@ -2,25 +2,215 @@
   "description": "Plates: add, move an object, settings, select, slice all, delete.",
   "confirm": "yes",
   "steps": [
-    { "call": "new_project", "args": {}, "expect": { "done": true } },
-    { "call": "import_models", "args": { "paths": ["${MODELS}/OrcaToleranceTest.stl"] }, "expect": { "done": true } },
-    { "call": "edit_plates", "args": { "reason": "bench", "operations": [
-        { "action": "add" },
-        { "action": "rename", "plate": 2, "name": "second" },
-        { "action": "set", "plate": 2, "bed_type": "Textured PEI Plate", "print_sequence": "by object" }
-      ] }, "expect": { "done": true, "plates": [{ "plate": 2, "name": "second", "bed_type": "Textured PEI Plate", "print_sequence": "by object" }] } },
-    { "call": "edit_objects", "args": { "reason": "bench", "operations": [{ "action": "move_to_plate", "object": 1, "plate": 2 }] },
-      "expect": { "done": true, "objects": [{ "index": 1, "plate": 2 }] } },
-    { "call": "edit_plates", "args": { "operations": [{ "action": "select", "plate": 1 }] }, "expect": { "done": true, "plates": [{ "plate": 1, "current": true }] } },
-    { "call": "edit_plates", "args": { "operations": [{ "action": "set", "plate": 1, "bed_type": "Glass" }] }, "error": true },
-    { "call": "edit_objects", "args": { "reason": "bench", "operations": [{ "action": "duplicate", "object": 1 }] }, "expect": { "done": true } },
-    { "call": "edit_objects", "args": { "reason": "bench", "operations": [{ "action": "move_to_plate", "object": 2, "plate": 1 }] }, "expect": { "done": true } },
-    { "call": "slice", "args": { "all_plates": true }, "expect": { "plates": [{ "plate": 1, "sliced": true }, { "plate": 2, "sliced": true }] } },
-    { "call": "edit_plates", "args": { "reason": "bench", "operations": [{ "action": "delete", "plate": 2 }] }, "error": true,
-      "note": "plate holding objects" },
-    { "call": "edit_plates", "args": { "reason": "bench", "operations": [{ "action": "add" }, { "action": "delete", "plate": 3 }] },
-      "expect": { "done": true } },
-    { "call": "get_project", "args": {}, "expect": { "plates": [{ "plate": 2 }] } },
-    { "call": "new_project", "args": {}, "expect": { "done": true } }
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "new"
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "import",
+        "paths": [
+          "${MODELS}/OrcaToleranceTest.stl"
+        ]
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "edit_plates",
+      "args": {
+        "reason": "bench",
+        "operations": [
+          {
+            "action": "add"
+          },
+          {
+            "action": "rename",
+            "plate": 2,
+            "name": "second"
+          },
+          {
+            "action": "set",
+            "plate": 2,
+            "bed_type": "Textured PEI Plate",
+            "print_sequence": "by object"
+          }
+        ]
+      },
+      "expect": {
+        "done": true,
+        "plates": [
+          {
+            "plate": 2,
+            "name": "second",
+            "bed_type": "Textured PEI Plate",
+            "print_sequence": "by object"
+          }
+        ]
+      }
+    },
+    {
+      "call": "edit_objects",
+      "args": {
+        "reason": "bench",
+        "operations": [
+          {
+            "action": "move_to_plate",
+            "object": 1,
+            "plate": 2
+          }
+        ]
+      },
+      "expect": {
+        "done": true,
+        "objects": [
+          {
+            "index": 1,
+            "plate": 2
+          }
+        ]
+      }
+    },
+    {
+      "call": "edit_plates",
+      "args": {
+        "operations": [
+          {
+            "action": "select",
+            "plate": 1
+          }
+        ]
+      },
+      "expect": {
+        "done": true,
+        "plates": [
+          {
+            "plate": 1,
+            "current": true
+          }
+        ]
+      }
+    },
+    {
+      "call": "edit_plates",
+      "args": {
+        "operations": [
+          {
+            "action": "set",
+            "plate": 1,
+            "bed_type": "Glass"
+          }
+        ]
+      },
+      "error": true
+    },
+    {
+      "call": "edit_objects",
+      "args": {
+        "reason": "bench",
+        "operations": [
+          {
+            "action": "duplicate",
+            "object": 1
+          }
+        ]
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "edit_objects",
+      "args": {
+        "reason": "bench",
+        "operations": [
+          {
+            "action": "move_to_plate",
+            "object": 2,
+            "plate": 1
+          }
+        ]
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "slice",
+      "args": {
+        "all_plates": true
+      },
+      "expect": {
+        "plates": [
+          {
+            "plate": 1,
+            "sliced": true
+          },
+          {
+            "plate": 2,
+            "sliced": true
+          }
+        ]
+      }
+    },
+    {
+      "call": "edit_plates",
+      "args": {
+        "reason": "bench",
+        "operations": [
+          {
+            "action": "delete",
+            "plate": 2
+          }
+        ]
+      },
+      "error": true,
+      "note": "plate holding objects"
+    },
+    {
+      "call": "edit_plates",
+      "args": {
+        "reason": "bench",
+        "operations": [
+          {
+            "action": "add"
+          },
+          {
+            "action": "delete",
+            "plate": 3
+          }
+        ]
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "get_project",
+      "args": {},
+      "expect": {
+        "plates": [
+          {
+            "plate": 2
+          }
+        ]
+      }
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "new"
+      },
+      "expect": {
+        "done": true
+      }
+    }
   ]
 }

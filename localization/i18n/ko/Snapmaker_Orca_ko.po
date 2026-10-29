@@ -18657,6 +18657,25 @@ msgid ""
 "operations?"
 msgstr "AI 어시스턴트가 프로젝트의 플레이트 변경을 요청합니다. 이 작업을 적용할까요?"
 
+msgid "The existing file is replaced."
+msgstr "기존 파일이 대체됩니다."
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the G-code of the current plate to %s. "
+"Export it?"
+msgstr "AI 어시스턴트가 현재 플레이트의 G-code를 %s(으)로 내보내려고 합니다. 내보낼까요?"
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to export the sliced current plate (3MF with its "
+"G-code) to %s. Export it?"
+msgstr "AI 어시스턴트가 슬라이스된 현재 플레이트(G-code 포함 3MF)를 %s(으)로 내보내려고 합니다. 내보낼까요?"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
+msgstr "AI 어시스턴트가 객체를 STL로 %s에 내보내려고 합니다. 내보낼까요?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."
