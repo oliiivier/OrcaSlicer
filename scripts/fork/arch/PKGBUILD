@@ -1,6 +1,7 @@
 # Fork-only (see FORK.md): pacman package of the fork for Arch Linux and CachyOS.
-# Packages the slicer staged by ./build_linux.sh -s in build/package (the AppImage contents)
-# under /opt; scripts/fork/arch/build-package.sh builds it with makepkg.
+# Packages the slicer staged by ./build_linux.sh -s in build/package (the AppImage contents), or
+# the folder given in SNAPMAKER_ORCA_STAGED, under /opt; scripts/fork/arch/build-package.sh builds
+# it with makepkg.
 pkgname=snapmaker-orca-ai
 pkgver=2.4.1
 pkgrel=1
@@ -17,7 +18,7 @@ conflicts=('snapmaker-orca')
 options=('!strip' '!debug')
 
 _repo="$(git -C "$startdir" rev-parse --show-toplevel)"
-_staged="$_repo/build/package"
+_staged="${SNAPMAKER_ORCA_STAGED:-$_repo/build/package}"
 
 pkgver() {
     printf "2.4.1.r%s.g%s" "$(git -C "$_repo" rev-list --count HEAD)" "$(git -C "$_repo" rev-parse --short HEAD)"

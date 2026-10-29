@@ -72,7 +72,8 @@ Le script active Actions le temps de la release seulement : il désactive tous l
 `fork_release.yml` (y compris ceux qu'upstream a ajoutés depuis), lance celui-ci, attend la fin (plusieurs
 heures : les dépendances sont recompilées, le fork n'a pas de cache) puis désactive Actions. `fork_release.yml`
 réutilise les workflows de build d'upstream, qui ne publient rien hors de leur `main`, et attache AppImage,
-installeur et zip Windows à la pré-release (macOS retiré pour l'instant : aucun runner arm64 disponible), avec `scripts/fork/release-notes.md` pour texte. Les
+paquet pacman (contenu de l'AppImage repaqueté dans un conteneur Arch Linux), installeur et zip Windows à la
+pré-release (macOS retiré pour l'instant : aucun runner arm64 disponible), avec `scripts/fork/release-notes.md` pour texte. Les
 paquets ne sont pas signés (pas de certificat dans le fork) et la publication des symboles Sentry échoue sans
 ses secrets, sans bloquer la release.
 
@@ -81,6 +82,7 @@ ses secrets, sans bloquer la release.
 ```bash
 ./build_linux.sh -s                    # compile le slicer (build/package)
 scripts/fork/arch/build-package.sh     # paquet build/snapmaker-orca-ai-<version>-x86_64.pkg.tar.zst
+scripts/fork/arch/build-package.sh Snapmaker_Orca_Linux_*.AppImage   # ou à partir d'une AppImage du fork
 sudo pacman -U build/snapmaker-orca-ai-*.pkg.tar.zst
 ```
 

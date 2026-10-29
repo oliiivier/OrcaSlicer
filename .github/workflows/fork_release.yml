@@ -34,9 +34,53 @@ jobs:
       build-deps-only: false
     secrets: inherit
 
+  # pacman package (Arch Linux, CachyOS): the contents of the Ubuntu AppImage, as the local
+  # scripts/fork/arch/build-package.sh does with build/package.
+  pacman:
+    name: Package for Arch Linux
+    needs: [build]
+    if: ${{ !cancelled() }}
+    runs-on: ubuntu-24.04
+    container: archlinux:base-devel
+    steps:
+      - name: Install the tools
+        run: pacman -Syu --noconfirm --needed git python
+
+      # Full history: the package version counts the commits.
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
+
+      - name: Download the AppImage
+        uses: actions/download-artifact@v4
+        with:
+          pattern: Snapmaker_Orca_Linux_ubuntu_*
+          path: appimage
+
+      - name: Build the package
+        shell: bash
+        run: |
+          set -euo pipefail
+          appimage=$(find appimage -name '*.AppImage' | head -n1)
+          [ -n "$appimage" ] || { echo "No AppImage was built" >&2; exit 1; }
+          chmod +x "$appimage"
+          # makepkg refuses to run as root.
+          useradd -m builder
+          git config --system --add safe.directory '*'
+          chown -R builder "$GITHUB_WORKSPACE"
+          mkdir -p pacman && chown builder pacman
+          # The runtime libraries are dependencies of the package, not needed to build it.
+          sudo -u builder env PKGDEST="$GITHUB_WORKSPACE/pacman" MAKEPKG_ARGS=--nodeps \
+            scripts/fork/arch/build-package.sh "$appimage"
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Snapmaker_Orca_Linux_pacman
+          path: pacman/*.pkg.tar.zst
+
   release:
     name: Publish the pre-release
-    needs: [build]
+    needs: [build, pacman]
     # The upstream workflows end with a Sentry upload that fails without its secrets:
     # publish whatever packages were built.
     if: ${{ !cancelled() }}
