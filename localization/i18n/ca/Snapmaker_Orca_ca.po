@@ -19562,6 +19562,66 @@ msgstr "L'assistent d'IA demana exportar la placa actual laminada (3MF amb el se
 msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
 msgstr "L'assistent d'IA demana exportar els objectes com a STL a %s. Voleu exportar-los?"
 
+#, boost-format
+msgid "Printer: %1%"
+msgstr "Impressora: %1%"
+
+#, boost-format
+msgid "Process: %1%"
+msgstr "Procés: %1%"
+
+#, boost-format
+msgid "Filament slot %1%: %2%"
+msgstr "Posició de filament %1%: %2%"
+
+msgid ""
+"The AI assistant asks to select this preset. The slicer asks what to do with "
+"unsaved changes. Select it?"
+msgstr "L'assistent d'IA demana seleccionar aquest perfil. El laminador preguntarà què fer amb els canvis no desats. Voleu seleccionar-lo?"
+
+#, boost-format
+msgid "Save the edited preset '%1%' as '%2%'"
+msgstr "Desa el perfil editat «%1%» com a «%2%»"
+
+msgid "The existing user preset with this name is replaced."
+msgstr "Se substitueix el perfil d'usuari existent amb aquest nom."
+
+msgid "The AI assistant asks to save a user preset. Save it?"
+msgstr "L'assistent d'IA demana desar un perfil d'usuari. Voleu desar-lo?"
+
+#, boost-format
+msgid "Add filament slot %1%"
+msgstr "Afegeix la posició de filament %1%"
+
+msgid "The AI assistant asks to add a filament slot. Add it?"
+msgstr "L'assistent d'IA demana afegir una posició de filament. Voleu afegir-la?"
+
+#, boost-format
+msgid "Remove filament slot %1% (%2%)"
+msgstr "Elimina la posició de filament %1% (%2%)"
+
+#, boost-format
+msgid "Printed with slot %1% afterwards: %2%"
+msgstr "S'imprimiran després amb la posició %1%: %2%"
+
+#, boost-format
+msgid "Printed with another slot afterwards: %1%"
+msgstr "S'imprimiran després amb una altra posició: %1%"
+
+msgid "The next slots move down by one."
+msgstr "Les posicions següents baixen un lloc."
+
+msgid "The AI assistant asks to remove a filament slot. Remove it?"
+msgstr "L'assistent d'IA demana eliminar una posició de filament. Voleu eliminar-la?"
+
+#, boost-format
+msgid "Filament slot %1%: color %2%"
+msgstr "Posició de filament %1%: color %2%"
+
+msgid ""
+"The AI assistant asks to change the color of a filament slot. Change it?"
+msgstr "L'assistent d'IA demana canviar el color d'una posició de filament. Voleu canviar-lo?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

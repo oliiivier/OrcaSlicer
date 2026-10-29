@@ -18676,6 +18676,66 @@ msgstr "AI 어시스턴트가 슬라이스된 현재 플레이트(G-code 포함 
 msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
 msgstr "AI 어시스턴트가 객체를 STL로 %s에 내보내려고 합니다. 내보낼까요?"
 
+#, boost-format
+msgid "Printer: %1%"
+msgstr "프린터: %1%"
+
+#, boost-format
+msgid "Process: %1%"
+msgstr "프로세스: %1%"
+
+#, boost-format
+msgid "Filament slot %1%: %2%"
+msgstr "필라멘트 슬롯 %1%: %2%"
+
+msgid ""
+"The AI assistant asks to select this preset. The slicer asks what to do with "
+"unsaved changes. Select it?"
+msgstr "AI 어시스턴트가 이 프리셋을 선택하려고 합니다. 저장되지 않은 변경 사항은 슬라이서가 처리 방법을 묻습니다. 선택할까요?"
+
+#, boost-format
+msgid "Save the edited preset '%1%' as '%2%'"
+msgstr "편집한 프리셋 '%1%'을(를) '%2%'(으)로 저장"
+
+msgid "The existing user preset with this name is replaced."
+msgstr "이 이름의 기존 사용자 프리셋이 대체됩니다."
+
+msgid "The AI assistant asks to save a user preset. Save it?"
+msgstr "AI 어시스턴트가 사용자 프리셋을 저장하려고 합니다. 저장할까요?"
+
+#, boost-format
+msgid "Add filament slot %1%"
+msgstr "필라멘트 슬롯 %1% 추가"
+
+msgid "The AI assistant asks to add a filament slot. Add it?"
+msgstr "AI 어시스턴트가 필라멘트 슬롯을 추가하려고 합니다. 추가할까요?"
+
+#, boost-format
+msgid "Remove filament slot %1% (%2%)"
+msgstr "필라멘트 슬롯 %1% 제거 (%2%)"
+
+#, boost-format
+msgid "Printed with slot %1% afterwards: %2%"
+msgstr "이후 슬롯 %1%(으)로 출력: %2%"
+
+#, boost-format
+msgid "Printed with another slot afterwards: %1%"
+msgstr "이후 다른 슬롯으로 출력: %1%"
+
+msgid "The next slots move down by one."
+msgstr "다음 슬롯 번호가 하나씩 앞당겨집니다."
+
+msgid "The AI assistant asks to remove a filament slot. Remove it?"
+msgstr "AI 어시스턴트가 필라멘트 슬롯을 제거하려고 합니다. 제거할까요?"
+
+#, boost-format
+msgid "Filament slot %1%: color %2%"
+msgstr "필라멘트 슬롯 %1%: 색상 %2%"
+
+msgid ""
+"The AI assistant asks to change the color of a filament slot. Change it?"
+msgstr "AI 어시스턴트가 필라멘트 슬롯의 색상을 변경하려고 합니다. 변경할까요?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

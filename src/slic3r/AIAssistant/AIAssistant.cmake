@@ -41,6 +41,8 @@ if (SNAPMAKER_AI_ASSISTANT)
         ${_ai_dir}/McpPrinterControl.hpp
         ${_ai_dir}/McpPrinterLive.cpp
         ${_ai_dir}/McpPrinterLive.hpp
+        ${_ai_dir}/McpPresets.cpp
+        ${_ai_dir}/McpPresets.hpp
         ${_ai_dir}/McpProject.cpp
         ${_ai_dir}/McpProject.hpp
         ${_ai_dir}/McpRender.cpp

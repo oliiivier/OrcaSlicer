@@ -19702,6 +19702,66 @@ msgstr "O assistente de IA pede para exportar a placa atual fatiada (3MF com seu
 msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
 msgstr "O assistente de IA pede para exportar os objetos como STL para %s. Exportar?"
 
+#, boost-format
+msgid "Printer: %1%"
+msgstr "Impressora: %1%"
+
+#, boost-format
+msgid "Process: %1%"
+msgstr "Processo: %1%"
+
+#, boost-format
+msgid "Filament slot %1%: %2%"
+msgstr "Posição de filamento %1%: %2%"
+
+msgid ""
+"The AI assistant asks to select this preset. The slicer asks what to do with "
+"unsaved changes. Select it?"
+msgstr "O assistente de IA pede para selecionar esta predefinição. O fatiador pergunta o que fazer com as alterações não salvas. Selecionar?"
+
+#, boost-format
+msgid "Save the edited preset '%1%' as '%2%'"
+msgstr "Salvar a predefinição editada '%1%' como '%2%'"
+
+msgid "The existing user preset with this name is replaced."
+msgstr "A predefinição de usuário existente com este nome será substituída."
+
+msgid "The AI assistant asks to save a user preset. Save it?"
+msgstr "O assistente de IA pede para salvar uma predefinição de usuário. Salvar?"
+
+#, boost-format
+msgid "Add filament slot %1%"
+msgstr "Adicionar a posição de filamento %1%"
+
+msgid "The AI assistant asks to add a filament slot. Add it?"
+msgstr "O assistente de IA pede para adicionar uma posição de filamento. Adicionar?"
+
+#, boost-format
+msgid "Remove filament slot %1% (%2%)"
+msgstr "Remover a posição de filamento %1% (%2%)"
+
+#, boost-format
+msgid "Printed with slot %1% afterwards: %2%"
+msgstr "Impressos depois com a posição %1%: %2%"
+
+#, boost-format
+msgid "Printed with another slot afterwards: %1%"
+msgstr "Impressos depois com outra posição: %1%"
+
+msgid "The next slots move down by one."
+msgstr "As posições seguintes descem uma posição."
+
+msgid "The AI assistant asks to remove a filament slot. Remove it?"
+msgstr "O assistente de IA pede para remover uma posição de filamento. Remover?"
+
+#, boost-format
+msgid "Filament slot %1%: color %2%"
+msgstr "Posição de filamento %1%: cor %2%"
+
+msgid ""
+"The AI assistant asks to change the color of a filament slot. Change it?"
+msgstr "O assistente de IA pede para mudar a cor de uma posição de filamento. Mudar?"
+
 #~ msgid "Enable filament ramming."
 #~ msgstr "Ativar moldeamento de ponta de filamento."
 

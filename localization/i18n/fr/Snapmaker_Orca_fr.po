@@ -19814,6 +19814,66 @@ msgstr "L'assistant IA demande d'exporter la plaque actuelle tranchée (3MF avec
 msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
 msgstr "L'assistant IA demande d'exporter les objets en STL vers %s. Les exporter ?"
 
+#, boost-format
+msgid "Printer: %1%"
+msgstr "Imprimante : %1%"
+
+#, boost-format
+msgid "Process: %1%"
+msgstr "Traitement : %1%"
+
+#, boost-format
+msgid "Filament slot %1%: %2%"
+msgstr "Emplacement de filament %1% : %2%"
+
+msgid ""
+"The AI assistant asks to select this preset. The slicer asks what to do with "
+"unsaved changes. Select it?"
+msgstr "L'assistant IA demande de sélectionner ce préréglage. Le slicer demande quoi faire des modifications non enregistrées. Le sélectionner ?"
+
+#, boost-format
+msgid "Save the edited preset '%1%' as '%2%'"
+msgstr "Enregistrer le préréglage modifié « %1% » sous « %2% »"
+
+msgid "The existing user preset with this name is replaced."
+msgstr "Le préréglage utilisateur existant de ce nom est remplacé."
+
+msgid "The AI assistant asks to save a user preset. Save it?"
+msgstr "L'assistant IA demande d'enregistrer un préréglage utilisateur. L'enregistrer ?"
+
+#, boost-format
+msgid "Add filament slot %1%"
+msgstr "Ajouter l'emplacement de filament %1%"
+
+msgid "The AI assistant asks to add a filament slot. Add it?"
+msgstr "L'assistant IA demande d'ajouter un emplacement de filament. L'ajouter ?"
+
+#, boost-format
+msgid "Remove filament slot %1% (%2%)"
+msgstr "Retirer l'emplacement de filament %1% (%2%)"
+
+#, boost-format
+msgid "Printed with slot %1% afterwards: %2%"
+msgstr "Imprimés ensuite avec l'emplacement %1% : %2%"
+
+#, boost-format
+msgid "Printed with another slot afterwards: %1%"
+msgstr "Imprimés ensuite avec un autre emplacement : %1%"
+
+msgid "The next slots move down by one."
+msgstr "Les emplacements suivants descendent d'un rang."
+
+msgid "The AI assistant asks to remove a filament slot. Remove it?"
+msgstr "L'assistant IA demande de retirer un emplacement de filament. Le retirer ?"
+
+#, boost-format
+msgid "Filament slot %1%: color %2%"
+msgstr "Emplacement de filament %1% : couleur %2%"
+
+msgid ""
+"The AI assistant asks to change the color of a filament slot. Change it?"
+msgstr "L'assistant IA demande de changer la couleur d'un emplacement de filament. La changer ?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

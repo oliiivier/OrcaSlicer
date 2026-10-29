@@ -1,0 +1,187 @@
+{
+  "description": "Presets and filament slots through the sidebar.",
+  "confirm": "yes",
+  "steps": [
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "new"
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "get_project",
+      "args": {},
+      "expect": {
+        "presets": {
+          "printer": "$any",
+          "available": {
+            "process": "$any",
+            "filament": "$any"
+          }
+        }
+      },
+      "capture": {
+        "PROCESS": "presets.available.process.0",
+        "FILAMENT": "presets.available.filament.1",
+        "SLOTS": "presets.filament_slots.0.filament_slot"
+      }
+    },
+    {
+      "call": "edit_presets",
+      "args": {
+        "action": "set_color",
+        "filament_slot": 1,
+        "color": "#FF8000"
+      },
+      "expect": {
+        "done": true,
+        "presets": {
+          "filament_slots": [
+            {
+              "filament_slot": 1,
+              "color": "#FF8000"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "call": "edit_presets",
+      "args": {
+        "action": "set_color",
+        "filament_slot": 1,
+        "color": "orange"
+      },
+      "error": true
+    },
+    {
+      "call": "edit_presets",
+      "args": {
+        "action": "add_slot",
+        "color": "#00FF00",
+        "name": "${FILAMENT}"
+      },
+      "expect": {
+        "done": true,
+        "filament_slot": "$any"
+      },
+      "capture": {
+        "NEW_SLOT": "filament_slot"
+      }
+    },
+    {
+      "call": "edit_presets",
+      "args": {
+        "action": "remove_slot",
+        "filament_slot": 99
+      },
+      "error": true
+    },
+    {
+      "call": "edit_presets",
+      "args": {
+        "action": "remove_slot",
+        "filament_slot": "${NEW_SLOT}",
+        "replace_with": 1
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "edit_presets",
+      "args": {
+        "action": "select",
+        "type": "filament",
+        "filament_slot": 1,
+        "name": "${FILAMENT}"
+      },
+      "expect": {
+        "presets": {
+          "filament_slots": [
+            {
+              "filament_slot": 1,
+              "preset": "${FILAMENT}"
+            }
+          ]
+        }
+      },
+      "note": "done, or already selected"
+    },
+    {
+      "call": "edit_presets",
+      "args": {
+        "action": "select",
+        "type": "process",
+        "name": "${PROCESS}"
+      },
+      "expect": {
+        "presets": {
+          "process": "${PROCESS}"
+        }
+      }
+    },
+    {
+      "call": "edit_presets",
+      "args": {
+        "action": "select",
+        "type": "printer",
+        "name": "No such printer"
+      },
+      "error": true
+    },
+    {
+      "call": "apply_changes",
+      "args": {
+        "reason": "bench",
+        "changes": [
+          {
+            "key": "wall_loops",
+            "value": 5
+          }
+        ]
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "edit_presets",
+      "args": {
+        "action": "save",
+        "type": "process",
+        "name": "Bench process"
+      },
+      "expect": {
+        "done": true,
+        "saved": "Bench process",
+        "presets": {
+          "process": "Bench process"
+        }
+      }
+    },
+    {
+      "call": "get_project",
+      "args": {},
+      "expect": {
+        "presets": {
+          "unsaved": {
+            "process": false
+          }
+        }
+      }
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "new"
+      },
+      "expect": {
+        "done": true
+      }
+    }
+  ]
+}

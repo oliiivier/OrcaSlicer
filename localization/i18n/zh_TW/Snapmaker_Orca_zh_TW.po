@@ -18765,3 +18765,63 @@ msgstr "AI 助理請求將已切片的目前列印板（含 G-code 的 3MF）匯
 #, c-format, boost-format
 msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
 msgstr "AI 助理請求將物件以 STL 格式匯出到 %s。是否匯出？"
+
+#, boost-format
+msgid "Printer: %1%"
+msgstr "印表機：%1%"
+
+#, boost-format
+msgid "Process: %1%"
+msgstr "製程：%1%"
+
+#, boost-format
+msgid "Filament slot %1%: %2%"
+msgstr "線材槽 %1%：%2%"
+
+msgid ""
+"The AI assistant asks to select this preset. The slicer asks what to do with "
+"unsaved changes. Select it?"
+msgstr "AI 助理請求選擇此預設。切片軟體會詢問如何處理未儲存的修改。是否選擇？"
+
+#, boost-format
+msgid "Save the edited preset '%1%' as '%2%'"
+msgstr "將編輯後的預設「%1%」另存為「%2%」"
+
+msgid "The existing user preset with this name is replaced."
+msgstr "同名的現有使用者預設將被取代。"
+
+msgid "The AI assistant asks to save a user preset. Save it?"
+msgstr "AI 助理請求儲存一個使用者預設。是否儲存？"
+
+#, boost-format
+msgid "Add filament slot %1%"
+msgstr "新增線材槽 %1%"
+
+msgid "The AI assistant asks to add a filament slot. Add it?"
+msgstr "AI 助理請求新增一個線材槽。是否新增？"
+
+#, boost-format
+msgid "Remove filament slot %1% (%2%)"
+msgstr "移除線材槽 %1%（%2%）"
+
+#, boost-format
+msgid "Printed with slot %1% afterwards: %2%"
+msgstr "之後改用線材槽 %1% 列印：%2%"
+
+#, boost-format
+msgid "Printed with another slot afterwards: %1%"
+msgstr "之後改用其他線材槽列印：%1%"
+
+msgid "The next slots move down by one."
+msgstr "後續線材槽編號依次減一。"
+
+msgid "The AI assistant asks to remove a filament slot. Remove it?"
+msgstr "AI 助理請求移除一個線材槽。是否移除？"
+
+#, boost-format
+msgid "Filament slot %1%: color %2%"
+msgstr "線材槽 %1%：顏色 %2%"
+
+msgid ""
+"The AI assistant asks to change the color of a filament slot. Change it?"
+msgstr "AI 助理請求變更一個線材槽的顏色。是否變更？"

@@ -17711,6 +17711,66 @@ msgstr "AI-assistenten vill exportera den slicade aktuella plattan (3MF med G-ko
 msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
 msgstr "AI-assistenten vill exportera objekten som STL till %s. Exportera dem?"
 
+#, boost-format
+msgid "Printer: %1%"
+msgstr "Skrivare: %1%"
+
+#, boost-format
+msgid "Process: %1%"
+msgstr "Process: %1%"
+
+#, boost-format
+msgid "Filament slot %1%: %2%"
+msgstr "Filamentplats %1%: %2%"
+
+msgid ""
+"The AI assistant asks to select this preset. The slicer asks what to do with "
+"unsaved changes. Select it?"
+msgstr "AI-assistenten vill välja den här förinställningen. Slicern frågar vad som ska göras med osparade ändringar. Välja den?"
+
+#, boost-format
+msgid "Save the edited preset '%1%' as '%2%'"
+msgstr "Spara den redigerade förinställningen '%1%' som '%2%'"
+
+msgid "The existing user preset with this name is replaced."
+msgstr "Den befintliga användarförinställningen med detta namn ersätts."
+
+msgid "The AI assistant asks to save a user preset. Save it?"
+msgstr "AI-assistenten vill spara en användarförinställning. Spara den?"
+
+#, boost-format
+msgid "Add filament slot %1%"
+msgstr "Lägg till filamentplats %1%"
+
+msgid "The AI assistant asks to add a filament slot. Add it?"
+msgstr "AI-assistenten vill lägga till en filamentplats. Lägga till den?"
+
+#, boost-format
+msgid "Remove filament slot %1% (%2%)"
+msgstr "Ta bort filamentplats %1% (%2%)"
+
+#, boost-format
+msgid "Printed with slot %1% afterwards: %2%"
+msgstr "Skrivs därefter ut med plats %1%: %2%"
+
+#, boost-format
+msgid "Printed with another slot afterwards: %1%"
+msgstr "Skrivs därefter ut med en annan plats: %1%"
+
+msgid "The next slots move down by one."
+msgstr "Följande platser flyttas ett steg."
+
+msgid "The AI assistant asks to remove a filament slot. Remove it?"
+msgstr "AI-assistenten vill ta bort en filamentplats. Ta bort den?"
+
+#, boost-format
+msgid "Filament slot %1%: color %2%"
+msgstr "Filamentplats %1%: färg %2%"
+
+msgid ""
+"The AI assistant asks to change the color of a filament slot. Change it?"
+msgstr "AI-assistenten vill ändra färgen på en filamentplats. Ändra den?"
+
 #~ msgid "Alt + Mouse wheel"
 #~ msgstr "Alt + mushjul"
 

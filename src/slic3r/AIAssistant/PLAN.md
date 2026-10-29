@@ -161,7 +161,7 @@ toi, traductions des nouveaux textes, mise à jour de `FORK.md`, commit.
 |---|---|
 | 0 ✓ | Base commune (confirmation, résultats, références), instructions par domaine, mode test et banc d'essai, scénarios des outils actuels |
 | 1 ✓ | Regroupement vers la liste cible (sans fonction nouvelle) ; `path` pour les exports ; mise à jour des guides et notes qui citent d'anciens noms |
-| 2 | Préréglages et filaments (sauf chargement) |
+| 2 ✓ | Préréglages et filaments (sauf chargement) |
 | 3 | Plages de hauteur, événements par couche, annulation |
 | 4 | Aperçu tranché, calibrations |
 | 5 | Texte, SVG, peinture automatique ; chargement du filament après étude sur l'imprimante |

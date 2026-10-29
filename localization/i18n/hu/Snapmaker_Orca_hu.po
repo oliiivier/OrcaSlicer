@@ -17803,6 +17803,66 @@ msgstr "Az MI-asszisztens a szeletelt aktuális tálca (3MF a G-kódjával) expo
 msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
 msgstr "Az MI-asszisztens az objektumok STL-ként való exportálását kéri ide: %s. Exportálja?"
 
+#, boost-format
+msgid "Printer: %1%"
+msgstr "Nyomtató: %1%"
+
+#, boost-format
+msgid "Process: %1%"
+msgstr "Folyamat: %1%"
+
+#, boost-format
+msgid "Filament slot %1%: %2%"
+msgstr "%1%. filamenthely: %2%"
+
+msgid ""
+"The AI assistant asks to select this preset. The slicer asks what to do with "
+"unsaved changes. Select it?"
+msgstr "Az MI-asszisztens ennek a beállításkészletnek a kiválasztását kéri. A szeletelő megkérdezi, mi legyen a nem mentett módosításokkal. Kiválasztja?"
+
+#, boost-format
+msgid "Save the edited preset '%1%' as '%2%'"
+msgstr "A szerkesztett „%1%” beállításkészlet mentése „%2%” néven"
+
+msgid "The existing user preset with this name is replaced."
+msgstr "Az ilyen nevű meglévő felhasználói beállításkészlet felülíródik."
+
+msgid "The AI assistant asks to save a user preset. Save it?"
+msgstr "Az MI-asszisztens egy felhasználói beállításkészlet mentését kéri. Menti?"
+
+#, boost-format
+msgid "Add filament slot %1%"
+msgstr "%1%. filamenthely hozzáadása"
+
+msgid "The AI assistant asks to add a filament slot. Add it?"
+msgstr "Az MI-asszisztens egy filamenthely hozzáadását kéri. Hozzáadja?"
+
+#, boost-format
+msgid "Remove filament slot %1% (%2%)"
+msgstr "%1%. filamenthely eltávolítása (%2%)"
+
+#, boost-format
+msgid "Printed with slot %1% afterwards: %2%"
+msgstr "Ezután a(z) %1%. hellyel nyomtatva: %2%"
+
+#, boost-format
+msgid "Printed with another slot afterwards: %1%"
+msgstr "Ezután másik hellyel nyomtatva: %1%"
+
+msgid "The next slots move down by one."
+msgstr "A következő helyek eggyel lejjebb kerülnek."
+
+msgid "The AI assistant asks to remove a filament slot. Remove it?"
+msgstr "Az MI-asszisztens egy filamenthely eltávolítását kéri. Eltávolítja?"
+
+#, boost-format
+msgid "Filament slot %1%: color %2%"
+msgstr "%1%. filamenthely: szín %2%"
+
+msgid ""
+"The AI assistant asks to change the color of a filament slot. Change it?"
+msgstr "Az MI-asszisztens egy filamenthely színének módosítását kéri. Módosítja?"
+
 #~ msgid "Alt + Mouse wheel"
 #~ msgstr "Alt + Egérgörgő"
 

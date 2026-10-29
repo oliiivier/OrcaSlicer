@@ -10,6 +10,7 @@
 #include "McpPrinter.hpp"
 #include "McpPrinterControl.hpp"
 #include "McpPrinterLive.hpp"
+#include "McpPresets.hpp"
 #include "McpProject.hpp"
 #include "McpRender.hpp"
 #include "McpSlicing.hpp"
@@ -72,9 +73,7 @@ json get_project(const json& /* args */)
     }
 
     json out = { { "project_name", GUI::into_u8(p.get_project_name()) },
-                 { "presets",
-                   { { "printer", bundle.printers.get_selected_preset_name() },
-                     { "process", bundle.prints.get_selected_preset_name() } } },
+                 { "presets", presets_summary() },
                  { "materials", describe_materials() },
                  { "objects", std::move(objects) },
                  { "plates", plates_summary() } };
@@ -312,6 +311,28 @@ const std::vector<Tool>& tools()
                         { "required", { "key", "value" } } } } } } } },
             { "required", { "reason", "changes" } } },
           // The user has to read and confirm the changes.
+          10min },
+        { "edit_presets",
+          "Presets and filament slots, like the lists and buttons of the sidebar, after the user's confirmation.\n"
+          "select: the preset 'name' of 'type' printer, process or filament (for 'filament_slot'), among "
+          "get_project.presets.available; the slicer asks the user what to do with unsaved changes.\n"
+          "save: the edited preset of 'type' as the user preset 'name' (the filament preset edited is the one of the "
+          "last slot changed by apply_changes).\n"
+          "add_slot: a new filament slot, with the preset 'name' and 'color' if given.\n"
+          "remove_slot: 'filament_slot'; the objects printed with it move to 'replace_with' (otherwise the slicer picks one) and "
+          "the next slots move down by one.\n"
+          "set_color: 'color' (#RRGGBB) of 'filament_slot'.",
+          [](const json& args, ToolContext& ctx) { return edit_presets(args, ctx.abandoned); },
+          { { "type", "object" },
+            { "properties",
+              { { "action", action_schema({ "select", "save", "add_slot", "remove_slot", "set_color" }) },
+                { "type", { { "type", "string" }, { "enum", { "printer", "process", "filament" } } } },
+                { "name", { { "type", "string" }, { "description", "select, add_slot: preset name; save: new preset name." } } },
+                { "filament_slot", { { "type", "integer" }, { "minimum", 1 } } },
+                { "replace_with", { { "type", "integer" }, { "minimum", 1 } } },
+                { "color", { { "type", "string" }, { "description", "e.g. #FF8000" } } },
+                { "reason", REASON } } },
+            { "required", { "action" } } },
           10min },
         // ------------------------------------------------ objects, plates, project, slicing
         { "edit_objects",
@@ -644,7 +665,10 @@ const char* const INSTRUCTIONS[] = {
     "- Process settings are shared by every filament: check that a new speed, layer height or cooling value suits "
     "all the materials used on the plate (filament_slots[].used_on_plate), not only one.\n"
     "- feature_filaments and the per-object filaments tell which slot prints walls, infill, supports and each "
-    "object (0 = the object's default filament). Mixed filaments are virtual IDs after the physical slots.",
+    "object (0 = the object's default filament). Mixed filaments are virtual IDs after the physical slots.\n"
+    "- edit_presets selects other printer, process or filament presets, saves user presets and adds, removes or "
+    "recolors filament slots. Prefer apply_changes for single settings; save a filament preset the user wants to "
+    "keep before editing another slot.",
     // Objects, plates, project, slicing and views
     "Objects and plates: edit_objects scales, rotates, moves, cuts, splits, duplicates, deletes, orients and arranges "
     "objects like the Prepare view; use it for placement issues (outside the build volume, too big, overhangs to "

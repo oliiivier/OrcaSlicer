@@ -19429,6 +19429,66 @@ msgstr "Asystent AI prosi o wyeksportowanie pociętej bieżącej płyty (3MF z G
 msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
 msgstr "Asystent AI prosi o wyeksportowanie obiektów jako STL do %s. Wyeksportować?"
 
+#, boost-format
+msgid "Printer: %1%"
+msgstr "Drukarka: %1%"
+
+#, boost-format
+msgid "Process: %1%"
+msgstr "Proces: %1%"
+
+#, boost-format
+msgid "Filament slot %1%: %2%"
+msgstr "Gniazdo filamentu %1%: %2%"
+
+msgid ""
+"The AI assistant asks to select this preset. The slicer asks what to do with "
+"unsaved changes. Select it?"
+msgstr "Asystent AI prosi o wybranie tego profilu. Slicer zapyta, co zrobić z niezapisanymi zmianami. Wybrać?"
+
+#, boost-format
+msgid "Save the edited preset '%1%' as '%2%'"
+msgstr "Zapisz edytowany profil „%1%” jako „%2%”"
+
+msgid "The existing user preset with this name is replaced."
+msgstr "Istniejący profil użytkownika o tej nazwie zostanie zastąpiony."
+
+msgid "The AI assistant asks to save a user preset. Save it?"
+msgstr "Asystent AI prosi o zapisanie profilu użytkownika. Zapisać?"
+
+#, boost-format
+msgid "Add filament slot %1%"
+msgstr "Dodaj gniazdo filamentu %1%"
+
+msgid "The AI assistant asks to add a filament slot. Add it?"
+msgstr "Asystent AI prosi o dodanie gniazda filamentu. Dodać?"
+
+#, boost-format
+msgid "Remove filament slot %1% (%2%)"
+msgstr "Usuń gniazdo filamentu %1% (%2%)"
+
+#, boost-format
+msgid "Printed with slot %1% afterwards: %2%"
+msgstr "Później drukowane gniazdem %1%: %2%"
+
+#, boost-format
+msgid "Printed with another slot afterwards: %1%"
+msgstr "Później drukowane innym gniazdem: %1%"
+
+msgid "The next slots move down by one."
+msgstr "Kolejne gniazda przesuną się o jedno."
+
+msgid "The AI assistant asks to remove a filament slot. Remove it?"
+msgstr "Asystent AI prosi o usunięcie gniazda filamentu. Usunąć?"
+
+#, boost-format
+msgid "Filament slot %1%: color %2%"
+msgstr "Gniazdo filamentu %1%: kolor %2%"
+
+msgid ""
+"The AI assistant asks to change the color of a filament slot. Change it?"
+msgstr "Asystent AI prosi o zmianę koloru gniazda filamentu. Zmienić?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

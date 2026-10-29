@@ -19833,6 +19833,66 @@ msgstr "ИИ-ассистент просит экспортировать нар
 msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
 msgstr "ИИ-ассистент просит экспортировать объекты в STL в %s. Экспортировать?"
 
+#, boost-format
+msgid "Printer: %1%"
+msgstr "Принтер: %1%"
+
+#, boost-format
+msgid "Process: %1%"
+msgstr "Процесс: %1%"
+
+#, boost-format
+msgid "Filament slot %1%: %2%"
+msgstr "Слот филамента %1%: %2%"
+
+msgid ""
+"The AI assistant asks to select this preset. The slicer asks what to do with "
+"unsaved changes. Select it?"
+msgstr "ИИ-ассистент просит выбрать этот профиль. Слайсер спросит, что делать с несохранёнными изменениями. Выбрать?"
+
+#, boost-format
+msgid "Save the edited preset '%1%' as '%2%'"
+msgstr "Сохранить изменённый профиль «%1%» как «%2%»"
+
+msgid "The existing user preset with this name is replaced."
+msgstr "Существующий пользовательский профиль с этим именем будет заменён."
+
+msgid "The AI assistant asks to save a user preset. Save it?"
+msgstr "ИИ-ассистент просит сохранить пользовательский профиль. Сохранить?"
+
+#, boost-format
+msgid "Add filament slot %1%"
+msgstr "Добавить слот филамента %1%"
+
+msgid "The AI assistant asks to add a filament slot. Add it?"
+msgstr "ИИ-ассистент просит добавить слот филамента. Добавить?"
+
+#, boost-format
+msgid "Remove filament slot %1% (%2%)"
+msgstr "Удалить слот филамента %1% (%2%)"
+
+#, boost-format
+msgid "Printed with slot %1% afterwards: %2%"
+msgstr "Далее печатается слотом %1%: %2%"
+
+#, boost-format
+msgid "Printed with another slot afterwards: %1%"
+msgstr "Далее печатается другим слотом: %1%"
+
+msgid "The next slots move down by one."
+msgstr "Следующие слоты сдвинутся на один."
+
+msgid "The AI assistant asks to remove a filament slot. Remove it?"
+msgstr "ИИ-ассистент просит удалить слот филамента. Удалить?"
+
+#, boost-format
+msgid "Filament slot %1%: color %2%"
+msgstr "Слот филамента %1%: цвет %2%"
+
+msgid ""
+"The AI assistant asks to change the color of a filament slot. Change it?"
+msgstr "ИИ-ассистент просит изменить цвет слота филамента. Изменить?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

@@ -18127,6 +18127,66 @@ msgstr "Asistent AI žádá o export slicované aktuální podložky (3MF s G-co
 msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
 msgstr "Asistent AI žádá o export objektů jako STL do %s. Exportovat?"
 
+#, boost-format
+msgid "Printer: %1%"
+msgstr "Tiskárna: %1%"
+
+#, boost-format
+msgid "Process: %1%"
+msgstr "Proces: %1%"
+
+#, boost-format
+msgid "Filament slot %1%: %2%"
+msgstr "Pozice filamentu %1%: %2%"
+
+msgid ""
+"The AI assistant asks to select this preset. The slicer asks what to do with "
+"unsaved changes. Select it?"
+msgstr "Asistent AI žádá o výběr této předvolby. Slicer se zeptá, co s neuloženými změnami. Vybrat ji?"
+
+#, boost-format
+msgid "Save the edited preset '%1%' as '%2%'"
+msgstr "Uložit upravenou předvolbu „%1%“ jako „%2%“"
+
+msgid "The existing user preset with this name is replaced."
+msgstr "Stávající uživatelská předvolba s tímto názvem bude nahrazena."
+
+msgid "The AI assistant asks to save a user preset. Save it?"
+msgstr "Asistent AI žádá o uložení uživatelské předvolby. Uložit?"
+
+#, boost-format
+msgid "Add filament slot %1%"
+msgstr "Přidat pozici filamentu %1%"
+
+msgid "The AI assistant asks to add a filament slot. Add it?"
+msgstr "Asistent AI žádá o přidání pozice filamentu. Přidat?"
+
+#, boost-format
+msgid "Remove filament slot %1% (%2%)"
+msgstr "Odebrat pozici filamentu %1% (%2%)"
+
+#, boost-format
+msgid "Printed with slot %1% afterwards: %2%"
+msgstr "Poté tištěno pozicí %1%: %2%"
+
+#, boost-format
+msgid "Printed with another slot afterwards: %1%"
+msgstr "Poté tištěno jinou pozicí: %1%"
+
+msgid "The next slots move down by one."
+msgstr "Následující pozice se posunou o jednu níž."
+
+msgid "The AI assistant asks to remove a filament slot. Remove it?"
+msgstr "Asistent AI žádá o odebrání pozice filamentu. Odebrat?"
+
+#, boost-format
+msgid "Filament slot %1%: color %2%"
+msgstr "Pozice filamentu %1%: barva %2%"
+
+msgid ""
+"The AI assistant asks to change the color of a filament slot. Change it?"
+msgstr "Asistent AI žádá o změnu barvy pozice filamentu. Změnit?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

@@ -19423,6 +19423,66 @@ msgstr "El asistente de IA pide exportar la placa actual laminada (3MF con su G-
 msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
 msgstr "El asistente de IA pide exportar los objetos como STL a %s. ¿Exportarlos?"
 
+#, boost-format
+msgid "Printer: %1%"
+msgstr "Impresora: %1%"
+
+#, boost-format
+msgid "Process: %1%"
+msgstr "Proceso: %1%"
+
+#, boost-format
+msgid "Filament slot %1%: %2%"
+msgstr "Ranura de filamento %1%: %2%"
+
+msgid ""
+"The AI assistant asks to select this preset. The slicer asks what to do with "
+"unsaved changes. Select it?"
+msgstr "El asistente de IA pide seleccionar este perfil. El laminador preguntará qué hacer con los cambios sin guardar. ¿Seleccionarlo?"
+
+#, boost-format
+msgid "Save the edited preset '%1%' as '%2%'"
+msgstr "Guardar el perfil editado «%1%» como «%2%»"
+
+msgid "The existing user preset with this name is replaced."
+msgstr "Se reemplaza el perfil de usuario existente con este nombre."
+
+msgid "The AI assistant asks to save a user preset. Save it?"
+msgstr "El asistente de IA pide guardar un perfil de usuario. ¿Guardarlo?"
+
+#, boost-format
+msgid "Add filament slot %1%"
+msgstr "Añadir la ranura de filamento %1%"
+
+msgid "The AI assistant asks to add a filament slot. Add it?"
+msgstr "El asistente de IA pide añadir una ranura de filamento. ¿Añadirla?"
+
+#, boost-format
+msgid "Remove filament slot %1% (%2%)"
+msgstr "Quitar la ranura de filamento %1% (%2%)"
+
+#, boost-format
+msgid "Printed with slot %1% afterwards: %2%"
+msgstr "Se imprimirán después con la ranura %1%: %2%"
+
+#, boost-format
+msgid "Printed with another slot afterwards: %1%"
+msgstr "Se imprimirán después con otra ranura: %1%"
+
+msgid "The next slots move down by one."
+msgstr "Las ranuras siguientes bajan un puesto."
+
+msgid "The AI assistant asks to remove a filament slot. Remove it?"
+msgstr "El asistente de IA pide quitar una ranura de filamento. ¿Quitarla?"
+
+#, boost-format
+msgid "Filament slot %1%: color %2%"
+msgstr "Ranura de filamento %1%: color %2%"
+
+msgid ""
+"The AI assistant asks to change the color of a filament slot. Change it?"
+msgstr "El asistente de IA pide cambiar el color de una ranura de filamento. ¿Cambiarlo?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

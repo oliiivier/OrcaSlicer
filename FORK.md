@@ -127,6 +127,7 @@ ces jetons ; seul un bac à sable (Flatpak, firejail...) l'en empêche.
 | `McpMaterials` | Têtes, emplacements de filament, filaments mixtes, attribution par élément |
 | `McpNotes` | Instructions de l'utilisateur et dossier de notes Markdown partagé (`notes`) |
 | `McpObjects` | Opérations de l'onglet Préparer sur les objets, après confirmation (`edit_objects`) |
+| `McpPresets` | Préréglages et emplacements de filament par les listes et boutons de la barre latérale (`edit_presets`) |
 | `McpSlicing` | Slicing de la plaque courante ou de toutes les plaques et résumé du résultat (`slice`) |
 | `McpProject` | Fichiers, plaques et lancement d'impression (`edit_project`, `edit_plates`, `control_printer` start_print) |
 | `McpRender` | Rendu PNG du plateau depuis une vue nommée (`get_view`) |
@@ -142,7 +143,8 @@ ces jetons ; seul un bac à sable (Flatpak, firejail...) l'en empêche.
 | `McpDialog` | Fenêtre de réglages |
 
 Outils (regroupés par domaine, le paramètre `action` choisit l'opération) : `get_issues`, `get_project`,
-`get_config`, `get_docs` (setting, page), `apply_changes`, `edit_objects`, `edit_plates`, `edit_project` (new,
+`get_config`, `get_docs` (setting, page), `apply_changes`, `edit_presets` (select, save, add_slot, remove_slot,
+set_color), `edit_objects`, `edit_plates`, `edit_project` (new,
 open, import, save, export), `adapt_to_printer`, `slice`, `get_view` (model), `get_printer` (status, snapshot,
 watch), `control_printer` (start_print, pause, resume, cancel, unload_filament), `notes` (list, read, write),
 `experiences` (search, record, report), `manufacturer_docs` (search, read). Le chat affiche l'action à côté du
@@ -192,6 +194,14 @@ de support (API Zendesk Help Center), lecture d'une page en texte avec sa date d
 `wiki.snapmaker.com` et `support.snapmaker.com` sont contactés, en tâche de fond (l'outil attend la réponse
 sans bloquer l'interface), et seulement si la case de la fenêtre MCP est cochée (activée par défaut).
 L'assistant résume dans les notes ce qui sert, avec l'adresse et la date.
+
+Préréglages (`edit_presets`) : la sélection passe par la liste de la barre latérale, comme un clic (le slicer
+demande lui-même quoi faire des modifications non enregistrées et règle buses, plaques et volumes de purge) ;
+l'enregistrement par le bouton de l'onglet de réglages, nom donné (préréglage utilisateur, jamais un nom de
+préréglage système) ; ajout et retrait d'emplacement par les commandes de la liste des filaments (le retrait
+dit dans la confirmation quels objets changent d'emplacement) ; la couleur comme le sélecteur de couleur de
+l'emplacement (couleur unie). `get_project.presets` donne les préréglages choisis, ceux que proposent les
+listes (visibles et compatibles) et les modifications non enregistrées.
 
 Conventions des outils qui modifient quelque chose (`McpActions`) : une seule forme de confirmation (raison
 donnée par le modèle, liste des opérations, question Oui/Non ; `apply_changes` garde sa fenêtre à cases, les
@@ -261,7 +271,7 @@ Plan de réalisation et regroupement des outils : [`src/slic3r/AIAssistant/PLAN.
   réglages par plaque (type de plateau, ordre d'impression), trancher toutes les plaques.
 - [x] Impression : lancer l'impression de la plaque tranchée, mettre en pause, reprendre, arrêter.
 - [ ] Chargement du filament (piste : même séquence `AUTO_FEEDING_BATCH` que le déchargement).
-- [ ] Préréglages : enregistrer un préréglage utilisateur, choisir un autre préréglage d'imprimante, de
+- [x] Préréglages : enregistrer un préréglage utilisateur, choisir un autre préréglage d'imprimante, de
   traitement ou de filament, ajouter ou retirer un emplacement de filament, changer sa couleur.
 - [ ] Plages de hauteur avec réglages propres, hauteur de couche variable.
 - [ ] Pause, changement de couleur ou G-code personnalisé à une couche.

@@ -18107,6 +18107,66 @@ msgstr "De AI-assistent vraagt de geslicete huidige plaat (3MF met G-code) te ex
 msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
 msgstr "De AI-assistent vraagt de objecten als STL te exporteren naar %s. Exporteren?"
 
+#, boost-format
+msgid "Printer: %1%"
+msgstr "Printer: %1%"
+
+#, boost-format
+msgid "Process: %1%"
+msgstr "Proces: %1%"
+
+#, boost-format
+msgid "Filament slot %1%: %2%"
+msgstr "Filamentpositie %1%: %2%"
+
+msgid ""
+"The AI assistant asks to select this preset. The slicer asks what to do with "
+"unsaved changes. Select it?"
+msgstr "De AI-assistent vraagt deze voorinstelling te selecteren. De slicer vraagt wat er met niet-opgeslagen wijzigingen moet gebeuren. Selecteren?"
+
+#, boost-format
+msgid "Save the edited preset '%1%' as '%2%'"
+msgstr "De bewerkte voorinstelling '%1%' opslaan als '%2%'"
+
+msgid "The existing user preset with this name is replaced."
+msgstr "De bestaande gebruikersvoorinstelling met deze naam wordt vervangen."
+
+msgid "The AI assistant asks to save a user preset. Save it?"
+msgstr "De AI-assistent vraagt een gebruikersvoorinstelling op te slaan. Opslaan?"
+
+#, boost-format
+msgid "Add filament slot %1%"
+msgstr "Filamentpositie %1% toevoegen"
+
+msgid "The AI assistant asks to add a filament slot. Add it?"
+msgstr "De AI-assistent vraagt een filamentpositie toe te voegen. Toevoegen?"
+
+#, boost-format
+msgid "Remove filament slot %1% (%2%)"
+msgstr "Filamentpositie %1% verwijderen (%2%)"
+
+#, boost-format
+msgid "Printed with slot %1% afterwards: %2%"
+msgstr "Daarna geprint met positie %1%: %2%"
+
+#, boost-format
+msgid "Printed with another slot afterwards: %1%"
+msgstr "Daarna geprint met een andere positie: %1%"
+
+msgid "The next slots move down by one."
+msgstr "De volgende posities schuiven één plaats op."
+
+msgid "The AI assistant asks to remove a filament slot. Remove it?"
+msgstr "De AI-assistent vraagt een filamentpositie te verwijderen. Verwijderen?"
+
+#, boost-format
+msgid "Filament slot %1%: color %2%"
+msgstr "Filamentpositie %1%: kleur %2%"
+
+msgid ""
+"The AI assistant asks to change the color of a filament slot. Change it?"
+msgstr "De AI-assistent vraagt de kleur van een filamentpositie te wijzigen. Wijzigen?"
+
 #~ msgid "Alt + Mouse wheel"
 #~ msgstr "Alt + muiswiel"
 

@@ -19268,6 +19268,66 @@ msgstr "DI asistentas prašo eksportuoti supjaustytą dabartinę plokštę (3MF 
 msgid "The AI assistant asks to export the objects as STL to %s. Export them?"
 msgstr "DI asistentas prašo eksportuoti objektus kaip STL į %s. Eksportuoti?"
 
+#, boost-format
+msgid "Printer: %1%"
+msgstr "Spausdintuvas: %1%"
+
+#, boost-format
+msgid "Process: %1%"
+msgstr "Procesas: %1%"
+
+#, boost-format
+msgid "Filament slot %1%: %2%"
+msgstr "Gijos vieta %1%: %2%"
+
+msgid ""
+"The AI assistant asks to select this preset. The slicer asks what to do with "
+"unsaved changes. Select it?"
+msgstr "DI asistentas prašo pasirinkti šį profilį. Pjaustyklė paklaus, ką daryti su neišsaugotais pakeitimais. Pasirinkti?"
+
+#, boost-format
+msgid "Save the edited preset '%1%' as '%2%'"
+msgstr "Išsaugoti redaguotą profilį „%1%“ kaip „%2%“"
+
+msgid "The existing user preset with this name is replaced."
+msgstr "Esamas naudotojo profilis šiuo pavadinimu bus pakeistas."
+
+msgid "The AI assistant asks to save a user preset. Save it?"
+msgstr "DI asistentas prašo išsaugoti naudotojo profilį. Išsaugoti?"
+
+#, boost-format
+msgid "Add filament slot %1%"
+msgstr "Pridėti gijos vietą %1%"
+
+msgid "The AI assistant asks to add a filament slot. Add it?"
+msgstr "DI asistentas prašo pridėti gijos vietą. Pridėti?"
+
+#, boost-format
+msgid "Remove filament slot %1% (%2%)"
+msgstr "Pašalinti gijos vietą %1% (%2%)"
+
+#, boost-format
+msgid "Printed with slot %1% afterwards: %2%"
+msgstr "Toliau spausdinama vieta %1%: %2%"
+
+#, boost-format
+msgid "Printed with another slot afterwards: %1%"
+msgstr "Toliau spausdinama kita vieta: %1%"
+
+msgid "The next slots move down by one."
+msgstr "Tolesnės vietos pasislenka per vieną."
+
+msgid "The AI assistant asks to remove a filament slot. Remove it?"
+msgstr "DI asistentas prašo pašalinti gijos vietą. Pašalinti?"
+
+#, boost-format
+msgid "Filament slot %1%: color %2%"
+msgstr "Gijos vieta %1%: spalva %2%"
+
+msgid ""
+"The AI assistant asks to change the color of a filament slot. Change it?"
+msgstr "DI asistentas prašo pakeisti gijos vietos spalvą. Pakeisti?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."
