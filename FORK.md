@@ -212,7 +212,10 @@ fenêtre *AI Assistant* (`claude_path`).
 Onglets : une conversation (session Claude Code, reprise par `--resume`) par onglet, enregistrées avec ce
 qu'elles affichent dans `ai_assistant/chats.json`. La CLI d'un onglet inactif et sans réponse en cours est
 arrêtée, puis relancée à son message suivant. Boutons de capture de la vue 3D (relue dans OpenGL) ou de toute la
-fenêtre, jointe au message suivant. La configuration MCP donnée à la CLI (avec le jeton) est écrite dans
+fenêtre, jointe au message suivant. Choix du modèle sous le champ de saisie, comme dans l'extension VS Code :
+liste donnée par la CLI (requête de contrôle `initialize`, gardée dans `chats.json`), choix mémorisé
+(`chat_model` de la section `ai_assistant` de la configuration), passé par `--model` au lancement et appliqué
+aux CLI déjà lancées par `set_model`. La configuration MCP donnée à la CLI (avec le jeton) est écrite dans
 `ai_assistant/claude_mcp.json`, lisible par l'utilisateur seul. La page du chat est
 `resources/web/ai_assistant/chat.html`.
 
@@ -221,7 +224,7 @@ fenêtre et volet, et la capture de la fenêtre entière (copie d'écran) resten
 
 | Fichier | Rôle |
 |---|---|
-| `ClaudeProcess` | Lance la CLI, écrit et lit les messages JSON ligne par ligne, interruption |
+| `ClaudeProcess` | Lance la CLI, écrit et lit les messages JSON ligne par ligne, interruption, modèle |
 | `ChatPanel` | Page du chat, onglets et sessions, fenêtre flottante ou volet wxAUI du `Plater` |
 | `ScreenCapture` | Capture de la vue 3D et de la fenêtre principale |
 

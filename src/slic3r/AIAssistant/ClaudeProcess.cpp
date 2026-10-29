@@ -219,6 +219,10 @@ bool ClaudeProcess::start(const Options& options, std::string& error)
         args.push_back(L"--resume");
         args.push_back(wxString::FromUTF8(options.resume_session).ToStdWstring());
     }
+    if (!options.model.empty()) {
+        args.push_back(L"--model");
+        args.push_back(wxString::FromUTF8(options.model).ToStdWstring());
+    }
 
     std::vector<const wchar_t*> argv;
     for (const std::wstring& a : args)
@@ -285,11 +289,22 @@ bool ClaudeProcess::send(const nlohmann::json& msg)
     return true;
 }
 
-bool ClaudeProcess::interrupt()
+bool ClaudeProcess::send_control(const std::string& subtype, nlohmann::json request)
 {
+    request["subtype"] = subtype;
     return send({{"type", "control_request"},
-                 {"request_id", "interrupt_" + std::to_string(++m_request_id)},
-                 {"request", {{"subtype", "interrupt"}}}});
+                 {"request_id", subtype + "_" + std::to_string(++m_request_id)},
+                 {"request", request}});
+}
+
+bool ClaudeProcess::interrupt() { return send_control("interrupt"); }
+
+bool ClaudeProcess::initialize() { return send_control("initialize"); }
+
+bool ClaudeProcess::set_model(const std::string& model)
+{
+    // Without a model, the CLI goes back to its default.
+    return send_control("set_model", model.empty() ? nlohmann::json::object() : nlohmann::json{{"model", model}});
 }
 
 void ClaudeProcess::read_available()

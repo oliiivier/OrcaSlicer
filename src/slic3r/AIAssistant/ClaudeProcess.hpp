@@ -42,6 +42,8 @@ public:
         std::string system_prompt;
         // Session to continue, empty for a new conversation.
         std::string resume_session;
+        // Model alias or name (--model), empty for the CLI's default.
+        std::string model;
     };
 
     using MessageHandler = std::function<void(const nlohmann::json& msg)>;
@@ -64,6 +66,11 @@ public:
     bool send(const nlohmann::json& msg);
     // Asks Claude to stop the current turn; the process keeps running.
     bool interrupt();
+    // Asks the CLI for its commands, models and account: the answer is a "control_response"
+    // message whose response holds "models" ([{value, displayName, description...}]).
+    bool initialize();
+    // Changes the model of the next requests, empty for the CLI's default.
+    bool set_model(const std::string& model);
 
     // Finds the CLI: `configured_path` when given, else on the PATH, in the usual install
     // locations, then (macOS, Linux) on the PATH of the user's login shell. Invalid if not found.
@@ -72,6 +79,7 @@ public:
 private:
     class Process;
 
+    bool send_control(const std::string& subtype, nlohmann::json request = nlohmann::json::object());
     void poll();
     void read_available();
     void on_terminate(int exit_code);

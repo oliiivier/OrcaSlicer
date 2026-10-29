@@ -48,6 +48,17 @@ constexpr size_t MAX_IMAGE_BASE64 = 4 * 1024 * 1024;
 constexpr int SCREENSHOT_MAX_EDGE = 1600;
 
 const char* DOCKED_KEY = "chat_docked";
+const char* MODEL_KEY  = "chat_model";
+const char* DEFAULT_MODEL = "default";
+
+// Offered until the CLI gives its own list.
+json fallback_models()
+{
+    return json::array({{{"value", DEFAULT_MODEL}, {"displayName", "Default (recommended)"}},
+                        {{"value", "opus"}, {"displayName", "Opus"}},
+                        {{"value", "sonnet"}, {"displayName", "Sonnet"}},
+                        {{"value", "haiku"}, {"displayName", "Haiku"}}});
+}
 
 wxWeakRef<ChatPanel>& instance()
 {
@@ -141,6 +152,7 @@ json page_labels()
         {"new_tab_title", t(_L("New conversation"))},
         {"close_tab", t(_L("Close this conversation"))},
         {"undock", t(_L("Float in its own window"))},
+        {"model_tip", t(_L("Choose the model"))},
     };
 }
 
@@ -302,6 +314,9 @@ ChatPanel::ChatPanel(wxWindow* parent) : wxPanel(parent, wxID_ANY)
     SetSizer(sizer);
 
     Bind(wxEVT_WEBVIEW_SCRIPT_MESSAGE_RECEIVED, &ChatPanel::on_script_message, this, m_browser->GetId());
+    m_model = wxGetApp().app_config->get("ai_assistant", MODEL_KEY);
+    if (m_model.empty())
+        m_model = DEFAULT_MODEL;
     load();
 }
 
@@ -385,6 +400,7 @@ void ChatPanel::on_script_message(wxWebViewEvent& evt)
         for (const json& e : pending)
             post(e);
         post_tabs();
+        post_models();
         post_replay();
     } else if (command == "send") {
         if (m_active != nullptr)
@@ -405,6 +421,8 @@ void ChatPanel::on_script_message(wxWebViewEvent& evt)
         sync_server();
     } else if (command == "capture") {
         capture(request.value("target", "") == "window");
+    } else if (command == "set_model") {
+        set_model(request.value("model", ""));
     } else if (command == "dock") {
         set_docked(request.value("docked", false));
     } else if (command == "resize") {
@@ -442,6 +460,20 @@ void ChatPanel::capture(bool whole_window)
                 self->m_window->Raise();
             }
         });
+}
+
+void ChatPanel::set_model(const std::string& model)
+{
+    if (model.empty() || model == m_model)
+        return;
+    m_model = model;
+    wxGetApp().app_config->set("ai_assistant", MODEL_KEY, m_model);
+    // The CLIs that are not running get it with --model when they start.
+    const std::string cli_model = m_model == DEFAULT_MODEL ? std::string() : m_model;
+    for (auto& conv : m_conversations)
+        if (conv->claude && conv->claude->is_running())
+            conv->claude->set_model(cli_model);
+    post_models();
 }
 
 // Lets the page start resizing the floating window from its edges: the window manager's
@@ -495,6 +527,8 @@ bool ChatPanel::ensure_started(Conversation& conv)
     options.launch         = launch;
     options.system_prompt  = SYSTEM_PROMPT;
     options.resume_session = conv.session_id;
+    if (m_model != DEFAULT_MODEL)
+        options.model = m_model;
     // An empty directory: the CLI must not pick up project files or instructions from elsewhere.
     const fs::path cwd = assistant_dir() / "chat";
     boost::system::error_code ec;
@@ -520,6 +554,8 @@ bool ChatPanel::ensure_started(Conversation& conv)
         post_status("error", from_u8(error));
         return false;
     }
+    if (!m_models_asked)
+        m_models_asked = conv.claude->initialize();
     return true;
 }
 
@@ -566,7 +602,25 @@ void ChatPanel::on_claude_message(Conversation& conv, const json& msg)
     if (msg.contains("parent_tool_use_id") && !msg["parent_tool_use_id"].is_null())
         return;
 
-    if (type == "system" && msg.value("subtype", "") == "init") {
+    if (type == "control_response") {
+        // The answer to initialize(): the models this account can use.
+        const json& response = msg.contains("response") ? msg["response"] : json();
+        if (response.is_object() && response.value("subtype", "") == "success" && response.contains("response") &&
+            response["response"].is_object() && response["response"].contains("models") &&
+            response["response"]["models"].is_array()) {
+            json models = json::array();
+            for (const json& m : response["response"]["models"])
+                if (m.is_object() && m.contains("value") && m["value"].is_string())
+                    models.push_back({{"value", m["value"]},
+                                      {"displayName", m.value("displayName", m["value"].get<std::string>())},
+                                      {"description", m.value("description", "")}});
+            if (!models.empty() && models != m_models) {
+                m_models = std::move(models);
+                post_models();
+                save();
+            }
+        }
+    } else if (type == "system" && msg.value("subtype", "") == "init") {
         conv.session_id = msg.value("session_id", "");
         bool connected = false;
         if (msg.contains("mcp_servers"))
@@ -702,6 +756,11 @@ void ChatPanel::post_tabs()
     post({{"kind", "tabs"}, {"tabs", tabs}, {"active", m_active ? m_active->id : std::string()}});
 }
 
+void ChatPanel::post_models()
+{
+    post({{"kind", "models"}, {"models", m_models.empty() ? fallback_models() : m_models}, {"current", m_model}});
+}
+
 void ChatPanel::post_replay()
 {
     if (!m_page_ready || m_active == nullptr)
@@ -728,6 +787,8 @@ void ChatPanel::load()
             if (c.contains("history") && c["history"].is_array())
                 conv.history = c["history"];
         }
+    if (data.is_object() && data.contains("models") && data["models"].is_array())
+        m_models = data["models"];
     if (m_conversations.empty())
         add_conversation();
     m_active = data.is_object() ? find(data.value("active", "")) : nullptr;
@@ -741,7 +802,9 @@ void ChatPanel::save() const
     for (const auto& conv : m_conversations)
         conversations.push_back(
             {{"id", conv->id}, {"title", conv->title}, {"session_id", conv->session_id}, {"history", conv->history}});
-    const json data = {{"active", m_active ? m_active->id : std::string()}, {"conversations", conversations}};
+    const json data = {{"active", m_active ? m_active->id : std::string()},
+                       {"conversations", conversations},
+                       {"models", m_models.is_array() ? m_models : json::array()}};
 
     boost::system::error_code ec;
     fs::create_directories(assistant_dir(), ec);

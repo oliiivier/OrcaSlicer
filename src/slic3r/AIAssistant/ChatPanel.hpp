@@ -59,6 +59,8 @@ private:
     void send_user_message(Conversation& conv, const nlohmann::json& request);
     // Attaches a screenshot of the 3D view or of the whole main window to the next message.
     void capture(bool whole_window);
+    // Uses `model` ("default" for the CLI's default) in every conversation, from their next request.
+    void set_model(const std::string& model);
     void begin_resize(const std::string& edge);
 
     // Posts an event to the page, or queues it until the page is loaded.
@@ -71,6 +73,7 @@ private:
     void post_server_state();
     void post_layout();
     void post_tabs();
+    void post_models();
     // Redraws the conversation on screen from its history.
     void post_replay();
 
@@ -84,6 +87,10 @@ private:
     std::vector<nlohmann::json> m_pending;
     std::vector<std::unique_ptr<Conversation>> m_conversations;
     Conversation* m_active { nullptr };
+    // The models offered by the CLI ([{value, displayName, description}]), asked once per run.
+    nlohmann::json m_models;
+    bool           m_models_asked { false };
+    std::string    m_model;
 };
 
 }} // namespace Slic3r::AIAssistant

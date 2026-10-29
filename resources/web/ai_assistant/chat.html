@@ -192,6 +192,25 @@ header svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke
 .tools-row button:hover { color: var(--text); }
 .tools-row button:disabled { opacity: 0.5; cursor: default; }
 .tools-row svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke-width: 1.6; stroke-linejoin: round; }
+#model-picker { margin-left: auto; position: relative; min-width: 0; }
+#model { max-width: 100%; }
+#model span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+#model-menu {
+  display: none;
+  position: absolute; right: 0; bottom: calc(100% + 4px); z-index: 20;
+  min-width: 220px; max-width: 300px; max-height: 60vh; overflow-y: auto;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  padding: 4px;
+}
+#model-menu.open { display: block; }
+.model-item { display: flex; gap: 8px; padding: 5px 8px; border-radius: 6px; cursor: pointer; }
+.model-item:hover { background: var(--panel); }
+.model-item .check { width: 12px; flex-shrink: 0; color: var(--accent); }
+.model-item .name { font-size: 13px; }
+.model-item .desc { font-size: 12px; color: var(--muted); }
 .grip { position: fixed; z-index: 10; }
 .grip.left { left: 0; top: 0; bottom: 14px; width: 5px; cursor: ew-resize; }
 .grip.bottom_left { left: 0; bottom: 0; width: 14px; height: 14px; cursor: nesw-resize; }
@@ -220,6 +239,10 @@ header svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke
   <div class="tools-row">
     <button id="capture-view"><svg viewBox="0 0 16 16"><path d="M8 1.5l5.5 3v7L8 14.5l-5.5-3v-7z M2.5 4.5L8 7.5l5.5-3 M8 7.5v7"/></svg><span></span></button>
     <button id="capture-window"><svg viewBox="0 0 16 16"><rect x="1.5" y="2.5" width="13" height="11" rx="1.5"/><path d="M1.5 5.5h13"/></svg><span></span></button>
+    <div id="model-picker">
+      <button id="model"><span></span><svg viewBox="0 0 16 16"><path d="M4 10l4-4 4 4"/></svg></button>
+      <div id="model-menu"></div>
+    </div>
   </div>
   <div id="attachments"></div>
   <div class="input-row">
@@ -243,6 +266,8 @@ header svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke
   var serverRunning = true;
   var docked = false;
   var renderPending = false;
+  var models = [];         // [{ value, displayName, description }]
+  var currentModel = "default";
 
   var $ = function (id) { return document.getElementById(id); };
   var log = $("log"), input = $("input"), sendBtn = $("send");
@@ -458,6 +483,29 @@ header svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke
     });
   }
 
+  function renderModels() {
+    var current = null;
+    models.forEach(function (m) { if (m.value === currentModel) current = m; });
+    $("model").firstChild.textContent = current ? current.displayName : currentModel;
+    var menu = $("model-menu");
+    menu.innerHTML = "";
+    models.forEach(function (m) {
+      var item = document.createElement("div");
+      item.className = "model-item";
+      item.innerHTML = '<span class="check"></span><div><div class="name"></div><div class="desc"></div></div>';
+      item.querySelector(".check").textContent = m.value === currentModel ? "\u2713" : "";
+      item.querySelector(".name").textContent = m.displayName;
+      item.querySelector(".desc").textContent = m.description || "";
+      item.onclick = function () {
+        menu.classList.remove("open");
+        if (m.value !== currentModel)
+          postToSlicer({ command: "set_model", model: m.value });
+        input.focus();
+      };
+      menu.appendChild(item);
+    });
+  }
+
   function send() {
     if (busy) {
       postToSlicer({ command: "interrupt" });
@@ -526,6 +574,7 @@ header svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke
       $("capture-view").title = L("capture_view_tip");
       $("capture-window").lastChild.textContent = L("capture_window");
       $("capture-window").title = L("capture_window_tip");
+      $("model").title = L("model_tip");
       setBusy(busy);
       showThinking(false);
       break;
@@ -559,6 +608,11 @@ header svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke
       break;
     case "tabs":
       renderTabs(e.tabs || [], e.active);
+      break;
+    case "models":
+      models = e.models || [];
+      currentModel = e.current || "default";
+      renderModels();
       break;
     case "replay":
       clearLog();
@@ -703,6 +757,18 @@ header svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke
       $("overlay").firstChild.src = ev.target.src;
       $("overlay").style.display = "flex";
     }
+  });
+  $("model").onclick = function (ev) {
+    ev.stopPropagation();
+    $("model-menu").classList.toggle("open");
+  };
+  document.addEventListener("mousedown", function (ev) {
+    if (!ev.target.closest || !ev.target.closest("#model-picker"))
+      $("model-menu").classList.remove("open");
+  });
+  document.addEventListener("keydown", function (ev) {
+    if (ev.key === "Escape")
+      $("model-menu").classList.remove("open");
   });
   $("capture-view").onclick = function () { capture("view"); };
   $("capture-window").onclick = function () { capture("window"); };
