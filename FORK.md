@@ -217,8 +217,11 @@ Prompts (commandes slash dans Claude Code / Gemini CLI) : `adapt_project`, `diag
    `read_documentation` (type `experience`).
 
 `render_view` montre le modèle (pas les supports ni les trajectoires) ; pour l'aperçu tranché, l'utilisateur
-peut coller une capture d'écran dans le client. Le serveur traite une requête à la fois : pendant un `slice`
-(jusqu'à 10 min), un `watch_print` ou un `unload_filament`, les autres requêtes attendent.
+peut coller une capture d'écran dans le client. Le serveur traite les requêtes en parallèle (8 fils) :
+un `slice` (jusqu'à 10 min), un `watch_print` ou un `unload_filament` ne bloque pas les autres outils ; leur
+exécution reste sérialisée sur le fil de l'interface. Claude Code abandonne un appel MCP après 60 s par
+défaut : le chat intégré passe `"timeout"` (31 min) dans sa config MCP, un client externe doit être lancé avec
+`MCP_TOOL_TIMEOUT` (valeur affichée dans les paramètres MCP).
 
 Multi-têtes (Snapmaker U1, 4 têtes) : `get_project.materials` décrit les têtes et chaque emplacement
 (preset, type, couleur, température, tête, utilisé sur le plateau) ; les réglages par emplacement/tête sont

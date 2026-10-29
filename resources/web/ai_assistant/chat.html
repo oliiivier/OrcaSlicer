@@ -123,7 +123,7 @@ button.primary:disabled { opacity: 0.5; cursor: default; }
 .msg.assistant > .text > :first-child { margin-top: 0; }
 .msg.assistant > .text > :last-child { margin-bottom: 0; }
 .msg.error { color: var(--error); font-size: 13px; }
-.msg.info { color: var(--muted); font-size: 13px; font-style: italic; }
+.msg.info { color: var(--muted); font-size: 13px; font-style: italic; white-space: pre-wrap; }
 .text p, .text ul, .text ol, .text pre, .text table, .text blockquote { margin: 0 0 8px; }
 .text h1, .text h2, .text h3, .text h4 { font-size: 15px; margin: 12px 0 6px; }
 .text ul, .text ol { padding-left: 22px; }
@@ -699,6 +699,9 @@ header svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke
     case "capture_failed":
       addInfo("error", L("capture_failed"));
       setCapturing(false);
+      break;
+    case "info":
+      addInfo("info", (e.label ? L(e.label) : "") + (e.label && e.text ? "\n" : "") + (e.text || ""));
       break;
     case "exited":
       addInfo("info", L("exited") + (e.text ? "\n" + e.text : ""));

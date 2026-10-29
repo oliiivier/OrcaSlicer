@@ -9,6 +9,7 @@
 #include <chrono>
 #include <stdexcept>
 #include <thread>
+#include <vector>
 
 #ifdef _WIN32
 #include <windows.h>
@@ -27,6 +28,7 @@ using nlohmann::json;
 static const char* MCP_PATH            = "/mcp";
 static const char* LATEST_PROTOCOL     = "2025-06-18";
 static const char* SUPPORTED_PROTOCOLS[] = { "2025-11-25", "2025-06-18", "2025-03-26" };
+static constexpr int WORKER_THREADS    = 8;
 
 // JSON-RPC error codes
 static constexpr int PARSE_ERROR      = -32700;
@@ -63,9 +65,9 @@ class McpSession;
 struct McpServer::Impl
 {
     // Declared first so it is destroyed last: pending handlers own sessions bound to it.
-    asio::io_context ioc;
-    tcp::acceptor    acceptor { ioc };
-    std::thread      thread;
+    asio::io_context         ioc;
+    tcp::acceptor            acceptor { ioc };
+    std::vector<std::thread> threads;
 
     void do_accept(McpServer& server);
 };
@@ -237,7 +239,11 @@ bool McpServer::start(std::string& error)
     }
 
     impl->do_accept(*this);
-    impl->thread = std::thread([ioc = &impl->ioc]() { ioc->run(); });
+    // A tool call blocks its thread until it returns (watch_print waits minutes): several
+    // threads let the other calls through meanwhile. Each connection still handles one
+    // request at a time, so its handlers never run concurrently.
+    for (int i = 0; i < WORKER_THREADS; ++i)
+        impl->threads.emplace_back([ioc = &impl->ioc]() { ioc->run(); });
 
     m_impl = std::move(impl);
     BOOST_LOG_TRIVIAL(info) << "MCP: server listening on " << url();
@@ -251,8 +257,8 @@ void McpServer::stop()
     if (!m_impl)
         return;
     m_impl->ioc.stop();
-    if (m_impl->thread.joinable())
-        m_impl->thread.join();
+    for (std::thread& thread : m_impl->threads)
+        thread.join();
     m_impl.reset();
     BOOST_LOG_TRIVIAL(info) << "MCP: server stopped";
 }

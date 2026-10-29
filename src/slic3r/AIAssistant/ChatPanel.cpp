@@ -15,6 +15,7 @@
 #include "slic3r/GUI/Widgets/StateColor.hpp"
 #include "slic3r/GUI/Widgets/WebView.hpp"
 
+#include <boost/algorithm/string/trim.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/nowide/fstream.hpp>
@@ -97,11 +98,16 @@ std::string title_from(const std::string& text)
 }
 
 // The MCP configuration given to the CLI. It holds the server token: readable by the user only.
+// The CLI gives up on a tool call after 60 s by default: slicing, watching a print or waiting
+// for the user to confirm takes longer.
 std::string write_mcp_config(const std::string& url, const std::string& token)
 {
     const json config = {{"mcpServers",
                           {{SERVER_NAME,
-                            {{"type", "http"}, {"url", url}, {"headers", {{"Authorization", "Bearer " + token}}}}}}}};
+                            {{"type", "http"},
+                             {"url", url},
+                             {"headers", {{"Authorization", "Bearer " + token}}},
+                             {"timeout", McpSettings::TOOL_TIMEOUT_MS}}}}}};
 
     const fs::path path = assistant_dir() / "claude_mcp.json";
     boost::system::error_code ec;
@@ -153,6 +159,9 @@ json page_labels()
         {"close_tab", t(_L("Close this conversation"))},
         {"undock", t(_L("Float in its own window"))},
         {"model_tip", t(_L("Choose the model"))},
+        {"compacting", t(_L("Compacting the conversation..."))},
+        {"compacted", t(_L("Conversation compacted: Claude keeps a summary of it."))},
+        {"cleared", t(_L("Conversation cleared: Claude starts from scratch."))},
     };
 }
 
@@ -584,9 +593,19 @@ void ChatPanel::send_user_message(Conversation& conv, const json& request)
     }
     // The page already shows it.
     post_to(conv, {{"kind", "user"}, {"text", text}, {"images", images}}, false);
-    if (conv.title.empty() && !text.empty()) {
+    // CLI commands (/compact, /context...) do not name the conversation.
+    const bool command = !text.empty() && text.front() == '/';
+    if (conv.title.empty() && !text.empty() && !command) {
         conv.title = title_from(text);
         post_tabs();
+    }
+    // The CLI starts a new session, which its next init message gives: the page starts over too.
+    if (command && boost::algorithm::trim_copy(text) == "/clear") {
+        conv.history = json::array();
+        conv.title.clear();
+        post_tabs();
+        post_replay();
+        post_to(conv, {{"kind", "info"}, {"label", "cleared"}});
     }
     conv.busy = true;
     post_busy(conv);
@@ -629,6 +648,22 @@ void ChatPanel::on_claude_message(Conversation& conv, const json& msg)
                     connected = server.value("status", "") == "connected";
         if (!conv.server_url.empty() && !connected && &conv == m_active)
             post({{"kind", "notice"}, {"level", "warning"}, {"label", "server_failed"}});
+    } else if (type == "system" && msg.value("subtype", "") == "status" && msg.value("status", json()) == "compacting") {
+        post_to(conv, {{"kind", "info"}, {"label", "compacting"}});
+    } else if (type == "system" && msg.value("subtype", "") == "compact_boundary") {
+        post_to(conv, {{"kind", "info"}, {"label", "compacted"}});
+    } else if (type == "user" && msg.contains("message") && msg["message"].contains("content") &&
+               msg["message"]["content"].is_string()) {
+        // Output of a CLI command (/context, /cost...); "Compacted" is already shown above.
+        const std::string content = msg["message"]["content"].get<std::string>();
+        const std::string open = "<local-command-stdout>", close = "</local-command-stdout>";
+        const size_t      from = content.find(open);
+        const size_t      to   = from == std::string::npos ? std::string::npos : content.find(close, from);
+        if (to != std::string::npos) {
+            const std::string out = boost::algorithm::trim_copy(content.substr(from + open.size(), to - from - open.size()));
+            if (!out.empty() && out != "Compacted")
+                post_to(conv, {{"kind", "info"}, {"text", out}});
+        }
     } else if (type == "stream_event" && msg.contains("event")) {
         const json&       event = msg["event"];
         const std::string etype = event.value("type", "");

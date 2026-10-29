@@ -43,14 +43,16 @@ std::string connection_instructions(const McpSettings& s)
 {
     const std::string url = "http://127.0.0.1:" + std::to_string(s.port) + "/mcp";
     return (boost::format(
-                "Claude Code:\n"
+                "Claude Code (slicing and print watching take longer than its default 60 s per call:\n"
+                "start it with MCP_TOOL_TIMEOUT=%3%):\n"
                 "  claude mcp add --transport http snapmaker-orca %1% --header \"Authorization: Bearer %2%\"\n"
                 "\n"
                 "Gemini CLI (~/.gemini/settings.json):\n"
                 "  \"mcpServers\": {\n"
                 "    \"snapmaker-orca\": {\n"
                 "      \"httpUrl\": \"%1%\",\n"
-                "      \"headers\": { \"Authorization\": \"Bearer %2%\" }\n"
+                "      \"headers\": { \"Authorization\": \"Bearer %2%\" },\n"
+                "      \"timeout\": %3%\n"
                 "    }\n"
                 "  }\n"
                 "\n"
@@ -61,7 +63,7 @@ std::string connection_instructions(const McpSettings& s)
                 "      \"args\": [\"mcp-remote\", \"%1%\", \"--header\", \"Authorization: Bearer %2%\"]\n"
                 "    }\n"
                 "  }\n") %
-            url % s.token)
+            url % s.token % McpSettings::TOOL_TIMEOUT_MS)
         .str();
 }
 

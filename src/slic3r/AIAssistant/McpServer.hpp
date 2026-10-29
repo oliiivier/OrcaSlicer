@@ -8,7 +8,8 @@
 
 namespace Slic3r { namespace AIAssistant {
 
-// What the server exposes to MCP clients. Called from the server thread.
+// What the server exposes to MCP clients. Called from the server threads, possibly
+// several calls at once.
 class McpToolbox
 {
 public:
@@ -34,7 +35,7 @@ public:
 
 // Minimal MCP server over the Streamable HTTP transport (single "/mcp" endpoint,
 // JSON responses, no SSE stream). Listens on 127.0.0.1 only and requires
-// "Authorization: Bearer <token>". Requests are served one at a time.
+// "Authorization: Bearer <token>". Requests on separate connections are served concurrently.
 class McpServer
 {
 public:

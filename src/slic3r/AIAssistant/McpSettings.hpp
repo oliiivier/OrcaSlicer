@@ -9,6 +9,9 @@ namespace Slic3r { namespace AIAssistant {
 struct McpSettings
 {
     static constexpr unsigned short DEFAULT_PORT = 13700;
+    // Time a client should allow for one tool call: the longest one (unload_filament)
+    // waits up to 30 min. MCP clients give up much sooner by default.
+    static constexpr long TOOL_TIMEOUT_MS = 31 * 60 * 1000;
 
     bool           enabled { false };
     unsigned short port { DEFAULT_PORT };

@@ -458,8 +458,8 @@ const std::vector<Tool>& tools()
         { "watch_print",
           "Waits until the print state changes (until=state_change, e.g. printing -> paused or error), the print ends "
           "(until=end) or a new layer starts (until=layer), at most timeout_s seconds, then reports the state, layer, "
-          "progress and any firmware error. Use it to follow a print without polling. Other tools wait meanwhile, so "
-          "keep timeout_s short when the user is waiting.",
+          "progress and any firmware error. Use it to follow a print without polling; other tools can be called "
+          "meanwhile.",
           [](const json& args, ToolContext& ctx) { return watch_print(args, ctx.state); },
           { { "type", "object" },
             { "properties",
