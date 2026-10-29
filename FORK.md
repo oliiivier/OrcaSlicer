@@ -107,7 +107,10 @@ qui se connecte seul). Le serveur écoute uniquement sur `127.0.0.1`, exige
 | `McpIssues` | Collecte des erreurs et avertissements du slicer (`get_issues`) |
 | `McpChanges` | Validation, confirmation et application des réglages (`apply_changes`) |
 | `McpChangesDialog` | Fenêtre de confirmation : une case par réglage, aide du réglage et commentaire du modèle au survol |
+| `McpManufacturerDocs` | Documentation Snapmaker en ligne : wiki et site de support (`search_manufacturer_docs`, `read_manufacturer_page`) |
 | `McpMaterials` | Têtes, emplacements de filament, filaments mixtes, attribution par élément |
+| `McpNotes` | Instructions de l'utilisateur et dossier de notes Markdown partagé (`list_notes`, `read_note`, `write_note`) |
+| `McpObjects` | Opérations de l'onglet Préparer sur les objets, après confirmation (`edit_objects`) |
 | `McpSlicing` | Slicing du plateau et résumé du résultat (`slice`) |
 | `McpRender` | Rendu PNG du plateau depuis une vue nommée (`render_view`) |
 | `McpPrinter` | Lecture seule de l'imprimante connectée (`get_printer_status`, écarts projet/imprimante) |
@@ -122,7 +125,7 @@ qui se connecte seul). Le serveur écoute uniquement sur `127.0.0.1`, exige
 | `McpDialog` | Fenêtre de réglages |
 
 Outils : `get_issues`, `get_project`, `get_config`, `describe_setting`, `read_documentation`, `apply_changes`,
-`slice`, `render_view`, `adapt_to_printer`, `get_printer_status`, `printer_snapshot`, `watch_print`, `unload_filament`,
+`edit_objects`, `list_notes`, `read_note`, `write_note`, `search_manufacturer_docs`, `read_manufacturer_page`, `slice`, `render_view`, `adapt_to_printer`, `get_printer_status`, `printer_snapshot`, `watch_print`, `unload_filament`,
 `record_experience`, `report_outcome`, `search_experiences`.
 
 Prompts : `adapt_project`, `diagnose_print`, `fix_issues`, `optimize_settings`, `capitalize_experiences`. Dans
@@ -148,7 +151,32 @@ commentaire du modèle (`comment`) ; le survol affiche aussi l'aide du réglage.
 décoche des valeurs : celles-ci reviennent au modèle sous `declined` et sont notées dans le journal
 d'expériences (`declined_by_user`), pour le suivi de l'impression.
 
+Instructions de l'utilisateur : champ de la fenêtre MCP, enregistré dans `<data_dir>/ai_assistant/instructions.md`
+(modifiable aussi hors du slicer) et ajouté aux instructions du serveur, donc lu au début de chaque conversation
+(chat intégré comme clients externes). Notes : dossier de fichiers Markdown (par défaut
+`<data_dir>/ai_assistant/notes`, réglable, bouton *Ouvrir*) que l'assistant liste, lit et enrichit ; l'écriture se
+désactive dans la fenêtre. Les noms restent dans le dossier (sous-dossiers par `/`, ni `..` ni fichiers cachés,
+extension `.md` imposée), 1 Mo maximum par note.
+
+Documentation du constructeur, interrogée en direct plutôt que copiée (elle change souvent, perd ses images et
+vidéos en Markdown, et n'est pas à nous) : recherche dans le wiki (API GraphQL publique de Wiki.js) et le site
+de support (API Zendesk Help Center), lecture d'une page en texte avec sa date de mise à jour. Seuls
+`wiki.snapmaker.com` et `support.snapmaker.com` sont contactés, en tâche de fond (l'outil attend la réponse
+sans bloquer l'interface), et seulement si la case de la fenêtre MCP est cochée (activée par défaut).
+L'assistant résume dans les notes ce qui sert, avec l'adresse et la date.
+
 `apply_changes` refuse `post_process` (scripts exécutés sur l'ordinateur à l'export du G-code), même confirmé.
+
+`edit_objects` enchaîne les opérations de l'onglet Préparer sur les objets : redimensionner (facteur ou cote),
+pivoter, déplacer, centrer, poser sur le plateau, miroir, couper horizontalement, séparer en objets, dupliquer,
+supprimer, orienter automatiquement, disposer le plateau courant, ajouter une pièce, une pièce négative, un
+modificateur ou un bloqueur / forceur de supports (cube, cylindre, cône, sphère aux cotes et à la position
+données), supprimer une pièce, changer le filament d'un objet ou d'une pièce, renommer. La liste est confirmée en une fois par
+l'utilisateur et forme une seule étape d'annulation (plus une par orientation ou disposition, tâches de fond
+attendues par l'outil). Les opérations passent par la sélection et le canevas 3D, comme la souris et les
+gizmos ; un gizmo ouvert bloque l'outil. La sélection est vidée avant les opérations qui suppriment ou
+remplacent un objet ou une pièce (la liste des objets la redessinerait sur des volumes supprimés). Pièces
+coupées : `<nom>_A` (haut), `<nom>_B` (bas).
 
 Accès à l'imprimante, via la connexion Snapmaker Connect déjà ouverte par l'application ; deux cases à cocher
 dans la fenêtre MCP, désactivées par défaut :

@@ -18,6 +18,8 @@ class McpDialog : public GUI::DPIDialog
 {
 public:
     explicit McpDialog(wxWindow* parent);
+    // Saves the user's instructions, whichever way the dialog was closed.
+    ~McpDialog() override;
 
 protected:
     void on_dpi_changed(const wxRect& suggested_rect) override;
@@ -33,6 +35,7 @@ private:
     ::CheckBox*   m_printer_control { nullptr };
     ::CheckBox*   m_auto_connect { nullptr };
     ::CheckBox*   m_suggest_adaptation { nullptr };
+    ::CheckBox*   m_manufacturer_docs { nullptr };
     SpinInput*    m_port { nullptr };
     TextInput*    m_token { nullptr };
     TextInput*    m_claude_path { nullptr };
@@ -40,6 +43,10 @@ private:
     wxStaticText* m_status_dot { nullptr };
     wxStaticText* m_status { nullptr };
     wxTextCtrl*   m_instructions { nullptr };
+    wxTextCtrl*   m_user_instructions { nullptr };
+    bool          m_user_instructions_changed { false };
+    TextInput*    m_notes_dir { nullptr };
+    ::CheckBox*   m_notes_writable { nullptr };
     std::string   m_error;
 };
 

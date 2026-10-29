@@ -25,6 +25,12 @@ struct McpSettings
     bool           suggest_adaptation { true };
     // Claude Code executable for the chat, empty to look for it.
     std::string    claude_path;
+    // Folder of Markdown notes shared with the assistant, empty for the default one.
+    std::string    notes_dir;
+    // Lets the assistant create and edit notes (reading is always allowed).
+    bool           notes_writable { true };
+    // Lets the tools search and read the Snapmaker wiki and support site.
+    bool           manufacturer_docs { true };
 
     static McpSettings load();
     void               save() const;

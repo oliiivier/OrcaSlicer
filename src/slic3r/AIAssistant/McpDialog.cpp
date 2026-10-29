@@ -1,5 +1,6 @@
 #include "McpDialog.hpp"
 #include "ClaudeProcess.hpp"
+#include "McpNotes.hpp"
 #include "McpService.hpp"
 #include "McpSettings.hpp"
 
@@ -15,12 +16,15 @@
 #include "slic3r/GUI/Widgets/TextInput.hpp"
 
 #include <wx/clipbrd.h>
+#include <wx/dirdlg.h>
 #include <wx/filedlg.h>
 #include <wx/sizer.h>
 #include <wx/stattext.h>
 #include <wx/textctrl.h>
 
+#include <boost/filesystem/operations.hpp>
 #include <boost/format.hpp>
+#include <boost/log/trivial.hpp>
 
 namespace Slic3r { namespace AIAssistant {
 
@@ -126,6 +130,8 @@ McpDialog::McpDialog(wxWindow* parent)
     m_auto_connect->SetValue(settings.auto_connect_printer);
     m_suggest_adaptation = new ::CheckBox(this);
     m_suggest_adaptation->SetValue(settings.suggest_adaptation);
+    m_manufacturer_docs = new ::CheckBox(this);
+    m_manufacturer_docs->SetValue(settings.manufacturer_docs);
 
     m_port = new SpinInput(this, wxEmptyString, wxEmptyString, wxDefaultPosition, wxSize(FromDIP(120), -1), wxSP_ARROW_KEYS, 1025,
                            65535, settings.port);
@@ -155,6 +161,33 @@ McpDialog::McpDialog(wxWindow* parent)
     grid->Add(m_claude_found, 1, wxEXPAND);
     grid->AddSpacer(0);
 
+    m_notes_dir = new TextInput(this, from_u8(settings.notes_dir), wxEmptyString, wxEmptyString);
+    m_notes_dir->GetTextCtrl()->SetHint(from_u8(default_notes_dir()));
+    auto* browse_notes = new Button(this, _L("Browse..."));
+    browse_notes->SetStyle(ButtonStyle::Regular, ButtonType::Choice);
+    grid->Add(label(this, _L("Notes folder")), 0, wxALIGN_CENTER_VERTICAL);
+    grid->Add(m_notes_dir, 1, wxEXPAND | wxALIGN_CENTER_VERTICAL);
+    grid->Add(browse_notes, 0, wxALIGN_CENTER_VERTICAL);
+    m_notes_writable = new ::CheckBox(this);
+    m_notes_writable->SetValue(settings.notes_writable);
+    auto* open_notes = new Button(this, _L("Open"));
+    open_notes->SetStyle(ButtonStyle::Regular, ButtonType::Choice);
+    grid->AddSpacer(0);
+    grid->Add(checkbox_row(this, m_notes_writable, _L("Let the assistant add and edit notes"), FromDIP(400)), 1, wxEXPAND);
+    grid->Add(open_notes, 0, wxALIGN_CENTER_VERTICAL);
+
+    // Free text: a native multiline control, as the client configuration below.
+    m_user_instructions = new wxTextCtrl(this, wxID_ANY, from_u8(user_instructions()), wxDefaultPosition,
+                                         FromDIP(wxSize(600, 120)), wxTE_MULTILINE | wxBORDER_SIMPLE);
+    m_user_instructions->SetHint(_L("e.g. Answer in French. I print mostly PETG on the U1 and prefer strong parts over speed."));
+    auto* user_instructions_hint = label(this,
+                                         wxString::Format(_L("Added to the assistant's instructions at the start of each "
+                                                             "conversation. Also editable in %s."),
+                                                          from_u8(user_instructions_path())),
+                                         Label::Body_13);
+    user_instructions_hint->SetForegroundColour(SECONDARY_COLOR);
+    user_instructions_hint->Wrap(wrap);
+
     m_instructions = new wxTextCtrl(this, wxID_ANY, wxEmptyString, wxDefaultPosition, FromDIP(wxSize(600, 240)),
                                     wxTE_MULTILINE | wxTE_READONLY | wxHSCROLL | wxBORDER_SIMPLE);
     m_instructions->SetFont(wxFont(wxFontInfo(Label::Body_13.GetPointSize()).Family(wxFONTFAMILY_TELETYPE)));
@@ -182,7 +215,15 @@ McpDialog::McpDialog(wxWindow* parent)
                             _L("Offer to adapt projects made for another printer (e.g. downloaded 3MF files) to the connected one."),
                             wrap),
                0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(8));
+    sizer->Add(checkbox_row(this, m_manufacturer_docs,
+                            _L("Allow searching the Snapmaker wiki and support site for the manufacturer's recommendations "
+                               "(the searches are sent to Snapmaker)."),
+                            wrap),
+               0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(8));
     sizer->Add(grid, 0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, margin);
+    sizer->Add(label(this, _L("Instructions for the assistant"), Label::Head_14), 0, wxLEFT | wxRIGHT | wxTOP, margin);
+    sizer->Add(user_instructions_hint, 0, wxLEFT | wxRIGHT | wxTOP, FromDIP(4));
+    sizer->Add(m_user_instructions, 0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(8));
     sizer->Add(label(this, _L("Client configuration"), Label::Head_14), 0, wxLEFT | wxRIGHT | wxTOP, margin);
     sizer->Add(m_instructions, 1, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(8));
     sizer->Add(buttons, 0, wxEXPAND);
@@ -223,6 +264,12 @@ McpDialog::McpDialog(wxWindow* parent)
         s.save();
         e.Skip();
     });
+    m_manufacturer_docs->Bind(wxEVT_TOGGLEBUTTON, [this](wxCommandEvent& e) {
+        McpSettings s       = McpSettings::load();
+        s.manufacturer_docs = m_manufacturer_docs->GetValue();
+        s.save();
+        e.Skip();
+    });
     m_port->Bind(wxEVT_SPINCTRL, [this](wxCommandEvent&) { apply_and_refresh(); });
     regenerate->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) {
         m_token->GetTextCtrl()->SetValue(from_u8(McpSettings::generate_token()));
@@ -247,6 +294,34 @@ McpDialog::McpDialog(wxWindow* parent)
         if (dlg.ShowModal() == wxID_OK)
             m_claude_path->GetTextCtrl()->SetValue(dlg.GetPath()); // saved by the wxEVT_TEXT handler
     });
+    // Read by the notes tools at each call.
+    m_notes_dir->GetTextCtrl()->Bind(wxEVT_TEXT, [this](wxCommandEvent& e) {
+        McpSettings s = McpSettings::load();
+        s.notes_dir   = GUI::into_u8(m_notes_dir->GetTextCtrl()->GetValue().Trim().Trim(false));
+        s.save();
+        e.Skip();
+    });
+    browse_notes->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) {
+        wxDirDialog dlg(this, _L("Choose the notes folder"), from_u8(notes_dir()), wxDD_DEFAULT_STYLE);
+        if (dlg.ShowModal() == wxID_OK)
+            m_notes_dir->GetTextCtrl()->SetValue(dlg.GetPath()); // saved by the wxEVT_TEXT handler
+    });
+    m_notes_writable->Bind(wxEVT_TOGGLEBUTTON, [this](wxCommandEvent& e) {
+        McpSettings s    = McpSettings::load();
+        s.notes_writable = m_notes_writable->GetValue();
+        s.save();
+        e.Skip();
+    });
+    open_notes->Bind(wxEVT_BUTTON, [](wxCommandEvent&) {
+        const std::string dir = notes_dir();
+        boost::system::error_code ec;
+        boost::filesystem::create_directories(dir, ec);
+        GUI::desktop_open_any_folder(dir);
+    });
+    m_user_instructions->Bind(wxEVT_TEXT, [this](wxCommandEvent& e) {
+        m_user_instructions_changed = true;
+        e.Skip();
+    });
     buttons->GetButtonFromID(wxID_COPY)->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) {
         if (wxTheClipboard->Open()) {
             wxTheClipboard->SetData(new wxTextDataObject(m_instructions->GetValue()));
@@ -263,6 +338,19 @@ McpDialog::McpDialog(wxWindow* parent)
     const bool dark = GUI::wxGetApp().dark_mode();
     m_instructions->SetBackgroundColour(dark ? StateColor::darkModeColorFor(INSTRUCTIONS_BG) : INSTRUCTIONS_BG);
     m_instructions->SetForegroundColour(dark ? wxColour("#DFDFDF") : TEXT_COLOR);
+    m_user_instructions->SetBackgroundColour(dark ? StateColor::darkModeColorFor(*wxWHITE) : *wxWHITE);
+    m_user_instructions->SetForegroundColour(dark ? wxColour("#DFDFDF") : TEXT_COLOR);
+}
+
+McpDialog::~McpDialog()
+{
+    if (!m_user_instructions_changed)
+        return;
+    try {
+        save_user_instructions(GUI::into_u8(m_user_instructions->GetValue()));
+    } catch (const std::exception& e) {
+        BOOST_LOG_TRIVIAL(error) << "AI assistant: could not save the instructions: " << e.what();
+    }
 }
 
 void McpDialog::on_dpi_changed(const wxRect&) { Fit(); }

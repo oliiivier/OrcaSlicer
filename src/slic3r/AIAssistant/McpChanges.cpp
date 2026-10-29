@@ -62,22 +62,6 @@ bool is_object_setting(const std::string& key)
     return PrintObjectConfig::defaults().option(key) != nullptr || PrintRegionConfig::defaults().option(key) != nullptr;
 }
 
-int find_object(const std::string& name)
-{
-    const ModelObjectPtrs& objects = wxGetApp().model().objects;
-    int                    found   = -1;
-    for (size_t i = 0; i < objects.size(); ++i) {
-        if (objects[i]->name != name)
-            continue;
-        if (found >= 0)
-            throw ToolError("Several objects are named '" + name + "', rename them in the slicer first");
-        found = int(i);
-    }
-    if (found < 0)
-        throw ToolError("No object named '" + name + "'");
-    return found;
-}
-
 int int_arg(const json& item, const char* name, int default_value)
 {
     if (!item.contains(name) || item[name].is_null())

@@ -25,8 +25,14 @@ if (SNAPMAKER_AI_ASSISTANT)
         ${_ai_dir}/McpExperiences.hpp
         ${_ai_dir}/McpIssues.cpp
         ${_ai_dir}/McpIssues.hpp
+        ${_ai_dir}/McpManufacturerDocs.cpp
+        ${_ai_dir}/McpManufacturerDocs.hpp
         ${_ai_dir}/McpMaterials.cpp
         ${_ai_dir}/McpMaterials.hpp
+        ${_ai_dir}/McpNotes.cpp
+        ${_ai_dir}/McpNotes.hpp
+        ${_ai_dir}/McpObjects.cpp
+        ${_ai_dir}/McpObjects.hpp
         ${_ai_dir}/McpPrinter.cpp
         ${_ai_dir}/McpPrinter.hpp
         ${_ai_dir}/McpPrinterControl.cpp

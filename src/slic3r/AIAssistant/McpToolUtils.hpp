@@ -30,6 +30,9 @@ struct ToolRetry : std::runtime_error
 // Returns the plater, or throws ToolError when no FFF project is open.
 GUI::Plater& require_plater();
 
+// Index of the model object with this name; throws ToolError when there is none or several.
+int find_object(const std::string& name);
+
 std::vector<std::string> string_list(const nlohmann::json& args, const char* name);
 
 // Short description of a setting, embedded in tool results next to its key.

@@ -41,6 +41,11 @@ McpSettings McpSettings::load()
     if (cfg->get(SECTION, "suggest_adaptation", value) && !value.empty())
         s.suggest_adaptation = is_true(value);
     cfg->get(SECTION, "claude_path", s.claude_path);
+    cfg->get(SECTION, "notes_dir", s.notes_dir);
+    if (cfg->get(SECTION, "notes_writable", value) && !value.empty())
+        s.notes_writable = is_true(value);
+    if (cfg->get(SECTION, "manufacturer_docs", value) && !value.empty())
+        s.manufacturer_docs = is_true(value);
 
     if (s.token.empty()) {
         s.token = generate_token();
@@ -63,6 +68,9 @@ void McpSettings::save() const
     cfg->set(SECTION, "auto_connect_printer", auto_connect_printer);
     cfg->set(SECTION, "suggest_adaptation", suggest_adaptation);
     cfg->set(SECTION, "claude_path", claude_path);
+    cfg->set(SECTION, "notes_dir", notes_dir);
+    cfg->set(SECTION, "notes_writable", notes_writable);
+    cfg->set(SECTION, "manufacturer_docs", manufacturer_docs);
 }
 
 std::string McpSettings::generate_token()

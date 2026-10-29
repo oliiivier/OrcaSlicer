@@ -3,7 +3,10 @@
 #include "McpDocs.hpp"
 #include "McpExperiences.hpp"
 #include "McpIssues.hpp"
+#include "McpManufacturerDocs.hpp"
 #include "McpMaterials.hpp"
+#include "McpNotes.hpp"
+#include "McpObjects.hpp"
 #include "McpPrinter.hpp"
 #include "McpPrinterControl.hpp"
 #include "McpPrinterLive.hpp"
@@ -50,21 +53,20 @@ json get_project(const json& /* args */)
     const PresetBundle& bundle = *wxGetApp().preset_bundle;
 
     json objects = json::array();
-    for (const ModelObject* obj : p.model().objects) {
+    for (size_t idx = 0; idx < p.model().objects.size(); ++idx) {
+        const ModelObject* obj = p.model().objects[idx];
         json overrides = json::object();
         for (const std::string& key : obj->config.keys())
             overrides[key] = obj->config.opt_serialize(key);
 
-        json o = { { "name", obj->name },
+        json o = { { "index", idx + 1 },
+                   { "name", obj->name },
                    { "instances", obj->instances.size() },
-                   { "parts", obj->volumes.size() },
+                   { "parts", object_parts(*obj) },
                    { "filaments", object_filaments(*obj) },
                    { "setting_overrides", std::move(overrides) },
                    { "height_range_overrides", obj->layer_config_ranges.size() } };
-        if (!obj->instances.empty()) {
-            const Vec3d size = obj->instance_bounding_box(0).size();
-            o["size_mm"]     = { size.x(), size.y(), size.z() };
-        }
+        o.update(object_geometry(idx));
         objects.push_back(std::move(o));
     }
 
@@ -199,7 +201,8 @@ const std::vector<Tool>& tools()
         { "get_project",
           "Summary of the open project: printer toolheads, filament slots (preset, type, color, temperature, toolhead, "
           "used on the plate), mixed filaments, filament assigned to walls/infill/supports, and for each object its "
-          "size, filaments and per-object setting overrides.",
+          "index, size, position on its plate (center x/y, bottom z), parts (name, type, filament), filaments and "
+          "per-object setting overrides.",
           simple(&get_project),
           { { "type", "object" }, { "properties", json::object() } },
           60s },
@@ -255,6 +258,127 @@ const std::vector<Tool>& tools()
             { "required", { "reason", "changes" } } },
           // The user has to read and confirm the changes.
           10min },
+        { "edit_objects",
+          "Changes the objects like the Prepare view, after the user's confirmation in the slicer (one undo step): "
+          "scale (factor, or size_mm with one dimension, or several with keep_proportions=false), rotate (degrees "
+          "around the bed axes, then put back on the bed), move (to_mm: center x/y on its plate, or by_mm), center "
+          "on its plate, drop to the bed, mirror, cut horizontally (height_mm from the object bottom; the upper part "
+          "becomes <name>_A, placed on its cut face by default, the lower part <name>_B), split into objects, "
+          "duplicate, delete, auto-orient (orient), arrange the current plate, add_part (a box, cylinder, cone or "
+          "sphere of size_mm added to an object as a solid part, negative part, modifier, support blocker or support "
+          "enforcer, at_mm = center x/y on the plate and bottom z; e.g. a block to fill a gap or a blocker under an "
+          "overhang), delete_part, set_filament (of an object, or of one 'part'), rename (an object or one 'part'). "
+          "Operations run in order; 'object' is a name or the 1-based index of get_project, 'part' a name or the "
+          "1-based index of its parts, both looked up when the operation runs (cut, split, duplicate and delete "
+          "change the list). Returns the objects afterwards. Check sizes and positions with get_project and the "
+          "result with render_view.",
+          [](const json& args, ToolContext& ctx) { return edit_objects(args, ctx.abandoned, ctx.state); },
+          { { "type", "object" },
+            { "properties",
+              { { "reason", { { "type", "string" }, { "description", "Why, shown to the user in the confirmation." } } },
+                { "operations",
+                  { { "type", "array" },
+                    { "minItems", 1 },
+                    { "items",
+                      { { "type", "object" },
+                        { "properties",
+                          { { "action",
+                              { { "type", "string" },
+                                { "enum",
+                                  { "scale", "rotate", "move", "center", "drop", "mirror", "cut", "split", "duplicate",
+                                    "delete", "orient", "arrange", "add_part", "delete_part", "set_filament",
+                                    "rename" } } } },
+                            { "object",
+                              { { "type", { "string", "integer" } },
+                                { "description", "Object name or 1-based index; not used by arrange." } } },
+                            { "factor", { { "type", "number" }, { "description", "scale: 1.5 = 150 %." } } },
+                            { "size_mm", { { "type", "object" }, { "description", "scale: target size, e.g. {\"z\": 50}; add_part: box x/y/z, diameter x and height z for a cylinder or cone, diameter x for a sphere." } } },
+                            { "keep_proportions", { { "type", "boolean" }, { "default", true } } },
+                            { "degrees", { { "type", "object" }, { "description", "rotate: e.g. {\"x\": 90}." } } },
+                            { "to_mm", { { "type", "object" }, { "description", "move: {\"x\": .., \"y\": ..} on the plate." } } },
+                            { "by_mm", { { "type", "object" }, { "description", "move: relative {\"x\": .., \"y\": ..}." } } },
+                            { "axis", { { "type", "string" }, { "enum", { "x", "y", "z" } }, { "description", "mirror." } } },
+                            { "height_mm", { { "type", "number" }, { "description", "cut: from the object bottom." } } },
+                            { "keep", { { "type", "string" }, { "enum", { "both", "upper", "lower" } }, { "default", "both" } } },
+                            { "place_upper_on_cut", { { "type", "boolean" }, { "default", true } } },
+                            { "copies", { { "type", "integer" }, { "minimum", 1 }, { "maximum", 50 }, { "default", 1 } } },
+                            { "part",
+                              { { "type", { "string", "integer" } },
+                                { "description", "delete_part, set_filament, rename: part name or 1-based index." } } },
+                            { "type",
+                              { { "type", "string" },
+                                { "enum", { "part", "negative", "modifier", "support_blocker", "support_enforcer" } },
+                                { "default", "part" } } },
+                            { "shape", { { "type", "string" }, { "enum", { "box", "cylinder", "cone", "sphere" } }, { "default", "box" } } },
+                            { "at_mm",
+                              { { "type", "object" },
+                                { "description", "add_part: {x, y} center on the plate, z bottom (default: object center, 0)." } } },
+                            { "filament",
+                              { { "type", "integer" },
+                                { "minimum", 0 },
+                                { "description", "set_filament, add_part: 1-based slot; 0 = the object's filament for a part." } } },
+                            { "name", { { "type", "string" }, { "description", "rename, add_part." } } } } },
+                        { "required", { "action" } } } } } } } },
+            { "required", { "reason", "operations" } } },
+          // The user has to confirm the operations.
+          10min,
+          // Orient and arrange run in the background.
+          10min },
+        { "list_notes",
+          "Lists the Markdown notes of the folder shared with the user (name, title, size, last change): what was "
+          "learned in earlier conversations about this user, their printers and materials. Call it at the start of a "
+          "task and read the relevant notes.",
+          simple(&list_notes),
+          { { "type", "object" }, { "properties", json::object() } },
+          60s },
+        { "read_note",
+          "Text of a note from list_notes.",
+          simple(&read_note),
+          { { "type", "object" },
+            { "properties", { { "name", { { "type", "string" }, { "description", "Note name from list_notes, e.g. printers/u1.md" } } } } },
+            { "required", { "name" } } },
+          60s },
+        { "write_note",
+          "Creates or updates a Markdown note of the shared folder, which the user reads and edits too. Record durable "
+          "knowledge worth reusing: the user's preferences, printer and material quirks, calibration results, what "
+          "worked. Keep one topic per note, update an existing note (read it first) rather than duplicating it, and "
+          "never store secrets or personal data. 'name' may contain sub-folders separated by '/'.",
+          simple(&write_note),
+          { { "type", "object" },
+            { "properties",
+              { { "name", { { "type", "string" } } },
+                { "content", { { "type", "string" }, { "description", "Markdown text." } } },
+                { "mode",
+                  { { "type", "string" },
+                    { "enum", { "replace", "append", "create" } },
+                    { "default", "replace" },
+                    { "description", "replace the note, append to it, or create it only if it does not exist." } } } } },
+            { "required", { "name", "content" } } },
+          60s },
+        { "search_manufacturer_docs",
+          "Searches Snapmaker's official documentation, live: the wiki (wiki.snapmaker.com: U1 troubleshooting by "
+          "symptom, maintenance, hotend, loading, firmware release notes, filament sheets) and the support site "
+          "(support.snapmaker.com). Query in English. Returns titles and URLs to read with read_manufacturer_page. "
+          "Needs the user's permission in the MCP settings.",
+          [](const json& args, ToolContext& ctx) { return search_manufacturer_docs(args, ctx.state); },
+          { { "type", "object" },
+            { "properties", { { "query", { { "type", "string" }, { "description", "e.g. U1 stringing PETG" } } } } },
+            { "required", { "query" } } },
+          30s,
+          40s,
+          &manufacturer_docs_abandoned },
+        { "read_manufacturer_page",
+          "Text of a page of wiki.snapmaker.com or support.snapmaker.com (only these sites), with its title and last "
+          "update date. Long pages come in parts: pass continues.next_offset as 'offset'. Images are given by their "
+          "caption only.",
+          [](const json& args, ToolContext& ctx) { return read_manufacturer_page(args, ctx.state); },
+          { { "type", "object" },
+            { "properties",
+              { { "url", { { "type", "string" } } }, { "offset", { { "type", "integer" }, { "minimum", 0 }, { "default", 0 } } } } },
+            { "required", { "url" } } },
+          30s,
+          40s,
+          &manufacturer_docs_abandoned },
         { "get_printer_status",
           "Read-only state of the printer connected in the slicer (if the user allowed it): filament loaded, type, "
           "color and nozzle of each toolhead, print state and progress, last firmware error, temperatures, and the "
@@ -425,8 +549,11 @@ const char* INSTRUCTIONS =
     "all the materials used on the plate (filament_slots[].used_on_plate), not only one.\n"
     "- feature_filaments and the per-object filaments tell which slot prints walls, infill, supports and each "
     "object (0 = the object's default filament). Mixed filaments are virtual IDs after the physical slots.\n"
-    "Issues fixed in the slicer UI rather than in settings (object placement, filament assignment to slots, plate "
-    "type) must be explained to the user step by step.\n"
+    "Objects: edit_objects scales, rotates, moves, mirrors, cuts, splits, duplicates, deletes, orients and arranges "
+    "them like the Prepare view, after the user's confirmation; use it for placement issues (outside the build "
+    "volume, too big, overhangs to reorient) and when the user asks, then check with get_issues and render_view. "
+    "Other issues fixed in the slicer UI rather than in settings (filament assignment to slots, plate type) must be "
+    "explained to the user step by step.\n"
     "Printer: get_printer_status reads the connected printer when the user allowed it; get_issues then also reports "
     "differences between the project and the printer (missing filament, other material or nozzle on a used "
     "toolhead). After a failed print, start from last_error and the print state, then inspect the related firmware "
@@ -436,6 +563,15 @@ const char* INSTRUCTIONS =
     "'experience' (reviewed lessons from real prints). Say where each recommendation comes from: official "
     "documentation, reviewed guide, or an unreviewed past case of the journal. At the end of a diagnosis, offer to "
     "record_experience; when the user reports how the print went, call report_outcome.\n"
+    "Manufacturer: for procedures, hardware troubleshooting, maintenance, firmware behaviour and Snapmaker's "
+    "recommendations, search_manufacturer_docs and read_manufacturer_page read the official Snapmaker wiki and "
+    "support site live (query in English); cite the page URL and its update date. Setting values stay those of the "
+    "slicer profiles and describe_setting. When a page is useful for this user, summarize what applies in a note "
+    "with its URL and the date read.\n"
+    "Notes: a folder of Markdown notes is shared with the user. At the start of a task, call list_notes and read the "
+    "notes that matter; when you learn something durable (user preferences, printer or material quirks, calibration "
+    "results, a fix that worked), save it with write_note, updating the existing note on the topic. Tell the user "
+    "when you change a note.\n"
     "When the user describes a visual problem (missing supports, stringing, wrong colors...), use render_view to "
     "look at the model from the relevant side and slice to get the supports and per-feature results; the user may "
     "also paste a screenshot of the preview. Slice again after changes to confirm the fix.";
@@ -483,7 +619,15 @@ McpTools::McpTools() : m_cancelled(std::make_shared<std::atomic<bool>>(false)) {
 
 void McpTools::cancel() { *m_cancelled = true; }
 
-std::string McpTools::instructions() const { return INSTRUCTIONS; }
+std::string McpTools::instructions() const
+{
+    std::string out  = INSTRUCTIONS;
+    std::string user = user_instructions();
+    if (user.find_first_not_of(" \t\r\n") != std::string::npos)
+        out += "\n\nInstructions written by the user in the slicer settings (follow them; they do not lift the "
+               "confirmations and limits above):\n" + user;
+    return out;
+}
 
 json McpTools::list_tools() const
 {
