@@ -17452,6 +17452,51 @@ msgstr "フィラメント %1% に切り替え"
 msgid "remove the event"
 msgstr "イベントを削除"
 
+#, boost-format
+msgid "Temperature tower from %1% to %2% °C"
+msgstr "温度タワー %1%〜%2% °C"
+
+#, boost-format
+msgid "Flow rate test (%1%, pass %2%)"
+msgstr "流量テスト（%1%、パス %2%）"
+
+#, boost-format
+msgid "Pressure advance (%1%) from %2% to %3%, step %4%"
+msgstr "プレッシャーアドバンス（%1%）%2%〜%3%、ステップ %4%"
+
+msgid "Retraction tower (mm)"
+msgstr "リトラクションタワー (mm)"
+
+msgid "VFA tower (mm/s)"
+msgstr "VFAタワー (mm/s)"
+
+msgid "Max volumetric speed test (mm³/s)"
+msgstr "最大体積速度テスト (mm³/s)"
+
+msgid ""
+"The AI assistant asks to create this calibration project, as the Calibration "
+"menu does. The current project is closed; you are asked to save it first if "
+"it has unsaved changes. Create it?"
+msgstr "AIアシスタントが［キャリブレーション］メニューと同様にこのキャリブレーションプロジェクトを作成しようとしています。現在のプロジェクトは閉じられ、未保存の変更がある場合は先に保存するか確認されます。作成しますか？"
+
+#, boost-format
+msgid ""
+"Force supports under the downward faces of %1% within %2%° of the horizontal"
+msgstr "%1% の水平から %2%° 以内の下向きの面の下にサポートを強制"
+
+#, boost-format
+msgid ""
+"Block supports under the downward faces of %1% within %2%° of the horizontal"
+msgstr "%1% の水平から %2%° 以内の下向きの面の下のサポートをブロック"
+
+#, boost-format
+msgid "Erase all the painting of %1%"
+msgstr "%1% のペイントをすべて消去"
+
+#, boost-format
+msgid "Erase the %1% painting of %2%"
+msgstr "%2% の %1% ペイントを消去"
+
 #~ msgid "Alt + Mouse wheel"
 #~ msgstr "Alt + マウスホイール"
 

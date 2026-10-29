@@ -20026,6 +20026,51 @@ msgstr "zu Filament %1% wechseln"
 msgid "remove the event"
 msgstr "Ereignis entfernen"
 
+#, boost-format
+msgid "Temperature tower from %1% to %2% °C"
+msgstr "Temperaturturm von %1% bis %2% °C"
+
+#, boost-format
+msgid "Flow rate test (%1%, pass %2%)"
+msgstr "Flussratentest (%1%, Durchgang %2%)"
+
+#, boost-format
+msgid "Pressure advance (%1%) from %2% to %3%, step %4%"
+msgstr "Pressure Advance (%1%) von %2% bis %3%, Schritt %4%"
+
+msgid "Retraction tower (mm)"
+msgstr "Rückzugsturm (mm)"
+
+msgid "VFA tower (mm/s)"
+msgstr "VFA-Turm (mm/s)"
+
+msgid "Max volumetric speed test (mm³/s)"
+msgstr "Test der maximalen Volumengeschwindigkeit (mm³/s)"
+
+msgid ""
+"The AI assistant asks to create this calibration project, as the Calibration "
+"menu does. The current project is closed; you are asked to save it first if "
+"it has unsaved changes. Create it?"
+msgstr "Der KI-Assistent möchte dieses Kalibrierungsprojekt erstellen, wie das Menü Kalibrierung. Das aktuelle Projekt wird geschlossen; bei ungespeicherten Änderungen werden Sie zuvor zum Speichern aufgefordert. Erstellen?"
+
+#, boost-format
+msgid ""
+"Force supports under the downward faces of %1% within %2%° of the horizontal"
+msgstr "Stützen unter den nach unten gerichteten Flächen von %1% innerhalb von %2%° zur Horizontalen erzwingen"
+
+#, boost-format
+msgid ""
+"Block supports under the downward faces of %1% within %2%° of the horizontal"
+msgstr "Stützen unter den nach unten gerichteten Flächen von %1% innerhalb von %2%° zur Horizontalen blockieren"
+
+#, boost-format
+msgid "Erase all the painting of %1%"
+msgstr "Alle Bemalungen von %1% löschen"
+
+#, boost-format
+msgid "Erase the %1% painting of %2%"
+msgstr "Die Bemalung %1% von %2% löschen"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

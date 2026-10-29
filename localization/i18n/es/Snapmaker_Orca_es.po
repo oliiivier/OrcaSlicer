@@ -19514,6 +19514,51 @@ msgstr "cambiar al filamento %1%"
 msgid "remove the event"
 msgstr "quitar el evento"
 
+#, boost-format
+msgid "Temperature tower from %1% to %2% °C"
+msgstr "Torre de temperatura de %1% a %2% °C"
+
+#, boost-format
+msgid "Flow rate test (%1%, pass %2%)"
+msgstr "Prueba de flujo (%1%, pasada %2%)"
+
+#, boost-format
+msgid "Pressure advance (%1%) from %2% to %3%, step %4%"
+msgstr "Avance de presión (%1%) de %2% a %3%, paso %4%"
+
+msgid "Retraction tower (mm)"
+msgstr "Torre de retracción (mm)"
+
+msgid "VFA tower (mm/s)"
+msgstr "Torre VFA (mm/s)"
+
+msgid "Max volumetric speed test (mm³/s)"
+msgstr "Prueba de velocidad volumétrica máxima (mm³/s)"
+
+msgid ""
+"The AI assistant asks to create this calibration project, as the Calibration "
+"menu does. The current project is closed; you are asked to save it first if "
+"it has unsaved changes. Create it?"
+msgstr "El asistente de IA pide crear este proyecto de calibración, como hace el menú Calibración. El proyecto actual se cierra; se le pedirá guardarlo si tiene cambios sin guardar. ¿Crearlo?"
+
+#, boost-format
+msgid ""
+"Force supports under the downward faces of %1% within %2%° of the horizontal"
+msgstr "Forzar soportes bajo las caras inferiores de %1% a menos de %2%° de la horizontal"
+
+#, boost-format
+msgid ""
+"Block supports under the downward faces of %1% within %2%° of the horizontal"
+msgstr "Bloquear soportes bajo las caras inferiores de %1% a menos de %2%° de la horizontal"
+
+#, boost-format
+msgid "Erase all the painting of %1%"
+msgstr "Borrar toda la pintura de %1%"
+
+#, boost-format
+msgid "Erase the %1% painting of %2%"
+msgstr "Borrar la pintura %1% de %2%"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

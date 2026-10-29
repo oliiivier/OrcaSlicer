@@ -17802,6 +17802,51 @@ msgstr "byt till filament %1%"
 msgid "remove the event"
 msgstr "ta bort händelsen"
 
+#, boost-format
+msgid "Temperature tower from %1% to %2% °C"
+msgstr "Temperaturtorn från %1% till %2% °C"
+
+#, boost-format
+msgid "Flow rate test (%1%, pass %2%)"
+msgstr "Flödestest (%1%, omgång %2%)"
+
+#, boost-format
+msgid "Pressure advance (%1%) from %2% to %3%, step %4%"
+msgstr "Pressure advance (%1%) från %2% till %3%, steg %4%"
+
+msgid "Retraction tower (mm)"
+msgstr "Retraktionstorn (mm)"
+
+msgid "VFA tower (mm/s)"
+msgstr "VFA-torn (mm/s)"
+
+msgid "Max volumetric speed test (mm³/s)"
+msgstr "Test av maximal volymetrisk hastighet (mm³/s)"
+
+msgid ""
+"The AI assistant asks to create this calibration project, as the Calibration "
+"menu does. The current project is closed; you are asked to save it first if "
+"it has unsaved changes. Create it?"
+msgstr "AI-assistenten vill skapa det här kalibreringsprojektet, som menyn Kalibrering gör. Det aktuella projektet stängs; har det osparade ändringar får du först frågan om att spara. Skapa det?"
+
+#, boost-format
+msgid ""
+"Force supports under the downward faces of %1% within %2%° of the horizontal"
+msgstr "Tvinga stöd under de nedåtvända ytorna på %1% inom %2%° från horisontalplanet"
+
+#, boost-format
+msgid ""
+"Block supports under the downward faces of %1% within %2%° of the horizontal"
+msgstr "Blockera stöd under de nedåtvända ytorna på %1% inom %2%° från horisontalplanet"
+
+#, boost-format
+msgid "Erase all the painting of %1%"
+msgstr "Radera all målning av %1%"
+
+#, boost-format
+msgid "Erase the %1% painting of %2%"
+msgstr "Radera målningen %1% av %2%"
+
 #~ msgid "Alt + Mouse wheel"
 #~ msgstr "Alt + mushjul"
 

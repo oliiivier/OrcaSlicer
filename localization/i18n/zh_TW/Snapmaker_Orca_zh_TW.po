@@ -18856,3 +18856,48 @@ msgstr "切換到線材 %1%"
 
 msgid "remove the event"
 msgstr "移除該事件"
+
+#, boost-format
+msgid "Temperature tower from %1% to %2% °C"
+msgstr "溫度塔：%1% 至 %2% °C"
+
+#, boost-format
+msgid "Flow rate test (%1%, pass %2%)"
+msgstr "流量測試（%1%，第 %2% 輪）"
+
+#, boost-format
+msgid "Pressure advance (%1%) from %2% to %3%, step %4%"
+msgstr "壓力提前（%1%）：%2% 至 %3%，步長 %4%"
+
+msgid "Retraction tower (mm)"
+msgstr "回抽塔 (mm)"
+
+msgid "VFA tower (mm/s)"
+msgstr "VFA 塔 (mm/s)"
+
+msgid "Max volumetric speed test (mm³/s)"
+msgstr "最大體積速度測試 (mm³/s)"
+
+msgid ""
+"The AI assistant asks to create this calibration project, as the Calibration "
+"menu does. The current project is closed; you are asked to save it first if "
+"it has unsaved changes. Create it?"
+msgstr "AI 助理請求像「校準」選單一樣建立此校準專案。目前專案將被關閉；如有未儲存的修改，會先詢問是否儲存。是否建立？"
+
+#, boost-format
+msgid ""
+"Force supports under the downward faces of %1% within %2%° of the horizontal"
+msgstr "在 %1% 與水平面夾角 %2%° 以內的朝下面下方強制添加支撐"
+
+#, boost-format
+msgid ""
+"Block supports under the downward faces of %1% within %2%° of the horizontal"
+msgstr "在 %1% 與水平面夾角 %2%° 以內的朝下面下方阻止支撐"
+
+#, boost-format
+msgid "Erase all the painting of %1%"
+msgstr "清除 %1% 的全部塗畫"
+
+#, boost-format
+msgid "Erase the %1% painting of %2%"
+msgstr "清除 %2% 的 %1% 塗畫"

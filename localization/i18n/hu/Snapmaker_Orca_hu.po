@@ -17894,6 +17894,51 @@ msgstr "váltás a(z) %1%. filamentre"
 msgid "remove the event"
 msgstr "esemény eltávolítása"
 
+#, boost-format
+msgid "Temperature tower from %1% to %2% °C"
+msgstr "Hőmérséklet-torony %1% és %2% °C között"
+
+#, boost-format
+msgid "Flow rate test (%1%, pass %2%)"
+msgstr "Anyagáramlás-teszt (%1%, %2%. menet)"
+
+#, boost-format
+msgid "Pressure advance (%1%) from %2% to %3%, step %4%"
+msgstr "Nyomáselőtolás (%1%) %2% és %3% között, %4% lépésköz"
+
+msgid "Retraction tower (mm)"
+msgstr "Visszahúzási torony (mm)"
+
+msgid "VFA tower (mm/s)"
+msgstr "VFA-torony (mm/s)"
+
+msgid "Max volumetric speed test (mm³/s)"
+msgstr "Maximális térfogati sebesség teszt (mm³/s)"
+
+msgid ""
+"The AI assistant asks to create this calibration project, as the Calibration "
+"menu does. The current project is closed; you are asked to save it first if "
+"it has unsaved changes. Create it?"
+msgstr "Az MI-asszisztens ennek a kalibrációs projektnek a létrehozását kéri, ahogy a Kalibráció menü teszi. Az aktuális projekt bezárul; ha nem mentett módosításai vannak, előbb a mentésre kérjük. Létrehozza?"
+
+#, boost-format
+msgid ""
+"Force supports under the downward faces of %1% within %2%° of the horizontal"
+msgstr "Támasz kényszerítése %1% lefelé néző, a vízszintestől legfeljebb %2%°-os lapjai alá"
+
+#, boost-format
+msgid ""
+"Block supports under the downward faces of %1% within %2%° of the horizontal"
+msgstr "Támasz tiltása %1% lefelé néző, a vízszintestől legfeljebb %2%°-os lapjai alatt"
+
+#, boost-format
+msgid "Erase all the painting of %1%"
+msgstr "%1% összes festésének törlése"
+
+#, boost-format
+msgid "Erase the %1% painting of %2%"
+msgstr "%2% %1% festésének törlése"
+
 #~ msgid "Alt + Mouse wheel"
 #~ msgstr "Alt + Egérgörgő"
 

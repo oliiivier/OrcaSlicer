@@ -1,0 +1,56 @@
+{
+  "description": "Capture of the sliced preview. Tagged: the slicer window must be visible on the screen (a covered window draws no frame).",
+  "confirm": "yes",
+  "tags": [
+    "screen"
+  ],
+  "steps": [
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "new"
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "import",
+        "paths": [
+          "${MODELS}/OrcaToleranceTest.stl"
+        ]
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "slice",
+      "args": {},
+      "expect": {
+        "sliced": true
+      }
+    },
+    {
+      "call": "get_view",
+      "args": {
+        "action": "preview",
+        "view": "front",
+        "size": 512
+      },
+      "image": true
+    },
+    {
+      "call": "get_view",
+      "args": {
+        "action": "preview",
+        "from_layer": 1,
+        "to_layer": 1
+      },
+      "image": true,
+      "note": "first layer"
+    }
+  ]
+}

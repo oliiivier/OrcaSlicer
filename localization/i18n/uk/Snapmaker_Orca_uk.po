@@ -19487,6 +19487,51 @@ msgstr "змінити на філамент %1%"
 msgid "remove the event"
 msgstr "видалити подію"
 
+#, boost-format
+msgid "Temperature tower from %1% to %2% °C"
+msgstr "Температурна вежа від %1% до %2% °C"
+
+#, boost-format
+msgid "Flow rate test (%1%, pass %2%)"
+msgstr "Тест потоку (%1%, прохід %2%)"
+
+#, boost-format
+msgid "Pressure advance (%1%) from %2% to %3%, step %4%"
+msgstr "Pressure advance (%1%) від %2% до %3%, крок %4%"
+
+msgid "Retraction tower (mm)"
+msgstr "Вежа ретракту (мм)"
+
+msgid "VFA tower (mm/s)"
+msgstr "Вежа VFA (мм/с)"
+
+msgid "Max volumetric speed test (mm³/s)"
+msgstr "Тест максимальної об'ємної швидкості (мм³/с)"
+
+msgid ""
+"The AI assistant asks to create this calibration project, as the Calibration "
+"menu does. The current project is closed; you are asked to save it first if "
+"it has unsaved changes. Create it?"
+msgstr "ШІ-асистент просить створити цей проєкт калібрування, як меню «Калібрування». Поточний проєкт буде закрито; якщо є незбережені зміни, буде запропоновано його зберегти. Створити?"
+
+#, boost-format
+msgid ""
+"Force supports under the downward faces of %1% within %2%° of the horizontal"
+msgstr "Примусові підтримки під нижніми гранями %1% у межах %2%° від горизонталі"
+
+#, boost-format
+msgid ""
+"Block supports under the downward faces of %1% within %2%° of the horizontal"
+msgstr "Заборонити підтримки під нижніми гранями %1% у межах %2%° від горизонталі"
+
+#, boost-format
+msgid "Erase all the painting of %1%"
+msgstr "Стерти все розфарбування %1%"
+
+#, boost-format
+msgid "Erase the %1% painting of %2%"
+msgstr "Стерти розфарбування %1% у %2%"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

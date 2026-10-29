@@ -7,6 +7,7 @@
 #include "libslic3r/Format/bbs_3mf.hpp"
 #include "libslic3r/Model.hpp"
 #include "libslic3r/PresetBundle.hpp"
+#include "libslic3r/TriangleSelector.hpp"
 #include "slic3r/GUI/GLCanvas3D.hpp"
 #include "slic3r/GUI/GUI.hpp"
 #include "slic3r/GUI/GUI_App.hpp"
@@ -370,6 +371,97 @@ void remove_height_range(GUI::Plater& plater, const json& op, int obj_idx)
     ranges_changed(plater, obj_idx);
 }
 
+// ------------------------------------------------------------ painting
+
+// Overhang limit of paint_supports: the angle from the horizontal under which a
+// downward face needs support, as the threshold of the support settings.
+double paint_angle(const json& op)
+{
+    if (!op.contains("angle_deg"))
+        return 30.;
+    const double angle = number(op, "angle_deg");
+    if (angle <= 0. || angle >= 90.)
+        throw ToolError("'angle_deg' must be between 0 and 90 (angle from the horizontal)");
+    return angle;
+}
+
+const char* const PAINTS[] = { "supports", "seam", "color", "fuzzy_skin", "all" };
+
+std::string paint_kind(const json& op)
+{
+    const std::string paint = op.value("paint", std::string("supports"));
+    for (const char* p : PAINTS)
+        if (paint == p)
+            return paint;
+    throw ToolError("'paint' must be supports, seam, color, fuzzy_skin or all");
+}
+
+// After the painting of an object changed: object list (painting rows), 3D view and slicing.
+void paint_changed(GUI::Plater& plater, int obj_idx)
+{
+    if (GUI::ObjectList* list = wxGetApp().obj_list())
+        list->update_info_items(size_t(obj_idx));
+    plater.changed_object(*wxGetApp().model().objects[obj_idx]);
+}
+
+// As the support painting tool filling the overhangs: the downward faces within
+// `angle_deg` of the horizontal, except those lying on the bed, become support
+// enforcers (or blockers). The painting of other faces is kept.
+void paint_supports(GUI::Plater& plater, const json& op, int obj_idx)
+{
+    ModelObject&              obj   = *wxGetApp().model().objects[obj_idx];
+    const double              angle = paint_angle(op);
+    const EnforcerBlockerType state = op.value("mode", std::string("enforce")) == "block" ? EnforcerBlockerType::BLOCKER :
+                                                                                           EnforcerBlockerType::ENFORCER;
+    // The slope of a face from the horizontal is the angle of its normal from straight down.
+    const double     limit = std::cos(angle * M_PI / 180.);
+    const Transform3d inst  = obj.instances.front()->get_matrix();
+    const double     bed_z = obj.instance_bounding_box(0).min.z();
+    size_t           painted = 0;
+    for (ModelVolume* volume : obj.volumes) {
+        if (!volume->is_model_part())
+            continue;
+        const Transform3d          matrix = inst * volume->get_matrix();
+        const indexed_triangle_set& its   = volume->mesh().its;
+        TriangleSelector           selector(volume->mesh());
+        selector.deserialize(volume->supported_facets.get_data(), false);
+        for (size_t i = 0; i < its.indices.size(); ++i) {
+            Vec3d v[3];
+            for (int k = 0; k < 3; ++k)
+                v[k] = matrix * its.vertices[its.indices[i][k]].cast<double>();
+            const Vec3d normal = (v[1] - v[0]).cross(v[2] - v[0]);
+            if (normal.norm() < EPSILON || -normal.normalized().z() < limit)
+                continue;
+            if (std::max({ v[0].z(), v[1].z(), v[2].z() }) < bed_z + 0.05)
+                continue; // on the bed
+            selector.set_facet(int(i), state);
+            ++painted;
+        }
+        volume->supported_facets.set(selector);
+    }
+    if (painted == 0)
+        throw ToolError("'" + obj.name + "' has no downward face within " + float_to_string_decimal_point(angle, 1) +
+                        " degrees of the horizontal above the bed");
+    paint_changed(plater, obj_idx);
+}
+
+void clear_paint(GUI::Plater& plater, const json& op, int obj_idx)
+{
+    ModelObject&      obj   = *wxGetApp().model().objects[obj_idx];
+    const std::string paint = paint_kind(op);
+    for (ModelVolume* volume : obj.volumes) {
+        if (paint == "supports" || paint == "all")
+            volume->supported_facets.reset();
+        if (paint == "seam" || paint == "all")
+            volume->seam_facets.reset();
+        if (paint == "color" || paint == "all")
+            volume->mmu_segmentation_facets.reset();
+        if (paint == "fuzzy_skin" || paint == "all")
+            volume->fuzzy_skin_facets.reset();
+    }
+    paint_changed(plater, obj_idx);
+}
+
 // A translated description with its arguments put in (%1%, %2%...): whole sentences, so
 // that each language can order the words its own way.
 template<typename... Args> std::string text_of(const std::string& format, const Args&... args)
@@ -489,6 +581,19 @@ std::string describe(const json& op, int obj_idx)
         if (obj_idx >= 0)
             find_range(*wxGetApp().model().objects[obj_idx], range);
         return text_of(_u8L("Remove the height range %1% of %2%"), range_text(range), name);
+    }
+    if (action == "paint_supports") {
+        const double angle = paint_angle(op);
+        if (op.contains("mode") && op["mode"] != "enforce" && op["mode"] != "block")
+            throw ToolError("'mode' must be enforce or block");
+        return text_of(op.value("mode", std::string("enforce")) == "block" ? _u8L("Block supports under the downward faces of %1% within %2%° of the horizontal")
+                                                                           : _u8L("Force supports under the downward faces of %1% within %2%° of the horizontal"),
+                       name, float_to_string_decimal_point(angle, 1));
+    }
+    if (action == "clear_paint") {
+        const std::string paint = paint_kind(op);
+        return paint == "all" ? text_of(_u8L("Erase all the painting of %1%"), name) :
+                                text_of(_u8L("Erase the %1% painting of %2%"), paint, name);
     }
     // The operations below apply to the whole object, or to one of its parts.
     const bool        on_part = op.contains("part");
@@ -703,6 +808,12 @@ bool run(GUI::Plater& plater, const json& op)
         set_filament(plater, op, obj_idx);
     else if (action == "rename")
         rename(op, obj_idx);
+    else if (action == "paint_supports") {
+        if (wxGetApp().model().objects[obj_idx]->instances.size() != 1)
+            throw ToolError("Painting needs an object with a single instance");
+        paint_supports(plater, op, obj_idx);
+    } else if (action == "clear_paint")
+        clear_paint(plater, op, obj_idx);
     else if (action == "add_height_range") {
         clear_selection(plater);
         add_height_range(plater, op, obj_idx);

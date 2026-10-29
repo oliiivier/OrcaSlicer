@@ -19566,6 +19566,51 @@ msgstr "%1% numaralı filamente geç"
 msgid "remove the event"
 msgstr "olayı kaldır"
 
+#, boost-format
+msgid "Temperature tower from %1% to %2% °C"
+msgstr "%1% ile %2% °C arası sıcaklık kulesi"
+
+#, boost-format
+msgid "Flow rate test (%1%, pass %2%)"
+msgstr "Akış testi (%1%, %2%. geçiş)"
+
+#, boost-format
+msgid "Pressure advance (%1%) from %2% to %3%, step %4%"
+msgstr "Basınç ilerlemesi (%1%) %2% ile %3% arası, adım %4%"
+
+msgid "Retraction tower (mm)"
+msgstr "Geri çekme kulesi (mm)"
+
+msgid "VFA tower (mm/s)"
+msgstr "VFA kulesi (mm/s)"
+
+msgid "Max volumetric speed test (mm³/s)"
+msgstr "Azami hacimsel hız testi (mm³/s)"
+
+msgid ""
+"The AI assistant asks to create this calibration project, as the Calibration "
+"menu does. The current project is closed; you are asked to save it first if "
+"it has unsaved changes. Create it?"
+msgstr "Yapay zekâ asistanı, Kalibrasyon menüsünün yaptığı gibi bu kalibrasyon projesini oluşturmak istiyor. Geçerli proje kapatılır; kaydedilmemiş değişiklikleri varsa önce kaydetmeniz istenir. Oluşturulsun mu?"
+
+#, boost-format
+msgid ""
+"Force supports under the downward faces of %1% within %2%° of the horizontal"
+msgstr "%1% nesnesinin yataydan %2%° içindeki aşağı bakan yüzlerinin altına destek zorla"
+
+#, boost-format
+msgid ""
+"Block supports under the downward faces of %1% within %2%° of the horizontal"
+msgstr "%1% nesnesinin yataydan %2%° içindeki aşağı bakan yüzlerinin altında desteği engelle"
+
+#, boost-format
+msgid "Erase all the painting of %1%"
+msgstr "%1% nesnesinin tüm boyamasını sil"
+
+#, boost-format
+msgid "Erase the %1% painting of %2%"
+msgstr "%2% nesnesinin %1% boyamasını sil"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

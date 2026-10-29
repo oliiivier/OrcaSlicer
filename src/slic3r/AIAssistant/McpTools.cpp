@@ -348,7 +348,9 @@ const std::vector<Tool>& tools()
           "overhang), delete_part, set_filament (of an object, or of one 'part'), rename (an object or one 'part'), "
           "add_height_range (from_mm to to_mm above the object bottom, with its own 'settings': layer_height, extruder "
           "= filament slot, wall, infill, surface and speed settings, as the Height range Modifier of the object list), "
-          "remove_height_range (from_mm, to_mm). "
+          "remove_height_range (from_mm, to_mm), paint_supports (mode enforce or block, on the downward faces within "
+          "angle_deg of the horizontal, 30 by default, like filling the overhangs with the support painting tool; "
+          "faces on the bed excepted), clear_paint (paint: supports, seam, color, fuzzy_skin or all). "
           "Operations run in order; 'object' is a name or the 1-based index of get_project, 'part' a name or the "
           "1-based index of its parts, both looked up when the operation runs (cut, split, duplicate and delete "
           "change the list). Returns the objects afterwards. Check sizes and positions with get_project and the "
@@ -368,7 +370,8 @@ const std::vector<Tool>& tools()
                                 { "enum",
                                   { "scale", "rotate", "move", "move_to_plate", "center", "drop", "mirror", "cut", "split", "duplicate",
                                     "delete", "orient", "arrange", "add_part", "delete_part", "set_filament",
-                                    "rename", "add_height_range", "remove_height_range" } } } },
+                                    "rename", "add_height_range", "remove_height_range", "paint_supports",
+                                    "clear_paint" } } } },
                             { "object",
                               { { "type", { "string", "integer" } },
                                 { "description", "Object name or 1-based index; not used by arrange." } } },
@@ -403,7 +406,10 @@ const std::vector<Tool>& tools()
                             { "from_mm", { { "type", "number" }, { "description", "height ranges: from the object bottom." } } },
                             { "to_mm", { { "type", "number" } } },
                             { "settings",
-                              { { "type", "object" }, { "description", "add_height_range: e.g. {\"layer_height\": 0.12, \"wall_loops\": 4}." } } } } },
+                              { { "type", "object" }, { "description", "add_height_range: e.g. {\"layer_height\": 0.12, \"wall_loops\": 4}." } } },
+                            { "mode", { { "type", "string" }, { "enum", { "enforce", "block" } }, { "default", "enforce" } } },
+                            { "angle_deg", { { "type", "number" }, { "default", 30 } } },
+                            { "paint", { { "type", "string" }, { "enum", { "supports", "seam", "color", "fuzzy_skin", "all" } } } } } },
                         { "required", { "action" } } } } } } } },
             { "required", { "reason", "operations" } } },
           // The user has to confirm the operations.
@@ -482,6 +488,28 @@ const std::vector<Tool>& tools()
                 { "reason", REASON } } },
             { "required", { "action" } } },
           10min },
+        { "calibrate",
+          "Creates a calibration project in place of the current one, like the Calibration menu once its dialog is "
+          "filled, after the user's confirmation. temperature: tower from 'start' down to 'end' °C. flow: 'method' "
+          "classic or yolo, 'pass' 1 or 2. pressure_advance: 'method' line, pattern or tower, start/end/step (and "
+          "'accelerations', 'speeds' for pattern). retraction (mm), max_volumetric_speed (mm³/s), vfa (mm/s): "
+          "start/end/step. Choose the values with the calibration guide (get_docs page) and the filament, then slice; "
+          "after the print, the guide tells how to read the result.",
+          [](const json& args, ToolContext& ctx) { return calibrate(args, ctx.abandoned); },
+          { { "type", "object" },
+            { "properties",
+              { { "action", action_schema({ "temperature", "flow", "pressure_advance", "retraction", "max_volumetric_speed", "vfa" }) },
+                { "method", { { "type", "string" }, { "enum", { "classic", "yolo", "line", "pattern", "tower" } } } },
+                { "pass", { { "type", "integer" }, { "enum", { 1, 2 } } } },
+                { "start", { { "type", "number" } } },
+                { "end", { { "type", "number" } } },
+                { "step", { { "type", "number" } } },
+                { "print_numbers", { { "type", "boolean" }, { "default", true } } },
+                { "accelerations", { { "type", "array" }, { "items", { { "type", "number" } } } } },
+                { "speeds", { { "type", "array" }, { "items", { { "type", "number" } } } } },
+                { "reason", REASON } } },
+            { "required", { "action" } } },
+          10min },
         { "adapt_to_printer",
           "Adapts a project made for another printer (e.g. a 3MF downloaded from MakerWorld) to the connected "
           "printer, after the user's confirmation: printer preset with the printer's nozzle, process preset with the "
@@ -517,19 +545,27 @@ const std::vector<Tool>& tools()
           10min },
         { "get_view",
           "PNG image of the current plate.\n"
-          "model: the objects seen from 'view', colored by filament, with a legend. Shows the model, not the supports or "
-          "toolpaths: use it to check orientation, overhangs, placement and color assignment, and slice to know about "
-          "supports.",
-          by_action({ { "model", simple(&render_view) } }, "model"),
+          "model: the objects seen from 'view', colored by filament, with a legend. Shows the model, not the supports "
+          "or toolpaths: use it to check orientation, overhangs, placement and color assignment.\n"
+          "preview: the sliced plate as the Preview tab shows it (toolpaths, supports, seams, legend), from 'view', "
+          "with the layers from_layer to to_layer (1-based, default all): look at supports, a given layer or the "
+          "first layer. Switches the slicer to the Preview tab on the screen; slice first.",
+          by_action({ { "model", simple(&render_view) },
+                      { "preview", [](const json& a, ToolContext& c) { return json { { MCP_CONTENT, preview_content(a, c.state) } }; } } },
+                    "model"),
           { { "type", "object" },
             { "properties",
-              { { "action", action_schema({ "model" }, "model") },
+              { { "action", action_schema({ "model", "preview" }, "model") },
                 { "view",
                   { { "type", "string" },
                     { "enum", { "iso", "top_front", "left", "right", "top", "bottom", "front", "rear" } },
-                    { "default", "iso" } } },
-                { "size", { { "type", "integer" }, { "minimum", 256 }, { "maximum", 1024 }, { "default", 768 } } } } } },
-          60s },
+                    { "default", "iso" },
+                    { "description", "top_front: model only." } } },
+                { "from_layer", { { "type", "integer" }, { "minimum", 1 } } },
+                { "to_layer", { { "type", "integer" }, { "minimum", 1 } } },
+                { "size", { { "type", "integer" }, { "minimum", 256 }, { "maximum", 1600 }, { "description", "Longest side in pixels (model: 768, preview: 1024 by default)." } } } } } },
+          60s,
+          30s },
         // ------------------------------------------------ printer
         { "get_printer",
           "The printer connected in the slicer, when the user allowed printer access. Never changes anything on it.\n"
@@ -703,11 +739,12 @@ const char* const INSTRUCTIONS[] = {
     "on the current plate: edit_plates selects, adds, deletes and sets up plates; slice all_plates for the whole "
     "project. Height ranges (edit_objects) give part of an object other settings; layer events (edit_plates) pause "
     "the print or change the filament at a layer. undo reverts the last steps when the user is not satisfied. "
-    "edit_project creates, opens, imports, saves and exports files. Issues fixed in the slicer UI rather "
+    "edit_project creates, opens, imports, saves and exports files; calibrate creates calibration projects. Issues "
+    "fixed in the slicer UI rather "
     "than through these tools must be explained to the user step by step.\n"
     "When the user describes a visual problem (missing supports, stringing, wrong colors...), look at the model with "
-    "get_view from the relevant side and slice to get the supports and per-feature results; the user may also paste "
-    "a screenshot of the preview. Slice again after changes to confirm the fix.",
+    "get_view from the relevant side, slice, then look at the preview (supports, toolpaths, a given layer) and the "
+    "per-feature results. Slice again after changes to confirm the fix.",
     // Printer
     "Printer: get_printer reads the connected printer when the user allowed it; get_issues then also reports "
     "differences between the project and the printer (missing filament, other material or nozzle on a used "

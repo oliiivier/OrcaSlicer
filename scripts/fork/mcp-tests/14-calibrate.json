@@ -1,0 +1,99 @@
+{
+  "description": "Calibration projects. Tagged: the calibration models are cut to the range, and the Debug build of upstream cut_mesh() asserts on cuts that Release handles.",
+  "confirm": "yes",
+  "tags": [
+    "cut"
+  ],
+  "steps": [
+    {
+      "call": "calibrate",
+      "args": {
+        "action": "retraction",
+        "start": 0,
+        "end": 2,
+        "step": 0.1
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "calibrate",
+      "args": {
+        "action": "max_volumetric_speed",
+        "start": 5,
+        "end": 20,
+        "step": 0.5
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "calibrate",
+      "args": {
+        "action": "vfa",
+        "start": 40,
+        "end": 200,
+        "step": 10
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "calibrate",
+      "args": {
+        "action": "pressure_advance",
+        "method": "tower",
+        "start": 0,
+        "end": 0.1,
+        "step": 0.002
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "calibrate",
+      "args": {
+        "action": "flow",
+        "method": "classic",
+        "pass": 1
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "calibrate",
+      "args": {
+        "action": "temperature",
+        "start": 230,
+        "end": 190
+      },
+      "expect": {
+        "done": true,
+        "project": {
+          "objects": "$any"
+        }
+      }
+    },
+    {
+      "call": "get_issues",
+      "args": {},
+      "expect": {
+        "summary": "$any"
+      }
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "new"
+      },
+      "expect": {
+        "done": true
+      }
+    }
+  ]
+}

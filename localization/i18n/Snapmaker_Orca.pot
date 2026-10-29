@@ -16911,3 +16911,48 @@ msgstr ""
 
 msgid "remove the event"
 msgstr ""
+
+#, boost-format
+msgid "Temperature tower from %1% to %2% °C"
+msgstr ""
+
+#, boost-format
+msgid "Flow rate test (%1%, pass %2%)"
+msgstr ""
+
+#, boost-format
+msgid "Pressure advance (%1%) from %2% to %3%, step %4%"
+msgstr ""
+
+msgid "Retraction tower (mm)"
+msgstr ""
+
+msgid "VFA tower (mm/s)"
+msgstr ""
+
+msgid "Max volumetric speed test (mm³/s)"
+msgstr ""
+
+msgid ""
+"The AI assistant asks to create this calibration project, as the Calibration "
+"menu does. The current project is closed; you are asked to save it first if "
+"it has unsaved changes. Create it?"
+msgstr ""
+
+#, boost-format
+msgid ""
+"Force supports under the downward faces of %1% within %2%° of the horizontal"
+msgstr ""
+
+#, boost-format
+msgid ""
+"Block supports under the downward faces of %1% within %2%° of the horizontal"
+msgstr ""
+
+#, boost-format
+msgid "Erase all the painting of %1%"
+msgstr ""
+
+#, boost-format
+msgid "Erase the %1% painting of %2%"
+msgstr ""

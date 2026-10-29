@@ -11,6 +11,7 @@
 #include "libslic3r/PresetBundle.hpp"
 #include "libslic3r/PrintConfig.hpp"
 #include "libslic3r/Utils.hpp"
+#include "libslic3r/calib.hpp"
 #include "slic3r/GUI/Event.hpp"
 #include "slic3r/GUI/GLToolbar.hpp"
 #include "slic3r/GUI/GUI.hpp"
@@ -96,6 +97,40 @@ json layer_events(int plate_idx)
                 e["filament_slot"] = item.extruder;
             out.push_back(std::move(e));
         }
+    return out;
+}
+
+// ------------------------------------------------------------ calibrations
+
+double calib_number(const json& args, const char* name)
+{
+    if (!args.contains(name) || !args[name].is_number())
+        throw ToolError(std::string("'") + name + "' must be a number");
+    return args[name].get<double>();
+}
+
+// start, end and step of a tower, checked as the calibration dialogs do.
+void calib_range(const json& args, Calib_Params& params, double min_start)
+{
+    params.start = calib_number(args, "start");
+    params.end   = calib_number(args, "end");
+    params.step  = calib_number(args, "step");
+    if (params.start < min_start || params.step < EPSILON || params.end < params.start + params.step)
+        throw ToolError("Needs start >= " + float_to_string_decimal_point(min_start, 3) + ", step > 0 and end >= start + step");
+}
+
+std::vector<double> number_list(const json& args, const char* name)
+{
+    std::vector<double> out;
+    if (!args.contains(name))
+        return out;
+    if (!args[name].is_array())
+        throw ToolError(std::string("'") + name + "' must be a list of numbers");
+    for (const json& v : args[name]) {
+        if (!v.is_number() || v.get<double>() <= 0.)
+            throw ToolError(std::string("'") + name + "' must be a list of positive numbers");
+        out.push_back(v.get<double>());
+    }
     return out;
 }
 
@@ -541,6 +576,78 @@ json start_print(const json& /* args */)
              { "plate", plate->get_index() + 1 },
              { "message", "The slicer shows its print dialog for this plate: the user checks the file name and the filament "
                           "mapping, then starts the print. Follow it with get_printer (status, then watch)." } };
+}
+
+json calibrate(const json& args, const std::atomic<bool>& abandoned)
+{
+    GUI::Plater&      plater = require_plater();
+    const std::string action = args.contains("action") && args["action"].is_string() ? args["action"].get<std::string>() : std::string();
+    Calib_Params      params;
+    std::string       line;
+    // The parameters of each calibration dialog of the Calibration menu, with the same checks.
+    if (action == "temperature") {
+        params.mode  = CalibMode::Calib_Temp_Tower;
+        params.start = std::round(calib_number(args, "start"));
+        params.end   = std::round(calib_number(args, "end"));
+        if (params.start > 350 || params.end < 170 || params.end > params.start - 5)
+            throw ToolError("Needs start <= 350 °C, end >= 170 °C and start > end + 5 (the tower goes from hot to cold)");
+        line = (boost::format(_u8L("Temperature tower from %1% to %2% °C")) % params.start % params.end).str();
+    } else if (action == "flow") {
+        const std::string method = args.value("method", std::string("classic"));
+        const int         pass   = args.value("pass", 1);
+        if ((method != "classic" && method != "yolo") || (pass != 1 && pass != 2))
+            throw ToolError("'method' must be classic or yolo and 'pass' 1 or 2");
+        line = (boost::format(_u8L("Flow rate test (%1%, pass %2%)")) % method % pass).str();
+        params.mode  = CalibMode::Calib_Flow_Rate;
+        params.start = pass;
+        params.print_numbers = method == "yolo";
+    } else if (action == "pressure_advance") {
+        const std::string method = args.value("method", std::string("line"));
+        params.mode = method == "line" ? CalibMode::Calib_PA_Line : method == "pattern" ? CalibMode::Calib_PA_Pattern :
+                      method == "tower" ? CalibMode::Calib_PA_Tower : CalibMode::Calib_None;
+        if (params.mode == CalibMode::Calib_None)
+            throw ToolError("'method' must be line, pattern or tower");
+        calib_range(args, params, 0.);
+        params.print_numbers = args.value("print_numbers", true);
+        params.accelerations = number_list(args, "accelerations");
+        params.speeds        = number_list(args, "speeds");
+        line = (boost::format(_u8L("Pressure advance (%1%) from %2% to %3%, step %4%")) % method %
+                float_to_string_decimal_point(params.start, 4) % float_to_string_decimal_point(params.end, 4) %
+                float_to_string_decimal_point(params.step, 4)).str();
+    } else if (action == "retraction" || action == "max_volumetric_speed" || action == "vfa") {
+        params.mode = action == "retraction" ? CalibMode::Calib_Retraction_tower :
+                      action == "vfa"        ? CalibMode::Calib_VFA_Tower : CalibMode::Calib_Vol_speed_Tower;
+        calib_range(args, params, action == "retraction" ? 0. : action == "vfa" ? 10. + EPSILON : EPSILON);
+        const std::string what = action == "retraction" ? _u8L("Retraction tower (mm)") :
+                                 action == "vfa"        ? _u8L("VFA tower (mm/s)") : _u8L("Max volumetric speed test (mm³/s)");
+        line = what + ": " + float_to_string_decimal_point(params.start, 3) + " - " + float_to_string_decimal_point(params.end, 3) +
+               ", " + float_to_string_decimal_point(params.step, 3);
+    } else
+        throw ToolError("'action' must be temperature, flow, pressure_advance, retraction, max_volumetric_speed or vfa");
+
+    if (!confirm(args.value("reason", std::string()), { line },
+                 _L("The AI assistant asks to create this calibration project, as the Calibration menu does. The current "
+                    "project is closed; you are asked to save it first if it has unsaved changes. Create it?")))
+        return declined();
+    if (abandoned)
+        return timed_out();
+    // The test mode cannot answer the slicer's own question about unsaved changes: they are dropped.
+    if (test_confirm_answer())
+        plater.new_project(true);
+
+    switch (params.mode) {
+    case CalibMode::Calib_Temp_Tower: plater.calib_temp(params); break;
+    case CalibMode::Calib_Flow_Rate: plater.calib_flowrate(params.print_numbers, int(params.start)); break;
+    case CalibMode::Calib_PA_Line:
+    case CalibMode::Calib_PA_Pattern:
+    case CalibMode::Calib_PA_Tower: plater.calib_pa(params); break;
+    case CalibMode::Calib_Retraction_tower: plater.calib_retraction(params); break;
+    case CalibMode::Calib_VFA_Tower: plater.calib_VFA(params); break;
+    default: plater.calib_max_vol_speed(params); break;
+    }
+    return done({ { "project", project_summary(plater) },
+                  { "next", "Check it with get_issues, slice, and let the user print it. Then read the matching calibration "
+                            "guide (get_docs page) to tell the user how to read the result and which setting to change." } });
 }
 
 }} // namespace Slic3r::AIAssistant

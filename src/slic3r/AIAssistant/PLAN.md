@@ -163,8 +163,27 @@ toi, traductions des nouveaux textes, mise à jour de `FORK.md`, commit.
 | 1 ✓ | Regroupement vers la liste cible (sans fonction nouvelle) ; `path` pour les exports ; mise à jour des guides et notes qui citent d'anciens noms |
 | 2 ✓ | Préréglages et filaments (sauf chargement) |
 | 3 ✓ | Plages de hauteur, événements par couche, annulation |
-| 4 | Aperçu tranché, calibrations |
-| 5 | Texte, SVG, peinture automatique ; chargement du filament après étude sur l'imprimante |
+| 4 ✓ | Aperçu tranché, calibrations |
+| 5 (en partie) | Peinture automatique ✓ ; reste texte, SVG, et chargement du filament après étude sur l'imprimante |
+
+## 6 bis. État et suite
+
+Fait (phases 0 à 5 en partie) : 19 outils, conformes à la liste cible ; `tools/list` 23 624 octets,
+instructions 6 290 octets. Banc d'essai : 115 étapes par défaut, toutes passées en Debug.
+
+Non vérifié par le banc, à contrôler à la main sur le build Release :
+- capture de l'aperçu (`get_view` preview, scénario `13-preview`, étiquette `screen`) : la fenêtre du slicer de
+  test doit être visible à l'écran, ce que le banc ne garantit pas ;
+- coupe et calibrations (`12-cut`, `14-calibrate`, étiquette `cut`) : `cut_mesh()` (upstream) lève une
+  assertion en Debug sur des coupes que Release traite, et chaque calibration coupe son modèle. Piste :
+  autoriser le mode test en `RelWithDebInfo` (sans assertions, jamais packagé) pour les jouer au banc ;
+- imprimante réelle (`90-printer`, étiquette `printer`).
+
+Reste à faire :
+- `add_text` : texte en relief ou en creux par la tâche d'embossage, sans ouvrir le gizmo (à étudier) ;
+- `add_svg` : SVG en pièce, pièce négative ou modificateur ;
+- `control_printer` `load_filament` : à étudier sur l'imprimante avec l'utilisateur ;
+- hauteur de couche variable (lissage adaptatif), non prévue au plan.
 
 ## 7. Risques
 

@@ -1,0 +1,146 @@
+{
+  "description": "Automatic support painting, preview and calibration checks (captures: 13-preview, calibration projects: 14-calibrate).",
+  "confirm": "yes",
+  "steps": [
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "new"
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "import",
+        "paths": [
+          "${MODELS}/OrcaToleranceTest.stl"
+        ]
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "get_view",
+      "args": {
+        "action": "preview"
+      },
+      "error": true,
+      "error_contains": "not sliced"
+    },
+    {
+      "call": "edit_objects",
+      "args": {
+        "reason": "bench",
+        "operations": [
+          {
+            "action": "rotate",
+            "object": 1,
+            "degrees": {
+              "x": 60
+            }
+          },
+          {
+            "action": "paint_supports",
+            "object": 1,
+            "angle_deg": 40
+          }
+        ]
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "edit_objects",
+      "args": {
+        "reason": "bench",
+        "operations": [
+          {
+            "action": "paint_supports",
+            "object": 1,
+            "angle_deg": 95
+          }
+        ]
+      },
+      "error": true
+    },
+    {
+      "call": "slice",
+      "args": {},
+      "expect": {
+        "sliced": true
+      }
+    },
+    {
+      "call": "get_view",
+      "args": {
+        "action": "preview",
+        "view": "top_front"
+      },
+      "error": true
+    },
+    {
+      "call": "edit_objects",
+      "args": {
+        "reason": "bench",
+        "operations": [
+          {
+            "action": "clear_paint",
+            "object": 1,
+            "paint": "all"
+          }
+        ]
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "undo",
+      "args": {
+        "action": "undo"
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "calibrate",
+      "args": {
+        "action": "temperature",
+        "start": 190,
+        "end": 230
+      },
+      "error": true
+    },
+    {
+      "call": "calibrate",
+      "args": {
+        "action": "flow",
+        "method": "classic",
+        "pass": 3
+      },
+      "error": true
+    },
+    {
+      "call": "get_issues",
+      "args": {},
+      "expect": {
+        "summary": "$any"
+      }
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "new"
+      },
+      "expect": {
+        "done": true
+      }
+    }
+  ]
+}

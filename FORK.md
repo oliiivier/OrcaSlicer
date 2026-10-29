@@ -129,8 +129,8 @@ ces jetons ; seul un bac à sable (Flatpak, firejail...) l'en empêche.
 | `McpObjects` | Opérations de l'onglet Préparer sur les objets, après confirmation (`edit_objects`) |
 | `McpPresets` | Préréglages et emplacements de filament par les listes et boutons de la barre latérale (`edit_presets`) |
 | `McpSlicing` | Slicing de la plaque courante ou de toutes les plaques et résumé du résultat (`slice`) |
-| `McpProject` | Fichiers, plaques et lancement d'impression (`edit_project`, `edit_plates`, `control_printer` start_print) |
-| `McpRender` | Rendu PNG du plateau depuis une vue nommée (`get_view`) |
+| `McpProject` | Fichiers, plaques, calibrations et lancement d'impression (`edit_project`, `edit_plates`, `calibrate`, `control_printer` start_print) |
+| `McpRender` | Rendu PNG du plateau depuis une vue nommée, capture de l'aperçu tranché (`get_view`) |
 | `McpPrinter` | Lecture seule de l'imprimante connectée (`get_printer` status, écarts projet/imprimante) |
 | `McpPrinterLive` | Lecture en direct (`printer.objects.query`), photo de la caméra et suivi d'impression (`get_printer` snapshot, watch) |
 | `McpPrinterControl` | Commandes envoyées à l'imprimante (`control_printer`) : déchargement des têtes, pause, reprise et arrêt |
@@ -145,7 +145,7 @@ ces jetons ; seul un bac à sable (Flatpak, firejail...) l'en empêche.
 Outils (regroupés par domaine, le paramètre `action` choisit l'opération) : `get_issues`, `get_project`,
 `get_config`, `get_docs` (setting, page), `apply_changes`, `edit_presets` (select, save, add_slot, remove_slot,
 set_color), `edit_objects`, `edit_plates`, `edit_project` (new,
-open, import, save, export), `undo` (undo, redo), `adapt_to_printer`, `slice`, `get_view` (model), `get_printer` (status, snapshot,
+open, import, save, export), `undo` (undo, redo), `adapt_to_printer`, `slice`, `get_view` (model, preview), `calibrate`, `get_printer` (status, snapshot,
 watch), `control_printer` (start_print, pause, resume, cancel, unload_filament), `notes` (list, read, write),
 `experiences` (search, record, report), `manufacturer_docs` (search, read). Le chat affiche l'action à côté du
 nom de l'outil.
@@ -232,6 +232,13 @@ vers un emplacement, à une couche de la plaque courante tranchée (numéro ou h
 dans `Model::plates_custom_gcodes` comme le curseur de l'aperçu ; jamais de G-code libre. `undo` défait ou
 refait des étapes de l'historique du slicer (Ctrl+Z / Ctrl+Y) après confirmation listant leurs noms.
 
+Calibrations (`calibrate`) : les paramètres de la fenêtre de chaque entrée du menu *Calibration*, avec les
+mêmes contrôles, puis la même fonction du slicer (`Plater::calib_*`), qui ferme le projet courant. Peinture
+automatique (`edit_objects` paint_supports) : les faces orientées vers le bas à moins de `angle_deg` de
+l'horizontale (hors faces posées sur le plateau) deviennent forceurs ou bloqueurs de supports, en gardant la
+peinture existante ; `clear_paint` efface la peinture des supports, de la couture, des couleurs ou du fuzzy
+skin.
+
 Fichiers et plaques : `edit_project` appelle les commandes du slicer. Nouveau projet, ouverture, import et
 enregistrement d'un chemin donné, exports vers un chemin donné (G-code de la plaque courante copié tel que
 tranché, sans les scripts de post-traitement ; 3MF tranché de la plaque courante ; STL de tous les objets en
@@ -284,10 +291,13 @@ Plan de réalisation et regroupement des outils : [`src/slic3r/AIAssistant/PLAN.
 - [x] Plages de hauteur avec réglages propres. (Reste : hauteur de couche variable.)
 - [x] Pause ou changement de filament à une couche (pas de G-code personnalisé : il partirait tel quel à
   l'imprimante).
-- [ ] Peinture (supports, couture, couleurs, fuzzy skin) et outils de la vue 3D (texte, SVG, mesure, coupe
-  inclinée ou avec connecteurs, simplification, réparation, booléens, poser sur une face, oreilles de bordure).
-- [ ] Aperçu tranché en image (trajectoires, supports, couche précise).
-- [ ] Calibrations, préférences de l'application, compte Snapmaker et MakerWorld.
+- [x] Peinture automatique des supports (remplissage des surplombs par angle) et effacement des peintures.
+- [ ] Peinture à la main (écartée : le modèle ne peut pas viser des triangles) et outils de la vue 3D (texte,
+  SVG, mesure, coupe inclinée ou avec connecteurs, simplification, réparation, booléens, poser sur une face,
+  oreilles de bordure).
+- [x] Aperçu tranché en image (trajectoires, supports, plage de couches).
+- [x] Calibrations (température, débit, pressure advance, rétraction, débit volumique maximal, VFA).
+- [ ] Préférences de l'application, compte Snapmaker et MakerWorld (écartés).
 - [x] Annulation par l'assistant (`undo`).
 
 Écartés volontairement : chauffe, déplacement des axes et mise à l'origine de l'imprimante.
@@ -304,7 +314,9 @@ Plan de réalisation et regroupement des outils : [`src/slic3r/AIAssistant/PLAN.
 3. **Injection** : après relecture, commit. Les guides sont livrés dans `setting_docs.json` et servis par
    `get_docs` page (type `experience`).
 
-`get_view` (model) montre le modèle (pas les supports ni les trajectoires). Le serveur traite les requêtes en
+`get_view` (model) montre le modèle (pas les supports ni les trajectoires) ; `get_view` (preview) bascule sur
+l'onglet Aperçu, choisit la vue et la plage de couches du curseur, puis capture la vue 3D telle qu'affichée
+(légende et curseurs compris) : la vue change à l'écran et la fenêtre doit être visible. Le serveur traite les requêtes en
 parallèle (8 fils) : un `slice` (jusqu'à 10 min), un suivi d'impression ou un déchargement ne bloque pas les autres outils ; leur
 exécution reste sérialisée sur le fil de l'interface. Claude Code abandonne un appel MCP après 60 s par
 défaut : le chat intégré passe `"timeout"` (31 min) dans sa config MCP, un client externe doit être lancé avec

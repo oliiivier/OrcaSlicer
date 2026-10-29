@@ -18767,6 +18767,51 @@ msgstr "필라멘트 %1%(으)로 변경"
 msgid "remove the event"
 msgstr "이벤트 제거"
 
+#, boost-format
+msgid "Temperature tower from %1% to %2% °C"
+msgstr "온도 타워 %1%~%2% °C"
+
+#, boost-format
+msgid "Flow rate test (%1%, pass %2%)"
+msgstr "유량 테스트 (%1%, %2%차)"
+
+#, boost-format
+msgid "Pressure advance (%1%) from %2% to %3%, step %4%"
+msgstr "압력 어드밴스 (%1%) %2%~%3%, 간격 %4%"
+
+msgid "Retraction tower (mm)"
+msgstr "리트랙션 타워 (mm)"
+
+msgid "VFA tower (mm/s)"
+msgstr "VFA 타워 (mm/s)"
+
+msgid "Max volumetric speed test (mm³/s)"
+msgstr "최대 체적 속도 테스트 (mm³/s)"
+
+msgid ""
+"The AI assistant asks to create this calibration project, as the Calibration "
+"menu does. The current project is closed; you are asked to save it first if "
+"it has unsaved changes. Create it?"
+msgstr "AI 어시스턴트가 보정 메뉴처럼 이 보정 프로젝트를 만들려고 합니다. 현재 프로젝트는 닫히며, 저장되지 않은 변경 사항이 있으면 먼저 저장할지 묻습니다. 만들까요?"
+
+#, boost-format
+msgid ""
+"Force supports under the downward faces of %1% within %2%° of the horizontal"
+msgstr "%1%의 수평에서 %2%° 이내인 아래쪽 면 밑에 서포트 강제"
+
+#, boost-format
+msgid ""
+"Block supports under the downward faces of %1% within %2%° of the horizontal"
+msgstr "%1%의 수평에서 %2%° 이내인 아래쪽 면 밑의 서포트 차단"
+
+#, boost-format
+msgid "Erase all the painting of %1%"
+msgstr "%1%의 모든 페인팅 지우기"
+
+#, boost-format
+msgid "Erase the %1% painting of %2%"
+msgstr "%2%의 %1% 페인팅 지우기"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

@@ -28,6 +28,11 @@ nlohmann::json export_file(const nlohmann::json& args, const std::atomic<bool>& 
 // print sequence), in order.
 nlohmann::json edit_plates(const nlohmann::json& args, const std::atomic<bool>& abandoned);
 
+// Creates a calibration project, as the Calibration menu once its dialog is
+// filled: args.action temperature, flow, pressure_advance, retraction,
+// max_volumetric_speed or vfa, with the parameters of that dialog.
+nlohmann::json calibrate(const nlohmann::json& args, const std::atomic<bool>& abandoned);
+
 // Opens the print dialog of the slicer for the sliced current plate, like the
 // Print plate button: the user checks the filament mapping and starts the print.
 nlohmann::json start_print(const nlohmann::json& args);
