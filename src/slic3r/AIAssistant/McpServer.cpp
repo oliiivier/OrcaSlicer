@@ -156,7 +156,9 @@ private:
             return make_response(http::status::not_found);
         if (!is_local_request())
             return make_response(http::status::forbidden);
-        if (std::string(req[http::field::authorization]) != "Bearer " + m_server.m_token)
+        const std::string bearer = "Bearer ";
+        const std::string auth(req[http::field::authorization]);
+        if (auth.compare(0, bearer.size(), bearer) != 0 || !m_server.m_authorize(auth.substr(bearer.size())))
             return make_response(http::status::unauthorized);
 
         if (req.method() != http::verb::post) {
@@ -202,8 +204,8 @@ void McpServer::Impl::do_accept(McpServer& server)
     });
 }
 
-McpServer::McpServer(unsigned short port, std::string token, McpToolbox& toolbox)
-    : m_port(port), m_token(std::move(token)), m_toolbox(toolbox)
+McpServer::McpServer(unsigned short port, Authorize authorize, McpToolbox& toolbox)
+    : m_port(port), m_authorize(std::move(authorize)), m_toolbox(toolbox)
 {}
 
 McpServer::~McpServer() { stop(); }
@@ -216,8 +218,8 @@ bool McpServer::start(std::string& error)
 {
     if (m_impl)
         return true;
-    if (m_token.empty()) {
-        error = "empty token";
+    if (!m_authorize) {
+        error = "no authorization";
         return false;
     }
 

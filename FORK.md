@@ -99,10 +99,17 @@ compte Snapmaker). `build-package.sh` refuse un `build/package` dont les pages n
 
 ## Serveur MCP
 
-Menu *Aide → AI Assistant (MCP server)* : activation, port (13700 par défaut), jeton, chemin de Claude Code pour
-le chat, et configuration à copier dans Claude Code, Gemini CLI ou Claude Desktop (inutile pour le chat intégré,
-qui se connecte seul). Le serveur écoute uniquement sur `127.0.0.1`, exige
-`Authorization: Bearer <jeton>` et refuse les requêtes venant d'un navigateur (en-têtes `Origin`/`Host`).
+Menu *Aide → AI Assistant (MCP server)* : activation, port (13700 par défaut), accès des autres clients MCP,
+chemin de Claude Code pour le chat, et configuration à copier dans Claude Code, Gemini CLI ou Claude Desktop.
+Le serveur écoute uniquement sur `127.0.0.1`, exige `Authorization: Bearer <jeton>` et refuse les requêtes
+venant d'un navigateur (en-têtes `Origin`/`Host`).
+
+Jetons : le chat intégré donne à chaque CLI qu'il lance un jeton tiré au hasard (`McpService::Grant`), gardé en
+mémoire et révoqué quand la CLI s'arrête. Les autres clients n'ont accès que si l'option *Allow other MCP
+clients* est cochée : leur jeton est alors gardé dans `ai_assistant/mcp_token` (lisible par l'utilisateur seul)
+et renouvelé à chaque activation. Les versions précédentes le gardaient dans `Snapmaker_Orca.conf` : il y est
+déplacé au démarrage, l'accès externe restant activé. Un programme lancé sous le même compte peut toujours lire
+ces jetons ; seul un bac à sable (Flatpak, firejail...) l'en empêche.
 
 | Fichier | Rôle |
 |---|---|
@@ -250,8 +257,8 @@ arrêtée, puis relancée à son message suivant. Boutons de capture de la vue 3
 fenêtre, jointe au message suivant. Choix du modèle sous le champ de saisie, comme dans l'extension VS Code :
 liste donnée par la CLI (requête de contrôle `initialize`, gardée dans `chats.json`), choix mémorisé
 (`chat_model` de la section `ai_assistant` de la configuration), passé par `--model` au lancement et appliqué
-aux CLI déjà lancées par `set_model`. La configuration MCP donnée à la CLI (avec le jeton) est écrite dans
-`ai_assistant/claude_mcp.json`, lisible par l'utilisateur seul. La page du chat est
+aux CLI déjà lancées par `set_model`. La configuration MCP donnée à la CLI (avec son jeton) est écrite dans
+`ai_assistant/claude_mcp_<onglet>.json`, lisible par l'utilisateur seul et supprimée à l'arrêt de la CLI. La page du chat est
 `resources/web/ai_assistant/chat.html`.
 
 Testé sous Linux uniquement : la recherche de `claude` sous Windows et macOS, le passage de la page entre

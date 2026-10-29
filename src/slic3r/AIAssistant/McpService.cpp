@@ -3,7 +3,12 @@
 #include "McpSettings.hpp"
 #include "McpTools.hpp"
 
+#include <openssl/crypto.h>
+
+#include <algorithm>
 #include <memory>
+#include <mutex>
+#include <vector>
 
 namespace Slic3r { namespace AIAssistant { namespace McpService {
 
@@ -33,7 +38,40 @@ State& state()
     return s;
 }
 
+// Tokens of the live grants, checked from the server threads.
+struct Grants
+{
+    std::mutex               mutex;
+    std::vector<std::string> tokens;
+};
+
+Grants& grants()
+{
+    static Grants g;
+    return g;
+}
+
+// Constant time: the comparison does not tell how much of a guessed token is right.
+bool same_token(const std::string& a, const std::string& b)
+{
+    return !a.empty() && a.size() == b.size() && CRYPTO_memcmp(a.data(), b.data(), a.size()) == 0;
+}
+
 } // namespace
+
+Grant::Grant() : m_token(McpSettings::generate_token())
+{
+    Grants&                     g = grants();
+    std::lock_guard<std::mutex> lock(g.mutex);
+    g.tokens.push_back(m_token);
+}
+
+Grant::~Grant()
+{
+    Grants&                     g = grants();
+    std::lock_guard<std::mutex> lock(g.mutex);
+    g.tokens.erase(std::remove(g.tokens.begin(), g.tokens.end(), m_token), g.tokens.end());
+}
 
 bool apply(const McpSettings& settings, std::string& error)
 {
@@ -43,7 +81,15 @@ bool apply(const McpSettings& settings, std::string& error)
         return true;
 
     s.tools  = std::make_unique<McpTools>();
-    s.server = std::make_unique<McpServer>(settings.port, settings.token, *s.tools);
+    const std::string external = settings.external_access ? settings.token : std::string();
+    auto authorize = [external](const std::string& token) {
+        if (same_token(token, external))
+            return true;
+        Grants&                     g = grants();
+        std::lock_guard<std::mutex> lock(g.mutex);
+        return std::any_of(g.tokens.begin(), g.tokens.end(), [&token](const std::string& t) { return same_token(token, t); });
+    };
+    s.server = std::make_unique<McpServer>(settings.port, authorize, *s.tools);
     if (!s.server->start(error)) {
         s.stop();
         return false;

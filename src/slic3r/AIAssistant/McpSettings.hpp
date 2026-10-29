@@ -15,7 +15,11 @@ struct McpSettings
 
     bool           enabled { false };
     unsigned short port { DEFAULT_PORT };
-    // Bearer token required from MCP clients. Generated on first load.
+    // Lets the MCP clients the user sets up (Claude Code, Gemini CLI...) connect with `token`.
+    // The chat does not need it: it gives its CLI a token of its own (McpService::Grant).
+    bool           external_access { false };
+    // Bearer token of those clients, empty without external access. Kept in
+    // ai_assistant/mcp_token, readable by the user only, and generated when access is turned on.
     std::string    token;
     // Lets the tools read the state of the connected printer (never control it).
     bool           printer_access { false };

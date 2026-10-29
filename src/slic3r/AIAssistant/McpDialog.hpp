@@ -31,6 +31,7 @@ private:
     void refresh_claude();
 
     ::CheckBox*   m_enabled { nullptr };
+    ::CheckBox*   m_external_access { nullptr };
     ::CheckBox*   m_printer_access { nullptr };
     ::CheckBox*   m_printer_control { nullptr };
     ::CheckBox*   m_auto_connect { nullptr };
@@ -38,6 +39,8 @@ private:
     ::CheckBox*   m_manufacturer_docs { nullptr };
     SpinInput*    m_port { nullptr };
     TextInput*    m_token { nullptr };
+    wxWindow*     m_regenerate { nullptr };
+    wxWindow*     m_copy { nullptr };
     TextInput*    m_claude_path { nullptr };
     wxStaticText* m_claude_found { nullptr };
     wxStaticText* m_status_dot { nullptr };

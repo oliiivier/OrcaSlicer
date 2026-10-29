@@ -123,6 +123,8 @@ McpDialog::McpDialog(wxWindow* parent)
 
     m_enabled = new ::CheckBox(this);
     m_enabled->SetValue(settings.enabled);
+    m_external_access = new ::CheckBox(this);
+    m_external_access->SetValue(settings.external_access);
     m_printer_access = new ::CheckBox(this);
     m_printer_access->SetValue(settings.printer_access);
     m_printer_control = new ::CheckBox(this);
@@ -141,6 +143,7 @@ McpDialog::McpDialog(wxWindow* parent)
                             wxTE_READONLY);
     auto* regenerate = new Button(this, _L("Regenerate"));
     regenerate->SetStyle(ButtonStyle::Regular, ButtonType::Choice);
+    m_regenerate = regenerate;
 
     auto* grid = new wxFlexGridSizer(3, FromDIP(8), FromDIP(8));
     grid->AddGrowableCol(1);
@@ -200,6 +203,12 @@ McpDialog::McpDialog(wxWindow* parent)
     sizer->Add(status, 0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, margin);
     sizer->Add(intro, 0, wxLEFT | wxRIGHT | wxTOP, margin);
     sizer->Add(checkbox_row(this, m_enabled, _L("Enable MCP server"), wrap), 0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, margin);
+    sizer->Add(checkbox_row(this, m_external_access,
+                            _L("Allow other MCP clients on this computer (Claude Code, Gemini CLI...) to connect with the "
+                               "token below. The built-in chat does not need it. Any program that can read the token can "
+                               "use the server."),
+                            wrap),
+               0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(8));
     sizer->Add(checkbox_row(this, m_printer_access,
                             _L("Allow reading the state of the connected printer (loaded filaments, nozzles, print status and "
                                "errors). The printer is never controlled."),
@@ -232,6 +241,12 @@ McpDialog::McpDialog(wxWindow* parent)
     SetSizerAndFit(sizer);
 
     m_enabled->Bind(wxEVT_TOGGLEBUTTON, [this](wxCommandEvent& e) {
+        apply_and_refresh();
+        e.Skip();
+    });
+    m_external_access->Bind(wxEVT_TOGGLEBUTTON, [this](wxCommandEvent& e) {
+        // A new token each time access is turned on: the clients set up before are left out.
+        m_token->GetTextCtrl()->SetValue(m_external_access->GetValue() ? from_u8(McpSettings::generate_token()) : wxString());
         apply_and_refresh();
         e.Skip();
     });
@@ -324,6 +339,7 @@ McpDialog::McpDialog(wxWindow* parent)
         m_user_instructions_changed = true;
         e.Skip();
     });
+    m_copy = buttons->GetButtonFromID(wxID_COPY);
     buttons->GetButtonFromID(wxID_COPY)->Bind(wxEVT_BUTTON, [this](wxCommandEvent&) {
         if (wxTheClipboard->Open()) {
             wxTheClipboard->SetData(new wxTextDataObject(m_instructions->GetValue()));
@@ -360,9 +376,10 @@ void McpDialog::on_dpi_changed(const wxRect&) { Fit(); }
 void McpDialog::apply_and_refresh()
 {
     McpSettings s = McpSettings::load();
-    s.enabled     = m_enabled->GetValue();
-    s.port        = static_cast<unsigned short>(m_port->GetValue());
-    s.token       = GUI::into_u8(m_token->GetTextCtrl()->GetValue());
+    s.enabled         = m_enabled->GetValue();
+    s.port            = static_cast<unsigned short>(m_port->GetValue());
+    s.external_access = m_external_access->GetValue();
+    s.token           = GUI::into_u8(m_token->GetTextCtrl()->GetValue());
     s.save();
 
     m_error.clear();
@@ -388,7 +405,11 @@ void McpDialog::refresh()
     m_status_dot->SetForegroundColour(color);
     m_status->SetForegroundColour(color);
     m_status->Wrap(FromDIP(580));
-    m_instructions->SetValue(from_u8(connection_instructions(s)));
+    m_token->Enable(s.external_access);
+    m_regenerate->Enable(s.external_access);
+    m_copy->Enable(s.external_access);
+    m_instructions->SetValue(s.external_access ? from_u8(connection_instructions(s))
+                                               : _L("Allow other MCP clients above to get their configuration."));
     Layout();
     Refresh();
 }

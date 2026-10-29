@@ -2,6 +2,7 @@
 
 #include <nlohmann/json.hpp>
 
+#include <functional>
 #include <memory>
 #include <stdexcept>
 #include <string>
@@ -35,11 +36,15 @@ public:
 
 // Minimal MCP server over the Streamable HTTP transport (single "/mcp" endpoint,
 // JSON responses, no SSE stream). Listens on 127.0.0.1 only and requires
-// "Authorization: Bearer <token>". Requests on separate connections are served concurrently.
+// "Authorization: Bearer <token>" with a token `authorize` accepts. Requests on separate
+// connections are served concurrently.
 class McpServer
 {
 public:
-    McpServer(unsigned short port, std::string token, McpToolbox& toolbox);
+    // Tells whether a bearer token is valid. Called from the server threads.
+    using Authorize = std::function<bool(const std::string& token)>;
+
+    McpServer(unsigned short port, Authorize authorize, McpToolbox& toolbox);
     ~McpServer();
 
     McpServer(const McpServer&) = delete;
@@ -61,7 +66,7 @@ private:
     struct Impl;
 
     unsigned short        m_port;
-    std::string           m_token;
+    Authorize             m_authorize;
     McpToolbox&           m_toolbox;
     std::unique_ptr<Impl> m_impl;
 

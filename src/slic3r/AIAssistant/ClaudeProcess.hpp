@@ -6,6 +6,7 @@
 #include <wx/timer.h>
 
 #include <functional>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -44,6 +45,8 @@ public:
         std::string resume_session;
         // Model alias or name (--model), empty for the CLI's default.
         std::string model;
+        // Kept while the process runs, released when it stops or exits (e.g. its MCP token).
+        std::shared_ptr<void> resources;
     };
 
     using MessageHandler = std::function<void(const nlohmann::json& msg)>;
@@ -58,7 +61,7 @@ public:
 
     // Returns false and fills `error` when the process could not be launched.
     bool start(const Options& options, std::string& error);
-    // Kills the process; the exit handler is not called.
+    // Kills the process and releases its resources; the exit handler is not called.
     void stop();
     bool is_running() const { return m_process != nullptr; }
 
@@ -92,6 +95,7 @@ private:
     std::string    m_stdout;
     std::string    m_stderr;
     unsigned       m_request_id { 0 };
+    std::shared_ptr<void> m_resources;
 };
 
 }} // namespace Slic3r::AIAssistant

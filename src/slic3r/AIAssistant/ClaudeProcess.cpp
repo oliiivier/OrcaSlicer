@@ -244,7 +244,8 @@ bool ClaudeProcess::start(const Options& options, std::string& error)
         error = "could not run " + options.launch.program;
         return false;
     }
-    m_process = process;
+    m_process   = process;
+    m_resources = options.resources;
     m_stdout.clear();
     m_stderr.clear();
     m_timer.Start(POLL_MS);
@@ -262,6 +263,7 @@ void ClaudeProcess::stop()
     m_process          = nullptr;
     wxProcess::Kill(m_pid, wxSIGTERM, wxKILL_CHILDREN);
     m_pid = 0;
+    m_resources.reset();
 }
 
 bool ClaudeProcess::send(const nlohmann::json& msg)
@@ -351,6 +353,7 @@ void ClaudeProcess::on_terminate(int exit_code)
     m_timer.Stop();
     m_process = nullptr;
     m_pid     = 0;
+    m_resources.reset();
     BOOST_LOG_TRIVIAL(info) << "AI chat: claude exited with code " << exit_code;
     m_on_exit(exit_code, m_stderr);
 }

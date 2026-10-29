@@ -15,6 +15,7 @@
 #include "slic3r/GUI/Widgets/StateColor.hpp"
 #include "slic3r/GUI/Widgets/WebView.hpp"
 
+#include <boost/algorithm/string/predicate.hpp>
 #include <boost/algorithm/string/trim.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/log/trivial.hpp>
@@ -97,29 +98,54 @@ std::string title_from(const std::string& text)
     return into_u8(title);
 }
 
-// The MCP configuration given to the CLI. It holds the server token: readable by the user only.
+// What a CLI needs to reach the MCP server: a token of its own and the configuration file that
+// gives it, readable by the user only. Both go away with the CLI.
 // The CLI gives up on a tool call after 60 s by default: slicing, watching a print or waiting
 // for the user to confirm takes longer.
-std::string write_mcp_config(const std::string& url, const std::string& token)
+struct McpAccess
 {
-    const json config = {{"mcpServers",
-                          {{SERVER_NAME,
-                            {{"type", "http"},
-                             {"url", url},
-                             {"headers", {{"Authorization", "Bearer " + token}}},
-                             {"timeout", McpSettings::TOOL_TIMEOUT_MS}}}}}};
+    McpService::Grant grant;
+    fs::path          config;
 
-    const fs::path path = assistant_dir() / "claude_mcp.json";
-    boost::system::error_code ec;
-    fs::create_directories(path.parent_path(), ec);
+    ~McpAccess()
     {
-        boost::nowide::ofstream out(path.string(), std::ios::binary | std::ios::trunc);
-        if (!out)
-            return {};
-        out << config.dump(2);
+        boost::system::error_code ec;
+        if (!config.empty())
+            fs::remove(config, ec);
     }
-    fs::permissions(path, fs::owner_read | fs::owner_write, ec);
-    return path.string();
+
+    // Returns false when the file could not be written.
+    bool write_config(const std::string& url, const std::string& conversation_id)
+    {
+        const json content = {{"mcpServers",
+                               {{SERVER_NAME,
+                                 {{"type", "http"},
+                                  {"url", url},
+                                  {"headers", {{"Authorization", "Bearer " + grant.token()}}},
+                                  {"timeout", McpSettings::TOOL_TIMEOUT_MS}}}}}};
+
+        config = assistant_dir() / ("claude_mcp_" + conversation_id + ".json");
+        boost::system::error_code ec;
+        fs::create_directories(config.parent_path(), ec);
+        // Created empty and restricted before the token is written into it.
+        { boost::nowide::ofstream touch(config.string(), std::ios::binary | std::ios::trunc); }
+        fs::permissions(config, fs::owner_read | fs::owner_write, ec);
+        boost::nowide::ofstream out(config.string(), std::ios::binary | std::ios::trunc);
+        out << content.dump(2);
+        return bool(out);
+    }
+};
+
+// Configurations left by a crash, or by older builds (claude_mcp.json, with the token of the
+// external clients): their tokens are no longer accepted, or must not lie around.
+void remove_stale_mcp_configs()
+{
+    boost::system::error_code ec;
+    for (fs::directory_iterator it(assistant_dir(), ec), end; !ec && it != end; it.increment(ec)) {
+        const std::string name = it->path().filename().string();
+        if (boost::algorithm::starts_with(name, "claude_mcp") && it->path().extension() == ".json")
+            fs::remove(it->path(), ec);
+    }
 }
 
 wxString chat_page_url()
@@ -323,6 +349,7 @@ ChatPanel::ChatPanel(wxWindow* parent) : wxPanel(parent, wxID_ANY)
     SetSizer(sizer);
 
     Bind(wxEVT_WEBVIEW_SCRIPT_MESSAGE_RECEIVED, &ChatPanel::on_script_message, this, m_browser->GetId());
+    remove_stale_mcp_configs();
     m_model = wxGetApp().app_config->get("ai_assistant", MODEL_KEY);
     if (m_model.empty())
         m_model = DEFAULT_MODEL;
@@ -546,9 +573,11 @@ bool ChatPanel::ensure_started(Conversation& conv)
 
     conv.server_url.clear();
     if (McpService::is_running()) {
-        options.mcp_config = write_mcp_config(McpService::url(), McpSettings::load().token);
-        if (!options.mcp_config.empty()) {
+        auto access = std::make_shared<McpAccess>();
+        if (access->write_config(McpService::url(), conv.id)) {
+            options.mcp_config    = access->config.string();
             options.allowed_tools = std::string("mcp__") + SERVER_NAME;
+            options.resources     = access;
             conv.server_url       = McpService::url();
         }
     }
