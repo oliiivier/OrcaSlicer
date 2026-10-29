@@ -18030,6 +18030,84 @@ msgid ""
 "original intent where it suits this printer."
 msgstr "Projekt nyní používá %s. %zu nastavení původního projektu se liší od nového profilu: požádejte AI asistenta (/adapt_project), aby obnovil původní záměr tam, kde to této tiskárně vyhovuje."
 
+msgid ""
+"Allow controlling the printer: start the sliced plate (through the print "
+"dialog), pause, resume or stop a print, unload filament from the toolheads. "
+"Each request has to be confirmed here."
+msgstr "Povolit ovládání tiskárny: spustit slicovanou podložku (přes dialog tisku), pozastavit, obnovit nebo zastavit tisk, vysunout filament z tiskových hlav. Každý požadavek je nutné potvrdit zde."
+
+#, boost-format
+msgid "Move %1% to plate %2%"
+msgstr "Přesunout %1% na podložku %2%"
+
+msgid "The AI assistant asks to pause the print. Pause it now?"
+msgstr "AI asistent žádá o pozastavení tisku. Pozastavit nyní?"
+
+msgid "The AI assistant asks to resume the print. Resume it now?"
+msgstr "AI asistent žádá o obnovení tisku. Obnovit nyní?"
+
+msgid ""
+"The AI assistant asks to stop the print. It cannot be resumed afterwards. "
+"Stop it now?"
+msgstr "AI asistent žádá o zastavení tisku. Poté jej nebude možné obnovit. Zastavit nyní?"
+
+msgid "Add a plate"
+msgstr "Přidat podložku"
+
+#, boost-format
+msgid "Show plate %1%"
+msgstr "Zobrazit podložku %1%"
+
+#, boost-format
+msgid "Delete plate %1%"
+msgstr "Smazat podložku %1%"
+
+#, boost-format
+msgid "Rename plate %1% to '%2%'"
+msgstr "Přejmenovat podložku %1% na „%2%“"
+
+#, boost-format
+msgid "bed type: %1%"
+msgstr "typ podložky: %1%"
+
+msgid "as the project"
+msgstr "podle projektu"
+
+#, boost-format
+msgid "print sequence: %1%"
+msgstr "pořadí tisku: %1%"
+
+msgid "as the process settings"
+msgstr "podle nastavení procesu"
+
+#, boost-format
+msgid "Plate %1%"
+msgstr "Podložka %1%"
+
+msgid ""
+"The AI assistant asks to start a new project. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "AI asistent žádá o založení nového projektu. Aktuální projekt se zavře; pokud má neuložené změny, budete vyzváni k jeho uložení."
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to open the project %s. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "AI asistent žádá o otevření projektu %s. Aktuální projekt se zavře; pokud má neuložené změny, budete vyzváni k jeho uložení."
+
+msgid ""
+"The AI assistant asks to add these models to the current plate. Import them?"
+msgstr "AI asistent žádá o přidání těchto modelů na aktuální podložku. Importovat je?"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to save the project to %s. Save it?"
+msgstr "AI asistent žádá o uložení projektu do %s. Uložit?"
+
+msgid ""
+"The AI assistant asks to change the plates of the project. Apply these "
+"operations?"
+msgstr "AI asistent žádá o změnu podložek projektu. Použít tyto operace?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

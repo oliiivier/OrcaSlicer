@@ -19736,6 +19736,84 @@ msgid ""
 "original intent where it suits this printer."
 msgstr "Теперь проект использует %s. %zu настроек исходного проекта отличаются от нового профиля: попросите ИИ-ассистента (/adapt_project) восстановить исходный замысел там, где он подходит этому принтеру."
 
+msgid ""
+"Allow controlling the printer: start the sliced plate (through the print "
+"dialog), pause, resume or stop a print, unload filament from the toolheads. "
+"Each request has to be confirmed here."
+msgstr "Разрешить управление принтером: запуск нарезанного стола (через окно печати), пауза, продолжение или остановка печати, выгрузка прутка из печатающих головок. Каждый запрос нужно подтвердить здесь."
+
+#, boost-format
+msgid "Move %1% to plate %2%"
+msgstr "Переместить %1% на стол %2%"
+
+msgid "The AI assistant asks to pause the print. Pause it now?"
+msgstr "ИИ-ассистент просит приостановить печать. Приостановить сейчас?"
+
+msgid "The AI assistant asks to resume the print. Resume it now?"
+msgstr "ИИ-ассистент просит продолжить печать. Продолжить сейчас?"
+
+msgid ""
+"The AI assistant asks to stop the print. It cannot be resumed afterwards. "
+"Stop it now?"
+msgstr "ИИ-ассистент просит остановить печать. Продолжить её потом будет нельзя. Остановить сейчас?"
+
+msgid "Add a plate"
+msgstr "Добавить стол"
+
+#, boost-format
+msgid "Show plate %1%"
+msgstr "Показать стол %1%"
+
+#, boost-format
+msgid "Delete plate %1%"
+msgstr "Удалить стол %1%"
+
+#, boost-format
+msgid "Rename plate %1% to '%2%'"
+msgstr "Переименовать стол %1% в «%2%»"
+
+#, boost-format
+msgid "bed type: %1%"
+msgstr "тип стола: %1%"
+
+msgid "as the project"
+msgstr "как в проекте"
+
+#, boost-format
+msgid "print sequence: %1%"
+msgstr "порядок печати: %1%"
+
+msgid "as the process settings"
+msgstr "как в настройках процесса"
+
+#, boost-format
+msgid "Plate %1%"
+msgstr "Стол %1%"
+
+msgid ""
+"The AI assistant asks to start a new project. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "ИИ-ассистент просит создать новый проект. Текущий проект закроется; если в нём есть несохранённые изменения, вам предложат его сохранить."
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to open the project %s. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "ИИ-ассистент просит открыть проект %s. Текущий проект закроется; если в нём есть несохранённые изменения, вам предложат его сохранить."
+
+msgid ""
+"The AI assistant asks to add these models to the current plate. Import them?"
+msgstr "ИИ-ассистент просит добавить эти модели на текущий стол. Импортировать их?"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to save the project to %s. Save it?"
+msgstr "ИИ-ассистент просит сохранить проект в %s. Сохранить?"
+
+msgid ""
+"The AI assistant asks to change the plates of the project. Apply these "
+"operations?"
+msgstr "ИИ-ассистент просит изменить столы проекта. Применить эти операции?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

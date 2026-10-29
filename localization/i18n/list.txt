@@ -190,3 +190,4 @@ src/slic3r/AIAssistant/McpDialog.cpp
 src/slic3r/AIAssistant/McpObjects.cpp
 src/slic3r/AIAssistant/McpPrinterControl.cpp
 src/slic3r/AIAssistant/ProjectAdapt.cpp
+src/slic3r/AIAssistant/McpProject.cpp

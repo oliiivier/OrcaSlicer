@@ -17264,6 +17264,84 @@ msgid ""
 "original intent where it suits this printer."
 msgstr "プロジェクトは %s を使用するようになりました。元のプロジェクトの %zu 個の設定が新しいプロファイルと異なります: このプリンターに合う範囲で元の意図を復元するよう、AIアシスタント (/adapt_project) に依頼してください。"
 
+msgid ""
+"Allow controlling the printer: start the sliced plate (through the print "
+"dialog), pause, resume or stop a print, unload filament from the toolheads. "
+"Each request has to be confirmed here."
+msgstr "プリンターの操作を許可します: スライス済みプレートの開始 (印刷ダイアログ経由)、印刷の一時停止・再開・停止、ツールヘッドからのフィラメントのアンロード。各要求はここで確認する必要があります。"
+
+#, boost-format
+msgid "Move %1% to plate %2%"
+msgstr "%1% をプレート %2% に移動"
+
+msgid "The AI assistant asks to pause the print. Pause it now?"
+msgstr "AIアシスタントが印刷の一時停止を求めています。今すぐ一時停止しますか?"
+
+msgid "The AI assistant asks to resume the print. Resume it now?"
+msgstr "AIアシスタントが印刷の再開を求めています。今すぐ再開しますか?"
+
+msgid ""
+"The AI assistant asks to stop the print. It cannot be resumed afterwards. "
+"Stop it now?"
+msgstr "AIアシスタントが印刷の停止を求めています。停止後は再開できません。今すぐ停止しますか?"
+
+msgid "Add a plate"
+msgstr "プレートを追加"
+
+#, boost-format
+msgid "Show plate %1%"
+msgstr "プレート %1% を表示"
+
+#, boost-format
+msgid "Delete plate %1%"
+msgstr "プレート %1% を削除"
+
+#, boost-format
+msgid "Rename plate %1% to '%2%'"
+msgstr "プレート %1% の名前を「%2%」に変更"
+
+#, boost-format
+msgid "bed type: %1%"
+msgstr "ベッドタイプ: %1%"
+
+msgid "as the project"
+msgstr "プロジェクトと同じ"
+
+#, boost-format
+msgid "print sequence: %1%"
+msgstr "印刷順序: %1%"
+
+msgid "as the process settings"
+msgstr "プロセス設定と同じ"
+
+#, boost-format
+msgid "Plate %1%"
+msgstr "プレート %1%"
+
+msgid ""
+"The AI assistant asks to start a new project. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "AIアシスタントが新しいプロジェクトの作成を求めています。現在のプロジェクトは閉じられます。未保存の変更がある場合は保存を確認します。"
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to open the project %s. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "AIアシスタントがプロジェクト %s を開くことを求めています。現在のプロジェクトは閉じられます。未保存の変更がある場合は保存を確認します。"
+
+msgid ""
+"The AI assistant asks to add these models to the current plate. Import them?"
+msgstr "AIアシスタントがこれらのモデルを現在のプレートに追加することを求めています。インポートしますか?"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to save the project to %s. Save it?"
+msgstr "AIアシスタントがプロジェクトを %s に保存することを求めています。保存しますか?"
+
+msgid ""
+"The AI assistant asks to change the plates of the project. Apply these "
+"operations?"
+msgstr "AIアシスタントがプロジェクトのプレートの変更を求めています。これらの操作を適用しますか?"
+
 #~ msgid "Alt + Mouse wheel"
 #~ msgstr "Alt + マウスホイール"
 

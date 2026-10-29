@@ -17614,6 +17614,84 @@ msgid ""
 "original intent where it suits this printer."
 msgstr "Projektet använder nu %s. %zu inställningar i det ursprungliga projektet skiljer sig från den nya profilen: be AI-assistenten (/adapt_project) att återställa den ursprungliga avsikten där den passar den här skrivaren."
 
+msgid ""
+"Allow controlling the printer: start the sliced plate (through the print "
+"dialog), pause, resume or stop a print, unload filament from the toolheads. "
+"Each request has to be confirmed here."
+msgstr "Tillåt styrning av skrivaren: starta den slicade plattan (via utskriftsdialogen), pausa, återuppta eller stoppa en utskrift, mata ut filament från skrivhuvudena. Varje begäran måste bekräftas här."
+
+#, boost-format
+msgid "Move %1% to plate %2%"
+msgstr "Flytta %1% till platta %2%"
+
+msgid "The AI assistant asks to pause the print. Pause it now?"
+msgstr "AI-assistenten ber om att pausa utskriften. Pausa nu?"
+
+msgid "The AI assistant asks to resume the print. Resume it now?"
+msgstr "AI-assistenten ber om att återuppta utskriften. Återuppta nu?"
+
+msgid ""
+"The AI assistant asks to stop the print. It cannot be resumed afterwards. "
+"Stop it now?"
+msgstr "AI-assistenten ber om att stoppa utskriften. Den kan inte återupptas efteråt. Stoppa nu?"
+
+msgid "Add a plate"
+msgstr "Lägg till en platta"
+
+#, boost-format
+msgid "Show plate %1%"
+msgstr "Visa platta %1%"
+
+#, boost-format
+msgid "Delete plate %1%"
+msgstr "Radera platta %1%"
+
+#, boost-format
+msgid "Rename plate %1% to '%2%'"
+msgstr "Döp om platta %1% till \"%2%\""
+
+#, boost-format
+msgid "bed type: %1%"
+msgstr "bäddtyp: %1%"
+
+msgid "as the project"
+msgstr "som projektet"
+
+#, boost-format
+msgid "print sequence: %1%"
+msgstr "utskriftsordning: %1%"
+
+msgid "as the process settings"
+msgstr "som processinställningarna"
+
+#, boost-format
+msgid "Plate %1%"
+msgstr "Platta %1%"
+
+msgid ""
+"The AI assistant asks to start a new project. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "AI-assistenten ber om att starta ett nytt projekt. Det aktuella projektet stängs; du får frågan om att spara det om det har osparade ändringar."
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to open the project %s. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "AI-assistenten ber om att öppna projektet %s. Det aktuella projektet stängs; du får frågan om att spara det om det har osparade ändringar."
+
+msgid ""
+"The AI assistant asks to add these models to the current plate. Import them?"
+msgstr "AI-assistenten ber om att lägga till dessa modeller på den aktuella plattan. Importera dem?"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to save the project to %s. Save it?"
+msgstr "AI-assistenten ber om att spara projektet i %s. Spara?"
+
+msgid ""
+"The AI assistant asks to change the plates of the project. Apply these "
+"operations?"
+msgstr "AI-assistenten ber om att ändra projektets plattor. Tillämpa dessa åtgärder?"
+
 #~ msgid "Alt + Mouse wheel"
 #~ msgstr "Alt + mushjul"
 

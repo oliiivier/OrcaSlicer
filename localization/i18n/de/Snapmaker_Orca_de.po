@@ -19838,6 +19838,84 @@ msgid ""
 "original intent where it suits this printer."
 msgstr "Das Projekt verwendet jetzt %s. %zu Einstellungen des ursprünglichen Projekts weichen vom neuen Profil ab: Bitten Sie den KI-Assistenten (/adapt_project), die ursprüngliche Absicht wiederherzustellen, wo sie zu diesem Drucker passt."
 
+msgid ""
+"Allow controlling the printer: start the sliced plate (through the print "
+"dialog), pause, resume or stop a print, unload filament from the toolheads. "
+"Each request has to be confirmed here."
+msgstr "Steuern des Druckers erlauben: die gesliceten Platte starten (über den Druckdialog), einen Druck pausieren, fortsetzen oder stoppen, Filament aus den Druckköpfen entladen. Jede Anfrage muss hier bestätigt werden."
+
+#, boost-format
+msgid "Move %1% to plate %2%"
+msgstr "%1% auf Platte %2% verschieben"
+
+msgid "The AI assistant asks to pause the print. Pause it now?"
+msgstr "Der KI-Assistent möchte den Druck pausieren. Jetzt pausieren?"
+
+msgid "The AI assistant asks to resume the print. Resume it now?"
+msgstr "Der KI-Assistent möchte den Druck fortsetzen. Jetzt fortsetzen?"
+
+msgid ""
+"The AI assistant asks to stop the print. It cannot be resumed afterwards. "
+"Stop it now?"
+msgstr "Der KI-Assistent möchte den Druck stoppen. Er kann danach nicht fortgesetzt werden. Jetzt stoppen?"
+
+msgid "Add a plate"
+msgstr "Eine Platte hinzufügen"
+
+#, boost-format
+msgid "Show plate %1%"
+msgstr "Platte %1% anzeigen"
+
+#, boost-format
+msgid "Delete plate %1%"
+msgstr "Platte %1% löschen"
+
+#, boost-format
+msgid "Rename plate %1% to '%2%'"
+msgstr "Platte %1% in „%2%“ umbenennen"
+
+#, boost-format
+msgid "bed type: %1%"
+msgstr "Druckbetttyp: %1%"
+
+msgid "as the project"
+msgstr "wie im Projekt"
+
+#, boost-format
+msgid "print sequence: %1%"
+msgstr "Druckreihenfolge: %1%"
+
+msgid "as the process settings"
+msgstr "wie in den Prozesseinstellungen"
+
+#, boost-format
+msgid "Plate %1%"
+msgstr "Platte %1%"
+
+msgid ""
+"The AI assistant asks to start a new project. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "Der KI-Assistent möchte ein neues Projekt beginnen. Das aktuelle Projekt wird geschlossen; Sie werden gefragt, ob Sie es speichern möchten, wenn es ungespeicherte Änderungen hat."
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to open the project %s. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "Der KI-Assistent möchte das Projekt %s öffnen. Das aktuelle Projekt wird geschlossen; Sie werden gefragt, ob Sie es speichern möchten, wenn es ungespeicherte Änderungen hat."
+
+msgid ""
+"The AI assistant asks to add these models to the current plate. Import them?"
+msgstr "Der KI-Assistent möchte diese Modelle zur aktuellen Platte hinzufügen. Importieren?"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to save the project to %s. Save it?"
+msgstr "Der KI-Assistent möchte das Projekt in %s speichern. Speichern?"
+
+msgid ""
+"The AI assistant asks to change the plates of the project. Apply these "
+"operations?"
+msgstr "Der KI-Assistent möchte die Platten des Projekts ändern. Diese Operationen anwenden?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

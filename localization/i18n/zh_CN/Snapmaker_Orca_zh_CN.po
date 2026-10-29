@@ -15642,6 +15642,84 @@ msgid ""
 "original intent where it suits this printer."
 msgstr "项目现在使用 %s。原项目有 %zu 项设置与新配置不同：请让 AI 助手（/adapt_project）在适合此打印机的地方恢复原始意图。"
 
+msgid ""
+"Allow controlling the printer: start the sliced plate (through the print "
+"dialog), pause, resume or stop a print, unload filament from the toolheads. "
+"Each request has to be confirmed here."
+msgstr "允许控制打印机：启动已切片的盘（通过打印对话框），暂停、继续或停止打印，从打印头退出耗材丝。每个请求都必须在此确认。"
+
+#, boost-format
+msgid "Move %1% to plate %2%"
+msgstr "将 %1% 移到第 %2% 盘"
+
+msgid "The AI assistant asks to pause the print. Pause it now?"
+msgstr "AI 助手请求暂停打印。现在暂停吗？"
+
+msgid "The AI assistant asks to resume the print. Resume it now?"
+msgstr "AI 助手请求继续打印。现在继续吗？"
+
+msgid ""
+"The AI assistant asks to stop the print. It cannot be resumed afterwards. "
+"Stop it now?"
+msgstr "AI 助手请求停止打印。停止后无法继续。现在停止吗？"
+
+msgid "Add a plate"
+msgstr "添加一个盘"
+
+#, boost-format
+msgid "Show plate %1%"
+msgstr "显示第 %1% 盘"
+
+#, boost-format
+msgid "Delete plate %1%"
+msgstr "删除第 %1% 盘"
+
+#, boost-format
+msgid "Rename plate %1% to '%2%'"
+msgstr "将第 %1% 盘重命名为“%2%”"
+
+#, boost-format
+msgid "bed type: %1%"
+msgstr "热床类型：%1%"
+
+msgid "as the project"
+msgstr "与项目相同"
+
+#, boost-format
+msgid "print sequence: %1%"
+msgstr "打印顺序：%1%"
+
+msgid "as the process settings"
+msgstr "与工艺设置相同"
+
+#, boost-format
+msgid "Plate %1%"
+msgstr "第 %1% 盘"
+
+msgid ""
+"The AI assistant asks to start a new project. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "AI 助手请求新建项目。当前项目将被关闭；如果有未保存的修改，会提示您先保存。"
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to open the project %s. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "AI 助手请求打开项目 %s。当前项目将被关闭；如果有未保存的修改，会提示您先保存。"
+
+msgid ""
+"The AI assistant asks to add these models to the current plate. Import them?"
+msgstr "AI 助手请求将这些模型添加到当前盘。导入吗？"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to save the project to %s. Save it?"
+msgstr "AI 助手请求将项目保存到 %s。保存吗？"
+
+msgid ""
+"The AI assistant asks to change the plates of the project. Apply these "
+"operations?"
+msgstr "AI 助手请求修改项目的盘。应用这些操作吗？"
+
 #~ msgid "Improve shell precision by adjusting outer wall spacing. This also improves layer consistency."
 #~ msgstr "优化外墙刀路以提高外墙精度。这个优化同时减少层纹"
 

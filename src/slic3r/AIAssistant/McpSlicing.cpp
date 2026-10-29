@@ -77,11 +77,48 @@ json slice_results(GUI::Plater& plater)
     return out;
 }
 
+// Plates holding objects: the ones Slice all slices.
+std::vector<GUI::PartPlate*> plates_to_slice(GUI::Plater& plater)
+{
+    std::vector<GUI::PartPlate*> out;
+    GUI::PartPlateList&          plates = plater.get_partplate_list();
+    for (int i = 0; i < plates.get_plate_count(); ++i)
+        if (!plates.get_plate(i)->get_objects_on_this_plate().empty())
+            out.push_back(plates.get_plate(i));
+    return out;
+}
+
+bool sliced(GUI::Plater& plater, bool all)
+{
+    if (!all)
+        return plater.get_partplate_list().get_curr_plate()->is_slice_result_valid();
+    for (GUI::PartPlate* plate : plates_to_slice(plater))
+        if (!plate->is_slice_result_valid())
+            return false;
+    return true;
+}
+
+// Print time of every plate, then the details of the current one.
+json all_plates_results(GUI::Plater& plater)
+{
+    json plates = json::array();
+    for (GUI::PartPlate* plate : plates_to_slice(plater)) {
+        json p = { { "plate", plate->get_index() + 1 }, { "sliced", plate->is_slice_result_valid() } };
+        if (const GCodeProcessorResult* result = plate->get_slice_result(); result != nullptr && plate->is_slice_result_valid())
+            p["print_time_s"] = std::lround(result->print_statistics.modes[size_t(PrintEstimatedStatistics::ETimeMode::Normal)].time);
+        plates.push_back(std::move(p));
+    }
+    json out = { { "plates", std::move(plates) } };
+    out["current_plate"] = slice_results(plater);
+    return out;
+}
+
 } // namespace
 
-json slice_plate(json& state)
+json slice_plate(const json& args, json& state)
 {
     GUI::Plater& plater = require_plater();
+    const bool   all    = args.value("all_plates", false);
 
     if (!state.value("started", false)) {
         // Slicing would be refused (or a blocking dialog shown): report why instead.
@@ -92,8 +129,8 @@ json slice_plate(json& state)
         if (blocked)
             return { { "sliced", false }, { "message", "Fix the blocking errors first" }, { "issues", std::move(issues) } };
 
-        // Same entry point as the "Slice plate" button (switches to the preview).
-        wxPostEvent(&plater, GUI::SimpleEvent(GUI::EVT_GLTOOLBAR_SLICE_PLATE));
+        // Same entry point as the "Slice plate" and "Slice all" buttons (switches to the preview).
+        wxPostEvent(&plater, GUI::SimpleEvent(all ? GUI::EVT_GLTOOLBAR_SLICE_ALL : GUI::EVT_GLTOOLBAR_SLICE_PLATE));
         state["started"] = true;
         throw ToolRetry();
     }
@@ -102,14 +139,17 @@ json slice_plate(json& state)
         state["idle_polls"] = 0;
         throw ToolRetry();
     }
-    if (plater.get_partplate_list().get_curr_plate()->is_slice_result_valid())
-        return slice_results(plater);
+    if (sliced(plater, all))
+        return all ? all_plates_results(plater) : slice_results(plater);
 
     const int idle = state.value("idle_polls", 0) + 1;
     state["idle_polls"] = idle;
     if (idle < IDLE_POLLS_BEFORE_FAILURE)
         throw ToolRetry();
-    return { { "sliced", false }, { "message", "Slicing did not produce a result" }, { "issues", collect_issues() } };
+    json out = { { "sliced", false }, { "message", "Slicing did not produce a result" }, { "issues", collect_issues() } };
+    if (all)
+        out["plates"] = all_plates_results(plater)["plates"];
+    return out;
 }
 
 }} // namespace Slic3r::AIAssistant

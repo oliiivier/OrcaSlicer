@@ -17706,6 +17706,84 @@ msgid ""
 "original intent where it suits this printer."
 msgstr "A projekt most ezt használja: %s. Az eredeti projekt %zu beállítása eltér az új profiltól: kérje meg az MI-asszisztenst (/adapt_project), hogy állítsa vissza az eredeti szándékot ott, ahol az illik ehhez a nyomtatóhoz."
 
+msgid ""
+"Allow controlling the printer: start the sliced plate (through the print "
+"dialog), pause, resume or stop a print, unload filament from the toolheads. "
+"Each request has to be confirmed here."
+msgstr "A nyomtató vezérlése engedélyezett: a szeletelt tálca indítása (a nyomtatási ablakon keresztül), nyomtatás szüneteltetése, folytatása vagy leállítása, filament kitöltése a nyomtatófejekből. Minden kérést itt kell jóváhagyni."
+
+#, boost-format
+msgid "Move %1% to plate %2%"
+msgstr "%1% áthelyezése a(z) %2%. tálcára"
+
+msgid "The AI assistant asks to pause the print. Pause it now?"
+msgstr "Az MI-asszisztens a nyomtatás szüneteltetését kéri. Szünetelteti most?"
+
+msgid "The AI assistant asks to resume the print. Resume it now?"
+msgstr "Az MI-asszisztens a nyomtatás folytatását kéri. Folytatja most?"
+
+msgid ""
+"The AI assistant asks to stop the print. It cannot be resumed afterwards. "
+"Stop it now?"
+msgstr "Az MI-asszisztens a nyomtatás leállítását kéri. Utána nem folytatható. Leállítja most?"
+
+msgid "Add a plate"
+msgstr "Tálca hozzáadása"
+
+#, boost-format
+msgid "Show plate %1%"
+msgstr "A(z) %1%. tálca megjelenítése"
+
+#, boost-format
+msgid "Delete plate %1%"
+msgstr "A(z) %1%. tálca törlése"
+
+#, boost-format
+msgid "Rename plate %1% to '%2%'"
+msgstr "A(z) %1%. tálca átnevezése erre: „%2%”"
+
+#, boost-format
+msgid "bed type: %1%"
+msgstr "tálcatípus: %1%"
+
+msgid "as the project"
+msgstr "a projekt szerint"
+
+#, boost-format
+msgid "print sequence: %1%"
+msgstr "nyomtatási sorrend: %1%"
+
+msgid "as the process settings"
+msgstr "a folyamatbeállítások szerint"
+
+#, boost-format
+msgid "Plate %1%"
+msgstr "%1%. tálca"
+
+msgid ""
+"The AI assistant asks to start a new project. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "Az MI-asszisztens új projekt létrehozását kéri. A jelenlegi projekt bezárul; ha nem mentett módosításai vannak, a program felajánlja a mentését."
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to open the project %s. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "Az MI-asszisztens a(z) %s projekt megnyitását kéri. A jelenlegi projekt bezárul; ha nem mentett módosításai vannak, a program felajánlja a mentését."
+
+msgid ""
+"The AI assistant asks to add these models to the current plate. Import them?"
+msgstr "Az MI-asszisztens ezeknek a modelleknek az aktuális tálcához adását kéri. Importálja őket?"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to save the project to %s. Save it?"
+msgstr "Az MI-asszisztens a projekt mentését kéri ide: %s. Menti?"
+
+msgid ""
+"The AI assistant asks to change the plates of the project. Apply these "
+"operations?"
+msgstr "Az MI-asszisztens a projekt tálcáinak módosítását kéri. Alkalmazza ezeket a műveleteket?"
+
 #~ msgid "Alt + Mouse wheel"
 #~ msgstr "Alt + Egérgörgő"
 

@@ -19299,6 +19299,84 @@ msgid ""
 "original intent where it suits this printer."
 msgstr "Тепер проєкт використовує %s. %zu налаштувань початкового проєкту відрізняються від нового профілю: попросіть ШІ-асистента (/adapt_project) відновити початковий задум там, де він підходить цьому принтеру."
 
+msgid ""
+"Allow controlling the printer: start the sliced plate (through the print "
+"dialog), pause, resume or stop a print, unload filament from the toolheads. "
+"Each request has to be confirmed here."
+msgstr "Дозволити керування принтером: запуск нарізаної пластини (через вікно друку), пауза, продовження або зупинка друку, вивантаження філаменту з друкувальних голівок. Кожен запит потрібно підтвердити тут."
+
+#, boost-format
+msgid "Move %1% to plate %2%"
+msgstr "Перемістити %1% на пластину %2%"
+
+msgid "The AI assistant asks to pause the print. Pause it now?"
+msgstr "ШІ-асистент просить призупинити друк. Призупинити зараз?"
+
+msgid "The AI assistant asks to resume the print. Resume it now?"
+msgstr "ШІ-асистент просить продовжити друк. Продовжити зараз?"
+
+msgid ""
+"The AI assistant asks to stop the print. It cannot be resumed afterwards. "
+"Stop it now?"
+msgstr "ШІ-асистент просить зупинити друк. Продовжити його потім буде неможливо. Зупинити зараз?"
+
+msgid "Add a plate"
+msgstr "Додати пластину"
+
+#, boost-format
+msgid "Show plate %1%"
+msgstr "Показати пластину %1%"
+
+#, boost-format
+msgid "Delete plate %1%"
+msgstr "Видалити пластину %1%"
+
+#, boost-format
+msgid "Rename plate %1% to '%2%'"
+msgstr "Перейменувати пластину %1% на «%2%»"
+
+#, boost-format
+msgid "bed type: %1%"
+msgstr "тип столу: %1%"
+
+msgid "as the project"
+msgstr "як у проєкті"
+
+#, boost-format
+msgid "print sequence: %1%"
+msgstr "порядок друку: %1%"
+
+msgid "as the process settings"
+msgstr "як у налаштуваннях процесу"
+
+#, boost-format
+msgid "Plate %1%"
+msgstr "Пластина %1%"
+
+msgid ""
+"The AI assistant asks to start a new project. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "ШІ-асистент просить створити новий проєкт. Поточний проєкт закриється; якщо в ньому є незбережені зміни, вам запропонують його зберегти."
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to open the project %s. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "ШІ-асистент просить відкрити проєкт %s. Поточний проєкт закриється; якщо в ньому є незбережені зміни, вам запропонують його зберегти."
+
+msgid ""
+"The AI assistant asks to add these models to the current plate. Import them?"
+msgstr "ШІ-асистент просить додати ці моделі на поточну пластину. Імпортувати їх?"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to save the project to %s. Save it?"
+msgstr "ШІ-асистент просить зберегти проєкт у %s. Зберегти?"
+
+msgid ""
+"The AI assistant asks to change the plates of the project. Apply these "
+"operations?"
+msgstr "ШІ-асистент просить змінити пластини проєкту. Застосувати ці операції?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

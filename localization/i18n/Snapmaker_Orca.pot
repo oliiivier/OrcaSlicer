@@ -16723,3 +16723,81 @@ msgid ""
 "the new profile: ask the AI assistant (/adapt_project) to restore the "
 "original intent where it suits this printer."
 msgstr ""
+
+msgid ""
+"Allow controlling the printer: start the sliced plate (through the print "
+"dialog), pause, resume or stop a print, unload filament from the toolheads. "
+"Each request has to be confirmed here."
+msgstr ""
+
+#, boost-format
+msgid "Move %1% to plate %2%"
+msgstr ""
+
+msgid "The AI assistant asks to pause the print. Pause it now?"
+msgstr ""
+
+msgid "The AI assistant asks to resume the print. Resume it now?"
+msgstr ""
+
+msgid ""
+"The AI assistant asks to stop the print. It cannot be resumed afterwards. "
+"Stop it now?"
+msgstr ""
+
+msgid "Add a plate"
+msgstr ""
+
+#, boost-format
+msgid "Show plate %1%"
+msgstr ""
+
+#, boost-format
+msgid "Delete plate %1%"
+msgstr ""
+
+#, boost-format
+msgid "Rename plate %1% to '%2%'"
+msgstr ""
+
+#, boost-format
+msgid "bed type: %1%"
+msgstr ""
+
+msgid "as the project"
+msgstr ""
+
+#, boost-format
+msgid "print sequence: %1%"
+msgstr ""
+
+msgid "as the process settings"
+msgstr ""
+
+#, boost-format
+msgid "Plate %1%"
+msgstr ""
+
+msgid ""
+"The AI assistant asks to start a new project. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr ""
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to open the project %s. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr ""
+
+msgid ""
+"The AI assistant asks to add these models to the current plate. Import them?"
+msgstr ""
+
+#, c-format, boost-format
+msgid "The AI assistant asks to save the project to %s. Save it?"
+msgstr ""
+
+msgid ""
+"The AI assistant asks to change the plates of the project. Apply these "
+"operations?"
+msgstr ""

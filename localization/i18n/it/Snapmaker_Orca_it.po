@@ -19600,6 +19600,84 @@ msgid ""
 "original intent where it suits this printer."
 msgstr "Il progetto ora usa %s. %zu impostazioni del progetto originale differiscono dal nuovo profilo: chiedi all'assistente IA (/adapt_project) di ripristinare l'intento originale dove si addice a questa stampante."
 
+msgid ""
+"Allow controlling the printer: start the sliced plate (through the print "
+"dialog), pause, resume or stop a print, unload filament from the toolheads. "
+"Each request has to be confirmed here."
+msgstr "Consenti di controllare la stampante: avviare il piatto elaborato (tramite la finestra di stampa), mettere in pausa, riprendere o fermare una stampa, scaricare il filamento dalle testine. Ogni richiesta deve essere confermata qui."
+
+#, boost-format
+msgid "Move %1% to plate %2%"
+msgstr "Sposta %1% sul piatto %2%"
+
+msgid "The AI assistant asks to pause the print. Pause it now?"
+msgstr "L'assistente IA chiede di mettere in pausa la stampa. Metterla in pausa ora?"
+
+msgid "The AI assistant asks to resume the print. Resume it now?"
+msgstr "L'assistente IA chiede di riprendere la stampa. Riprenderla ora?"
+
+msgid ""
+"The AI assistant asks to stop the print. It cannot be resumed afterwards. "
+"Stop it now?"
+msgstr "L'assistente IA chiede di fermare la stampa. Non potrà essere ripresa. Fermarla ora?"
+
+msgid "Add a plate"
+msgstr "Aggiungi un piatto"
+
+#, boost-format
+msgid "Show plate %1%"
+msgstr "Mostra il piatto %1%"
+
+#, boost-format
+msgid "Delete plate %1%"
+msgstr "Elimina il piatto %1%"
+
+#, boost-format
+msgid "Rename plate %1% to '%2%'"
+msgstr "Rinomina il piatto %1% in «%2%»"
+
+#, boost-format
+msgid "bed type: %1%"
+msgstr "tipo di piano: %1%"
+
+msgid "as the project"
+msgstr "come il progetto"
+
+#, boost-format
+msgid "print sequence: %1%"
+msgstr "sequenza di stampa: %1%"
+
+msgid "as the process settings"
+msgstr "come le impostazioni di processo"
+
+#, boost-format
+msgid "Plate %1%"
+msgstr "Piatto %1%"
+
+msgid ""
+"The AI assistant asks to start a new project. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "L'assistente IA chiede di creare un nuovo progetto. Il progetto attuale viene chiuso; ti verrà chiesto di salvarlo se ha modifiche non salvate."
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to open the project %s. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "L'assistente IA chiede di aprire il progetto %s. Il progetto attuale viene chiuso; ti verrà chiesto di salvarlo se ha modifiche non salvate."
+
+msgid ""
+"The AI assistant asks to add these models to the current plate. Import them?"
+msgstr "L'assistente IA chiede di aggiungere questi modelli al piatto corrente. Importarli?"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to save the project to %s. Save it?"
+msgstr "L'assistente IA chiede di salvare il progetto in %s. Salvarlo?"
+
+msgid ""
+"The AI assistant asks to change the plates of the project. Apply these "
+"operations?"
+msgstr "L'assistente IA chiede di modificare i piatti del progetto. Applicare queste operazioni?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

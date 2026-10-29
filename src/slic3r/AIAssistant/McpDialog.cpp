@@ -211,8 +211,8 @@ McpDialog::McpDialog(wxWindow* parent)
                             wrap),
                0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(8));
     sizer->Add(checkbox_row(this, m_printer_control,
-                            _L("Allow unloading filament from the toolheads. Each request has to be confirmed here, and it is "
-                               "refused while a print is running."),
+                            _L("Allow controlling the printer: start the sliced plate (through the print dialog), pause, resume or "
+                               "stop a print, unload filament from the toolheads. Each request has to be confirmed here."),
                             wrap),
                0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(8));
     sizer->Add(checkbox_row(this, m_auto_connect,

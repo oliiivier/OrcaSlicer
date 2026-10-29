@@ -17938,6 +17938,84 @@ msgid ""
 "original intent where it suits this printer."
 msgstr "專案現在使用 %s。原專案有 %zu 項設定與新設定檔不同：請讓 AI 助理（/adapt_project）在適合此列印設備的地方恢復原始意圖。"
 
+msgid ""
+"Allow controlling the printer: start the sliced plate (through the print "
+"dialog), pause, resume or stop a print, unload filament from the toolheads. "
+"Each request has to be confirmed here."
+msgstr "允許控制列印設備：啟動已切片的列印板（透過列印對話框），暫停、繼續或停止列印，從列印頭退出線材。每個請求都必須在此確認。"
+
+#, boost-format
+msgid "Move %1% to plate %2%"
+msgstr "將 %1% 移到列印板 %2%"
+
+msgid "The AI assistant asks to pause the print. Pause it now?"
+msgstr "AI 助理請求暫停列印。現在暫停嗎？"
+
+msgid "The AI assistant asks to resume the print. Resume it now?"
+msgstr "AI 助理請求繼續列印。現在繼續嗎？"
+
+msgid ""
+"The AI assistant asks to stop the print. It cannot be resumed afterwards. "
+"Stop it now?"
+msgstr "AI 助理請求停止列印。停止後無法繼續。現在停止嗎？"
+
+msgid "Add a plate"
+msgstr "新增列印板"
+
+#, boost-format
+msgid "Show plate %1%"
+msgstr "顯示列印板 %1%"
+
+#, boost-format
+msgid "Delete plate %1%"
+msgstr "刪除列印板 %1%"
+
+#, boost-format
+msgid "Rename plate %1% to '%2%'"
+msgstr "將列印板 %1% 重新命名為「%2%」"
+
+#, boost-format
+msgid "bed type: %1%"
+msgstr "熱床類型：%1%"
+
+msgid "as the project"
+msgstr "與專案相同"
+
+#, boost-format
+msgid "print sequence: %1%"
+msgstr "列印順序：%1%"
+
+msgid "as the process settings"
+msgstr "與列印參數設定相同"
+
+#, boost-format
+msgid "Plate %1%"
+msgstr "列印板 %1%"
+
+msgid ""
+"The AI assistant asks to start a new project. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "AI 助理請求建立新專案。目前的專案將被關閉；如果有未儲存的修改，會提示您先儲存。"
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to open the project %s. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "AI 助理請求開啟專案 %s。目前的專案將被關閉；如果有未儲存的修改，會提示您先儲存。"
+
+msgid ""
+"The AI assistant asks to add these models to the current plate. Import them?"
+msgstr "AI 助理請求將這些模型新增到目前的列印板。匯入嗎？"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to save the project to %s. Save it?"
+msgstr "AI 助理請求將專案儲存到 %s。儲存嗎？"
+
+msgid ""
+"The AI assistant asks to change the plates of the project. Apply these "
+"operations?"
+msgstr "AI 助理請求修改專案的列印板。要套用這些操作嗎？"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

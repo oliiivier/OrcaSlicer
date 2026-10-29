@@ -36,8 +36,8 @@ constexpr auto TOOLHEAD_TIMEOUT = 6min;
 // the tool only sends that step when nobody did after this delay.
 constexpr auto SCREEN_TAKEOVER_DELAY = 15s;
 
-const char* CONTROL_DISABLED = "printer control is disabled in the slicer (Help > AI Assistant (MCP server), \"Allow unloading "
-                               "filament\"). Ask the user to enable it, or to unload the filament from the printer screen.";
+const char* CONTROL_DISABLED = "printer control is disabled in the slicer (Help > AI Assistant (MCP server), \"Allow controlling "
+                               "the printer\"). Ask the user to enable it, or to do it from the printer screen.";
 
 std::int64_t now_ms()
 {
@@ -79,21 +79,21 @@ std::map<int, Reply>& replies()
 }
 
 // Moonraker may answer printer.gcode.script only after minutes (or never, for
-// the feed steps): send it asynchronously and look at the reply later. The
+// the feed steps): send requests asynchronously and look at the reply later. The
 // gateway delivers the reply on the GUI thread.
-int send_script(const std::string& script)
+int send_request(const std::string& method, const json& params)
 {
     static int last_id = 0;
     const int  id      = ++last_id;
     replies()[id];
-    BOOST_LOG_TRIVIAL(info) << "MCP: printer.gcode.script " << script;
+    BOOST_LOG_TRIVIAL(info) << "MCP: " << method << " " << params.dump();
 
     const std::shared_ptr<Gateway::GatewayService> gateway = wxGetApp().gateway_service();
     if (!gateway) {
         replies()[id] = { true, "the slicer is not connected to the Snapmaker Connect service" };
         return id;
     }
-    gateway->request("printer.gcode.script", { { "script", script } }, [id](Gateway::GatewayError error, const json&) {
+    gateway->request(method, params, [id](Gateway::GatewayError error, const json&) {
         Reply& reply = replies()[id];
         reply.done   = true;
         if (error)
@@ -113,6 +113,8 @@ std::string script_error(int id)
     replies().erase(it);
     return boost::algorithm::istarts_with(error, "timeout") ? std::string() : error;
 }
+
+int send_script(const std::string& script) { return send_request("printer.gcode.script", { { "script", script } }); }
 
 bool script_done(int id)
 {
@@ -395,7 +397,94 @@ json advance(json& state)
     throw ToolRetry();
 }
 
+// ------------------------------------------------------------ print control
+
+// Time for the printer to reach the requested state (pausing parks the toolhead first).
+constexpr auto PRINT_CONTROL_TIMEOUT = 2min;
+
+struct PrintAction
+{
+    const char* name;
+    const char* method;
+    // Print states the action applies to, and the states that show it is done.
+    std::set<std::string> from;
+    std::set<std::string> done;
+};
+
+const PrintAction PRINT_ACTIONS[] = {
+    { "pause", "printer.print.pause", { "printing" }, { "paused" } },
+    { "resume", "printer.print.resume", { "paused" }, { "printing" } },
+    { "cancel", "printer.print.cancel", { "printing", "paused" }, { "cancelled", "standby", "complete", "error" } },
+};
+
+const PrintAction& print_action(const std::string& name)
+{
+    for (const PrintAction& a : PRINT_ACTIONS)
+        if (name == a.name)
+            return a;
+    throw ToolError("'action' must be pause, resume or cancel");
+}
+
+json begin_print_control(const json& args, const std::atomic<bool>& abandoned, json& state)
+{
+    const PrintAction& action = print_action(args.value("action", std::string()));
+    std::string        reason;
+    const json         objects = live_objects(reason);
+    if (objects.is_null())
+        throw ToolError("Cannot control the print: " + reason);
+    const std::string print = print_state(objects);
+    if (action.from.count(print) == 0)
+        throw ToolError("The print state is '" + (print.empty() ? std::string("unknown") : print) + "': nothing to " + action.name);
+
+    const std::string why      = args.value("reason", std::string());
+    const wxString    question = action.name == std::string("pause")  ? _L("The AI assistant asks to pause the print. Pause it now?") :
+                                 action.name == std::string("resume") ? _L("The AI assistant asks to resume the print. Resume it now?") :
+                                                                        _L("The AI assistant asks to stop the print. It cannot be resumed afterwards. Stop it now?");
+    GUI::MessageDialog dlg(wxGetApp().mainframe, (why.empty() ? wxString() : from_u8(why) + "\n\n") + question, _L("AI Assistant"),
+                           wxYES_NO | wxICON_QUESTION);
+    if (dlg.ShowModal() != wxID_YES)
+        return { { "done", false }, { "message", "The user declined. Ask them what they want instead." } };
+    if (abandoned)
+        return { { "done", false }, { "message", "The request timed out before the user answered" } };
+
+    state["action"]      = action.name;
+    state["request"]     = send_request(action.method, json::object());
+    state["deadline_ms"] = now_ms() + ms(PRINT_CONTROL_TIMEOUT);
+    throw ToolRetry();
+}
+
+json follow_print_control(json& state)
+{
+    const std::int64_t now = now_ms();
+    if (now < state.value("next_poll_ms", std::int64_t(0)))
+        throw ToolRetry();
+    state["next_poll_ms"] = now + ms(POLL_INTERVAL);
+
+    const PrintAction& action = print_action(state["action"].get<std::string>());
+    if (const std::string error = script_error(state["request"].get<int>()); !error.empty())
+        return { { "done", false }, { "error", "the printer refused the command: " + error } };
+
+    std::string reason;
+    const json  objects = live_objects(reason);
+    const std::string print = objects.is_null() ? std::string() : print_state(objects);
+    if (action.done.count(print) != 0)
+        return { { "done", true }, { "print_state", print } };
+    if (now > state["deadline_ms"].get<std::int64_t>())
+        return { { "done", false },
+                 { "print_state", print.empty() ? std::string("unknown") : print },
+                 { "message", "The printer did not reach the expected state in time: check it with get_printer_status" } };
+    throw ToolRetry();
+}
+
 } // namespace
+
+json control_print(const json& args, const std::atomic<bool>& abandoned, json& state)
+{
+    require_plater();
+    if (!state.contains("action"))
+        return begin_print_control(args, abandoned, state);
+    return follow_print_control(state);
+}
 
 json unload_filament(const json& args, const std::atomic<bool>& abandoned, json& state)
 {

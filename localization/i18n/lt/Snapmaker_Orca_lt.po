@@ -19171,6 +19171,84 @@ msgid ""
 "original intent where it suits this printer."
 msgstr "Projektas dabar naudoja %s. %zu pradinio projekto nustatymų skiriasi nuo naujo profilio: paprašykite DI asistento (/adapt_project) atkurti pradinį sumanymą ten, kur jis tinka šiam spausdintuvui."
 
+msgid ""
+"Allow controlling the printer: start the sliced plate (through the print "
+"dialog), pause, resume or stop a print, unload filament from the toolheads. "
+"Each request has to be confirmed here."
+msgstr "Leisti valdyti spausdintuvą: paleisti supjaustytą plokštę (per spausdinimo langą), pristabdyti, tęsti arba sustabdyti spausdinimą, išimti giją iš spausdinimo galvučių. Kiekvienas prašymas turi būti patvirtintas čia."
+
+#, boost-format
+msgid "Move %1% to plate %2%"
+msgstr "Perkelti %1% į plokštę %2%"
+
+msgid "The AI assistant asks to pause the print. Pause it now?"
+msgstr "DI asistentas prašo pristabdyti spausdinimą. Pristabdyti dabar?"
+
+msgid "The AI assistant asks to resume the print. Resume it now?"
+msgstr "DI asistentas prašo tęsti spausdinimą. Tęsti dabar?"
+
+msgid ""
+"The AI assistant asks to stop the print. It cannot be resumed afterwards. "
+"Stop it now?"
+msgstr "DI asistentas prašo sustabdyti spausdinimą. Vėliau jo nebus galima tęsti. Sustabdyti dabar?"
+
+msgid "Add a plate"
+msgstr "Pridėti plokštę"
+
+#, boost-format
+msgid "Show plate %1%"
+msgstr "Rodyti plokštę %1%"
+
+#, boost-format
+msgid "Delete plate %1%"
+msgstr "Ištrinti plokštę %1%"
+
+#, boost-format
+msgid "Rename plate %1% to '%2%'"
+msgstr "Pervardyti plokštę %1% į „%2%“"
+
+#, boost-format
+msgid "bed type: %1%"
+msgstr "pagrindo tipas: %1%"
+
+msgid "as the project"
+msgstr "kaip projekte"
+
+#, boost-format
+msgid "print sequence: %1%"
+msgstr "spausdinimo tvarka: %1%"
+
+msgid "as the process settings"
+msgstr "kaip proceso nustatymuose"
+
+#, boost-format
+msgid "Plate %1%"
+msgstr "Plokštė %1%"
+
+msgid ""
+"The AI assistant asks to start a new project. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "DI asistentas prašo sukurti naują projektą. Dabartinis projektas uždaromas; jei jame yra neišsaugotų pakeitimų, jūsų paklaus, ar jį išsaugoti."
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to open the project %s. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "DI asistentas prašo atidaryti projektą %s. Dabartinis projektas uždaromas; jei jame yra neišsaugotų pakeitimų, jūsų paklaus, ar jį išsaugoti."
+
+msgid ""
+"The AI assistant asks to add these models to the current plate. Import them?"
+msgstr "DI asistentas prašo pridėti šiuos modelius prie dabartinės plokštės. Importuoti juos?"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to save the project to %s. Save it?"
+msgstr "DI asistentas prašo išsaugoti projektą į %s. Išsaugoti?"
+
+msgid ""
+"The AI assistant asks to change the plates of the project. Apply these "
+"operations?"
+msgstr "DI asistentas prašo pakeisti projekto plokštes. Taikyti šias operacijas?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

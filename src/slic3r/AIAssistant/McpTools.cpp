@@ -10,6 +10,7 @@
 #include "McpPrinter.hpp"
 #include "McpPrinterControl.hpp"
 #include "McpPrinterLive.hpp"
+#include "McpProject.hpp"
 #include "McpRender.hpp"
 #include "McpSlicing.hpp"
 #include "McpToolUtils.hpp"
@@ -75,7 +76,8 @@ json get_project(const json& /* args */)
                    { { "printer", bundle.printers.get_selected_preset_name() },
                      { "process", bundle.prints.get_selected_preset_name() } } },
                  { "materials", describe_materials() },
-                 { "objects", std::move(objects) } };
+                 { "objects", std::move(objects) },
+                 { "plates", plates_summary() } };
     try {
         out["issues"] = collect_issues()["summary"].get<std::string>() + " (details: get_issues)";
     } catch (const ToolRetry&) {
@@ -200,9 +202,9 @@ const std::vector<Tool>& tools()
           60s },
         { "get_project",
           "Summary of the open project: printer toolheads, filament slots (preset, type, color, temperature, toolhead, "
-          "used on the plate), mixed filaments, filament assigned to walls/infill/supports, and for each object its "
-          "index, size, position on its plate (center x/y, bottom z), parts (name, type, filament), filaments and "
-          "per-object setting overrides.",
+          "used on the plate), mixed filaments, filament assigned to walls/infill/supports, for each object its "
+          "index, size, plate and position on it (center x/y, bottom z), parts (name, type, filament), filaments and "
+          "per-object setting overrides, and the plates (objects, bed type, print sequence, sliced, current one).",
           simple(&get_project),
           { { "type", "object" }, { "properties", json::object() } },
           60s },
@@ -262,7 +264,7 @@ const std::vector<Tool>& tools()
           "Changes the objects like the Prepare view, after the user's confirmation in the slicer (one undo step): "
           "scale (factor, or size_mm with one dimension, or several with keep_proportions=false), rotate (degrees "
           "around the bed axes, then put back on the bed), move (to_mm: center x/y on its plate, or by_mm), center "
-          "on its plate, drop to the bed, mirror, cut horizontally (height_mm from the object bottom; the upper part "
+          "on its plate, move_to_plate (to the 1-based 'plate' of get_project, keeping its position on the plate), drop to the bed, mirror, cut horizontally (height_mm from the object bottom; the upper part "
           "becomes <name>_A, placed on its cut face by default, the lower part <name>_B), split into objects, "
           "duplicate, delete, auto-orient (orient), arrange the current plate, add_part (a box, cylinder, cone or "
           "sphere of size_mm added to an object as a solid part, negative part, modifier, support blocker or support "
@@ -285,7 +287,7 @@ const std::vector<Tool>& tools()
                           { { "action",
                               { { "type", "string" },
                                 { "enum",
-                                  { "scale", "rotate", "move", "center", "drop", "mirror", "cut", "split", "duplicate",
+                                  { "scale", "rotate", "move", "move_to_plate", "center", "drop", "mirror", "cut", "split", "duplicate",
                                     "delete", "orient", "arrange", "add_part", "delete_part", "set_filament",
                                     "rename" } } } },
                             { "object",
@@ -295,6 +297,7 @@ const std::vector<Tool>& tools()
                             { "size_mm", { { "type", "object" }, { "description", "scale: target size, e.g. {\"z\": 50}; add_part: box x/y/z, diameter x and height z for a cylinder or cone, diameter x for a sphere." } } },
                             { "keep_proportions", { { "type", "boolean" }, { "default", true } } },
                             { "degrees", { { "type", "object" }, { "description", "rotate: e.g. {\"x\": 90}." } } },
+                            { "plate", { { "type", "integer" }, { "minimum", 1 }, { "description", "move_to_plate: target plate." } } },
                             { "to_mm", { { "type", "object" }, { "description", "move: {\"x\": .., \"y\": ..} on the plate." } } },
                             { "by_mm", { { "type", "object" }, { "description", "move: relative {\"x\": .., \"y\": ..}." } } },
                             { "axis", { { "type", "string" }, { "enum", { "x", "y", "z" } }, { "description", "mirror." } } },
@@ -444,8 +447,14 @@ const std::vector<Tool>& tools()
           "result: print time, filament per slot (model, supports, wipe tower, flush), time and filament per feature "
           "(supports, walls, infill...), support layers per object, and the issues found while slicing. Refuses to "
           "slice while blocking errors remain.",
-          [](const json&, ToolContext& ctx) { return slice_plate(ctx.state); },
-          { { "type", "object" }, { "properties", json::object() } },
+          [](const json& args, ToolContext& ctx) { return slice_plate(args, ctx.state); },
+          { { "type", "object" },
+            { "properties",
+              { { "all_plates",
+                  { { "type", "boolean" },
+                    { "default", false },
+                    { "description", "Slice every plate holding objects, like Slice all: print time of each plate, "
+                                     "details of the current one." } } } } } },
           60s,
           10min },
         { "printer_snapshot",
@@ -504,6 +513,89 @@ const std::vector<Tool>& tools()
           10min,
           30min,
           &unload_filament_abandoned },
+        { "new_project",
+          "Starts a new empty project, like File > New project, after the user's confirmation (the slicer asks to save "
+          "the current project if it has unsaved changes).",
+          [](const json& args, ToolContext& ctx) { return new_project(args, ctx.abandoned); },
+          { { "type", "object" }, { "properties", { { "reason", { { "type", "string" } } } } } },
+          10min },
+        { "open_project",
+          "Opens a 3MF project in place of the current one, after the user's confirmation. Without 'path', the slicer "
+          "shows its file dialog and the user picks the file.",
+          [](const json& args, ToolContext& ctx) { return open_project(args, ctx.abandoned); },
+          { { "type", "object" },
+            { "properties",
+              { { "path", { { "type", "string" }, { "description", "Absolute path of the .3mf file (~ for the home folder)." } } },
+                { "reason", { { "type", "string" } } } } } },
+          10min },
+        { "import_models",
+          "Adds models from files (STL, 3MF, OBJ, STEP, AMF, SVG) to the current plate, like the Import button, after "
+          "the user's confirmation; the settings of an imported 3MF are not applied. Without 'paths', the slicer shows "
+          "its file dialog. Returns the added objects.",
+          [](const json& args, ToolContext& ctx) { return import_models(args, ctx.abandoned); },
+          { { "type", "object" },
+            { "properties",
+              { { "paths", { { "type", "array" }, { "items", { { "type", "string" } } }, { "description", "Absolute file paths." } } },
+                { "reason", { { "type", "string" } } } } } },
+          10min },
+        { "save_project",
+          "Saves the project (3MF) to its file after the user's confirmation, or with save_as (or for a project never "
+          "saved) through the slicer's save dialog, where the user picks the file.",
+          [](const json& args, ToolContext& ctx) { return save_project(args, ctx.abandoned); },
+          { { "type", "object" },
+            { "properties", { { "save_as", { { "type", "boolean" }, { "default", false } } }, { "reason", { { "type", "string" } } } } } },
+          10min },
+        { "export_file",
+          "Exports through the slicer's save dialog, where the user picks the file: the G-code of the sliced current "
+          "plate (gcode), the 3MF holding that G-code, printable as is (sliced_3mf), or the objects as STL (stl).",
+          [](const json& args, ToolContext& ctx) { return export_file(args, ctx.abandoned); },
+          { { "type", "object" },
+            { "properties", { { "format", { { "type", "string" }, { "enum", { "gcode", "sliced_3mf", "stl" } } } } } },
+            { "required", { "format" } } },
+          10min },
+        { "edit_plates",
+          "Changes the plates, in order, after the user's confirmation (none needed to only select): select (show it; "
+          "get_issues, slice and render_view work on the current plate), add (a new plate, then current), delete (an "
+          "empty plate), rename, set (bed_type: e.g. \"Textured PEI Plate\", \"Cool Plate\", \"High Temp Plate\"; "
+          "print_sequence: \"by layer\" or \"by object\"; \"default\" follows the project or process settings). "
+          "'plate' is the 1-based number of get_project.plates, the current plate by default. Move objects between "
+          "plates with edit_objects (move_to_plate).",
+          [](const json& args, ToolContext& ctx) { return edit_plates(args, ctx.abandoned); },
+          { { "type", "object" },
+            { "properties",
+              { { "reason", { { "type", "string" } } },
+                { "operations",
+                  { { "type", "array" },
+                    { "minItems", 1 },
+                    { "items",
+                      { { "type", "object" },
+                        { "properties",
+                          { { "action", { { "type", "string" }, { "enum", { "select", "add", "delete", "rename", "set" } } } },
+                            { "plate", { { "type", "integer" }, { "minimum", 1 } } },
+                            { "name", { { "type", "string" } } },
+                            { "bed_type", { { "type", "string" } } },
+                            { "print_sequence", { { "type", "string" } } } } },
+                        { "required", { "action" } } } } } } } },
+            { "required", { "operations" } } },
+          10min },
+        { "start_print",
+          "Opens the slicer's print dialog for the sliced current plate, like the Print plate button: the user checks "
+          "the file name and the filament mapping, then starts the print themselves. Needs the 'printer control' "
+          "permission. Slice first and agree on the result with the user.",
+          [](const json& args, ToolContext&) { return start_print(args); },
+          { { "type", "object" }, { "properties", json::object() } },
+          30s },
+        { "control_print",
+          "Pauses, resumes or stops (cancel) the running print after the user's confirmation, then waits until the "
+          "printer reports the new state. Needs the 'printer control' permission. A stopped print cannot be resumed.",
+          [](const json& args, ToolContext& ctx) { return control_print(args, ctx.abandoned, ctx.state); },
+          { { "type", "object" },
+            { "properties",
+              { { "action", { { "type", "string" }, { "enum", { "pause", "resume", "cancel" } } } },
+                { "reason", { { "type", "string" }, { "description", "Why, shown to the user in the confirmation" } } } } },
+            { "required", { "action" } } },
+          10min,
+          3min },
         { "render_view",
           "PNG image of the objects of the current plate seen from a viewpoint, colored by filament, with a legend. "
           "Shows the model, not the supports or toolpaths: use it to check orientation, overhangs, placement and "
@@ -552,13 +644,17 @@ const char* INSTRUCTIONS =
     "Objects: edit_objects scales, rotates, moves, mirrors, cuts, splits, duplicates, deletes, orients and arranges "
     "them like the Prepare view, after the user's confirmation; use it for placement issues (outside the build "
     "volume, too big, overhangs to reorient) and when the user asks, then check with get_issues and render_view. "
-    "Other issues fixed in the slicer UI rather than in settings (filament assignment to slots, plate type) must be "
+    "Other issues fixed in the slicer UI rather than in settings (filament assignment to slots) must be "
     "explained to the user step by step.\n"
     "Printer: get_printer_status reads the connected printer when the user allowed it; get_issues then also reports "
     "differences between the project and the printer (missing filament, other material or nozzle on a used "
     "toolhead). After a failed print, start from last_error and the print state, then inspect the related firmware "
-    "objects, and printer_snapshot to see it. watch_print follows a running print. The only command you can send is unload_filament, when the user allowed printer control; you cannot "
-    "start, stop or control a print, or heat or move the printer otherwise: tell the user what to do.\n"
+    "objects, and printer_snapshot to see it. watch_print follows a running print. When the user allowed printer control, "
+    "you can unload_filament, start_print (opens the print dialog, the user starts the print) and control_print (pause, "
+    "resume, stop); only do so when the user asks. You cannot heat or move the printer: tell the user what to do.\n"
+    "Project and plates: new_project, open_project, import_models, save_project and export_file work through the "
+    "slicer's confirmations and file dialogs. get_issues, slice and render_view work on the current plate: switch with "
+    "edit_plates (select), which also adds, deletes and sets up plates; slice all_plates for the whole project.\n"
     "Experience: before diagnosing, search_experiences for similar cases and read_documentation for guides of kind "
     "'experience' (reviewed lessons from real prints). Say where each recommendation comes from: official "
     "documentation, reviewed guide, or an unreviewed past case of the journal. At the end of a diagnosis, offer to "

@@ -19332,6 +19332,84 @@ msgid ""
 "original intent where it suits this printer."
 msgstr "Projekt używa teraz %s. %zu ustawień oryginalnego projektu różni się od nowego profilu: poproś asystenta AI (/adapt_project) o przywrócenie pierwotnego zamysłu tam, gdzie pasuje do tej drukarki."
 
+msgid ""
+"Allow controlling the printer: start the sliced plate (through the print "
+"dialog), pause, resume or stop a print, unload filament from the toolheads. "
+"Each request has to be confirmed here."
+msgstr "Pozwól sterować drukarką: uruchomić pociętą płytę (przez okno drukowania), wstrzymać, wznowić lub zatrzymać druk, wyładować filament z głowic. Każde żądanie trzeba tu potwierdzić."
+
+#, boost-format
+msgid "Move %1% to plate %2%"
+msgstr "Przenieś %1% na płytę %2%"
+
+msgid "The AI assistant asks to pause the print. Pause it now?"
+msgstr "Asystent AI prosi o wstrzymanie druku. Wstrzymać teraz?"
+
+msgid "The AI assistant asks to resume the print. Resume it now?"
+msgstr "Asystent AI prosi o wznowienie druku. Wznowić teraz?"
+
+msgid ""
+"The AI assistant asks to stop the print. It cannot be resumed afterwards. "
+"Stop it now?"
+msgstr "Asystent AI prosi o zatrzymanie druku. Nie będzie można go potem wznowić. Zatrzymać teraz?"
+
+msgid "Add a plate"
+msgstr "Dodaj płytę"
+
+#, boost-format
+msgid "Show plate %1%"
+msgstr "Pokaż płytę %1%"
+
+#, boost-format
+msgid "Delete plate %1%"
+msgstr "Usuń płytę %1%"
+
+#, boost-format
+msgid "Rename plate %1% to '%2%'"
+msgstr "Zmień nazwę płyty %1% na „%2%”"
+
+#, boost-format
+msgid "bed type: %1%"
+msgstr "typ płyty: %1%"
+
+msgid "as the project"
+msgstr "jak w projekcie"
+
+#, boost-format
+msgid "print sequence: %1%"
+msgstr "kolejność druku: %1%"
+
+msgid "as the process settings"
+msgstr "jak w ustawieniach procesu"
+
+#, boost-format
+msgid "Plate %1%"
+msgstr "Płyta %1%"
+
+msgid ""
+"The AI assistant asks to start a new project. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "Asystent AI prosi o utworzenie nowego projektu. Bieżący projekt zostanie zamknięty; jeśli ma niezapisane zmiany, zostaniesz poproszony o jego zapisanie."
+
+#, c-format, boost-format
+msgid ""
+"The AI assistant asks to open the project %s. The current project is closed; "
+"you are asked to save it first if it has unsaved changes."
+msgstr "Asystent AI prosi o otwarcie projektu %s. Bieżący projekt zostanie zamknięty; jeśli ma niezapisane zmiany, zostaniesz poproszony o jego zapisanie."
+
+msgid ""
+"The AI assistant asks to add these models to the current plate. Import them?"
+msgstr "Asystent AI prosi o dodanie tych modeli do bieżącej płyty. Zaimportować je?"
+
+#, c-format, boost-format
+msgid "The AI assistant asks to save the project to %s. Save it?"
+msgstr "Asystent AI prosi o zapisanie projektu w %s. Zapisać?"
+
+msgid ""
+"The AI assistant asks to change the plates of the project. Apply these "
+"operations?"
+msgstr "Asystent AI prosi o zmianę płyt projektu. Zastosować te operacje?"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

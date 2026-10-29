@@ -122,11 +122,12 @@ ces jetons ; seul un bac à sable (Flatpak, firejail...) l'en empêche.
 | `McpMaterials` | Têtes, emplacements de filament, filaments mixtes, attribution par élément |
 | `McpNotes` | Instructions de l'utilisateur et dossier de notes Markdown partagé (`list_notes`, `read_note`, `write_note`) |
 | `McpObjects` | Opérations de l'onglet Préparer sur les objets, après confirmation (`edit_objects`) |
-| `McpSlicing` | Slicing du plateau et résumé du résultat (`slice`) |
+| `McpSlicing` | Slicing de la plaque courante ou de toutes les plaques et résumé du résultat (`slice`) |
+| `McpProject` | Fichiers, plaques et lancement d'impression (`new_project`, `open_project`, `import_models`, `save_project`, `export_file`, `edit_plates`, `start_print`) |
 | `McpRender` | Rendu PNG du plateau depuis une vue nommée (`render_view`) |
 | `McpPrinter` | Lecture seule de l'imprimante connectée (`get_printer_status`, écarts projet/imprimante) |
 | `McpPrinterLive` | Lecture en direct (`printer.objects.query`), photo de la caméra (`printer_snapshot`), suivi d'impression (`watch_print`) |
-| `McpPrinterControl` | Seule commande envoyée à l'imprimante : déchargement des têtes (`unload_filament`) |
+| `McpPrinterControl` | Commandes envoyées à l'imprimante : déchargement des têtes (`unload_filament`), pause, reprise et arrêt (`control_print`) |
 | `PrinterAutoConnect` | Connexion automatique au démarrage quand une seule imprimante est en ligne |
 | `ProjectAdapt` | Adaptation d'un projet à l'imprimante connectée (`adapt_to_printer`) et notification |
 | `McpExperiences` | Journal local des retours d'expérience (`record_experience`, `report_outcome`, `search_experiences`) |
@@ -136,7 +137,9 @@ ces jetons ; seul un bac à sable (Flatpak, firejail...) l'en empêche.
 | `McpDialog` | Fenêtre de réglages |
 
 Outils : `get_issues`, `get_project`, `get_config`, `describe_setting`, `read_documentation`, `apply_changes`,
-`edit_objects`, `list_notes`, `read_note`, `write_note`, `search_manufacturer_docs`, `read_manufacturer_page`, `slice`, `render_view`, `adapt_to_printer`, `get_printer_status`, `printer_snapshot`, `watch_print`, `unload_filament`,
+`edit_objects`, `edit_plates`, `new_project`, `open_project`, `import_models`, `save_project`, `export_file`,
+`list_notes`, `read_note`, `write_note`, `search_manufacturer_docs`, `read_manufacturer_page`, `slice`, `render_view`,
+`adapt_to_printer`, `get_printer_status`, `printer_snapshot`, `watch_print`, `start_print`, `control_print`, `unload_filament`,
 `record_experience`, `report_outcome`, `search_experiences`.
 
 Prompts : `adapt_project`, `diagnose_print`, `fix_issues`, `optimize_settings`, `capitalize_experiences`. Dans
@@ -182,12 +185,23 @@ L'assistant résume dans les notes ce qui sert, avec l'adresse et la date.
 pivoter, déplacer, centrer, poser sur le plateau, miroir, couper horizontalement, séparer en objets, dupliquer,
 supprimer, orienter automatiquement, disposer le plateau courant, ajouter une pièce, une pièce négative, un
 modificateur ou un bloqueur / forceur de supports (cube, cylindre, cône, sphère aux cotes et à la position
-données), supprimer une pièce, changer le filament d'un objet ou d'une pièce, renommer. La liste est confirmée en une fois par
+données), supprimer une pièce, changer le filament d'un objet ou d'une pièce, renommer, déplacer vers une autre plaque
+(même position sur la plaque, comme un glisser-déposer). La liste est confirmée en une fois par
 l'utilisateur et forme une seule étape d'annulation (plus une par orientation ou disposition, tâches de fond
 attendues par l'outil). Les opérations passent par la sélection et le canevas 3D, comme la souris et les
 gizmos ; un gizmo ouvert bloque l'outil. La sélection est vidée avant les opérations qui suppriment ou
 remplacent un objet ou une pièce (la liste des objets la redessinerait sur des volumes supprimés). Pièces
 coupées : `<nom>_A` (haut), `<nom>_B` (bas).
+
+Fichiers et plaques : les outils appellent les commandes du slicer, avec ses propres dialogues. Nouveau projet,
+ouverture d'un chemin donné, import de fichiers donnés et enregistrement dans le fichier courant sont confirmés
+par une question ; sans chemin, ou pour *Enregistrer sous* et les exports (G-code ou 3MF tranché de la plaque
+courante, STL des objets), le dialogue de fichier du slicer sert de confirmation. Le slicer demande lui-même
+d'enregistrer un projet modifié avant de le fermer. Les chemins donnés doivent être absolus (`~` accepté) et
+désigner un fichier existant d'un type connu. `edit_plates` sélectionne (sans confirmation), ajoute, supprime
+(une plaque vide seulement : sinon ses objets partiraient hors des plaques), renomme les plaques et règle leur
+type de plateau et leur ordre d'impression, comme la fenêtre de réglages de la plaque. `get_project` liste les
+plaques ; `slice` avec `all_plates` agit comme *Trancher tout*.
 
 Accès à l'imprimante, via la connexion Snapmaker Connect déjà ouverte par l'application ; deux cases à cocher
 dans la fenêtre MCP, désactivées par défaut :
@@ -197,7 +211,11 @@ dans la fenêtre MCP, désactivées par défaut :
   `http://<ip>/webcam/snapshot.jpg` sur le réseau local ; pas `camera.start_monitor`, dont le flux reste
   actif ~6 min après l'arrêt), suivi borné d'une impression. Numéros de série, réseau, comptes et secrets sont
   retirés avant envoi au modèle.
-- **Contrôle** (exige la lecture) : uniquement `unload_filament`, refusé pendant une impression, confirmé
+- **Contrôle** (exige la lecture), confirmé dans le slicer à chaque demande : `start_print` ouvre le dialogue
+  d'impression du slicer pour la plaque tranchée (comme le bouton *Imprimer la plaque* : l'utilisateur vérifie
+  le nom et la correspondance des filaments, puis lance) ; `control_print` met en pause, reprend ou arrête
+  l'impression (`printer.print.pause`, `resume`, `cancel`) puis attend le nouvel état ; `unload_filament`,
+  refusé pendant une impression, confirmé
   dans le slicer à chaque demande. Même séquence que l'écran de la U1 : `AUTO_FEEDING_BATCH ACTION=START`,
   puis `ACTION=DOING STAGE=prepare EXTRUDER=n UNLOAD=1` (le firmware chauffe lui-même). L'écran de
   l'imprimante envoie ensuite `STAGE=doing` dès `unload_heat_finish` (l'outil ne l'envoie qu'après 15 s sans
@@ -210,6 +228,27 @@ La documentation vient de `doc/` (wiki OrcaSlicer) : `scripts/fork/build-setting
 avec l'application (aucun accès réseau). `sync-upstream.sh` le régénère et le commite après chaque fusion.
 Prompts (commandes slash dans Claude Code / Gemini CLI) : `adapt_project`, `diagnose_print`, `fix_issues`,
 `optimize_settings`, `capitalize_experiences`.
+
+### Fonctions d'Orca hors de portée du serveur (à faire)
+
+Plan de réalisation et regroupement des outils : [`src/slic3r/AIAssistant/PLAN.md`](src/slic3r/AIAssistant/PLAN.md).
+
+- [x] Fichiers et projet : nouveau projet, ouvrir un projet, importer des modèles (STL, 3MF, STEP),
+  enregistrer le projet, exporter le G-code, le STL ou le 3MF tranché.
+- [x] Plaques : changer de plaque, en ajouter, en supprimer, déplacer un objet vers une autre plaque,
+  réglages par plaque (type de plateau, ordre d'impression), trancher toutes les plaques.
+- [x] Impression : lancer l'impression de la plaque tranchée, mettre en pause, reprendre, arrêter.
+- [ ] Chargement du filament (piste : même séquence `AUTO_FEEDING_BATCH` que le déchargement).
+- [ ] Préréglages : enregistrer un préréglage utilisateur, choisir un autre préréglage d'imprimante, de
+  traitement ou de filament, ajouter ou retirer un emplacement de filament, changer sa couleur.
+- [ ] Plages de hauteur avec réglages propres, hauteur de couche variable.
+- [ ] Pause, changement de couleur ou G-code personnalisé à une couche.
+- [ ] Peinture (supports, couture, couleurs, fuzzy skin) et outils de la vue 3D (texte, SVG, mesure, coupe
+  inclinée ou avec connecteurs, simplification, réparation, booléens, poser sur une face, oreilles de bordure).
+- [ ] Aperçu tranché en image (trajectoires, supports, couche précise).
+- [ ] Calibrations, préférences de l'application, compte Snapmaker et MakerWorld, annulation par l'assistant.
+
+Écartés volontairement : chauffe, déplacement des axes et mise à l'origine de l'imprimante.
 
 ### Retours d'expérience
 

@@ -365,6 +365,12 @@ std::string describe(const json& op, int obj_idx)
     }
     if (action == "center")
         return text_of(_u8L("Center %1% on its plate"), name);
+    if (action == "move_to_plate") {
+        const int count = wxGetApp().plater()->get_partplate_list().get_plate_count();
+        if (!op.contains("plate") || !op["plate"].is_number_integer() || op["plate"].get<int>() < 1 || op["plate"].get<int>() > count)
+            throw ToolError("'move_to_plate' needs 'plate', between 1 and " + std::to_string(count) + " (edit_plates adds plates)");
+        return text_of(_u8L("Move %1% to plate %2%"), name, op["plate"].get<int>());
+    }
     if (action == "drop")
         return text_of(_u8L("Drop %1% to the bed"), name);
     if (action == "mirror") {
@@ -540,6 +546,18 @@ void move(GUI::Plater& plater, const json& op, int obj_idx)
     plater.canvas3D()->do_move("");
 }
 
+// Keeps the position of the object on its plate, as when it is dragged onto the other plate.
+void move_to_plate(GUI::Plater& plater, const json& op, int obj_idx)
+{
+    GUI::PartPlateList& plates  = plater.get_partplate_list();
+    const int           current = plates.find_instance_belongs(obj_idx, 0);
+    const Vec3d from = current >= 0 ? plates.get_plate(current)->get_origin() : plates.get_curr_plate()->get_origin();
+    const Vec3d to   = plates.get_plate(op["plate"].get<int>() - 1)->get_origin();
+    GUI::Selection& sel = select_object(plater, obj_idx);
+    sel.translate(Vec3d(to.x() - from.x(), to.y() - from.y(), 0.), GUI::TransformationType(GUI::TransformationType::World_Relative_Joint));
+    plater.canvas3D()->do_move("");
+}
+
 void cut(GUI::Plater& plater, const json& op, int obj_idx)
 {
     const ModelObject* obj = wxGetApp().model().objects[obj_idx];
@@ -600,6 +618,8 @@ bool run(GUI::Plater& plater, const json& op)
         rotate(plater, op, obj_idx);
     else if (action == "move")
         move(plater, op, obj_idx);
+    else if (action == "move_to_plate")
+        move_to_plate(plater, op, obj_idx);
     else if (action == "center") {
         select_object(plater, obj_idx);
         plater.center_selection();
