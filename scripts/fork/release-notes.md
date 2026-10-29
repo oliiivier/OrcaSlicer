@@ -30,6 +30,7 @@ Snapmaker Orca avec un assistant IA. Non signé, non officiel : ni Snapmaker ni 
 | Système | Fichier | Remarque |
 |---|---|---|
 | Linux | `.AppImage` | `chmod +x` puis lancer |
+| Arch Linux, CachyOS | `.pkg.tar.zst` | `sudo pacman -U <fichier>` ; lancer `snapmaker-orca` |
 | Windows | `.exe` (installeur) ou `_portable.zip` | SmartScreen : *Informations complémentaires → Exécuter quand même* |
 
 Pas de version macOS pour l'instant.

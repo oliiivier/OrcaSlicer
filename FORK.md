@@ -68,7 +68,9 @@ Réactiver Actions si besoin : `gh api -X PUT repos/oliiivier/OrcaSlicer/actions
 scripts/fork/release.sh v2.4.1-ai.1   # publie la tête poussée de ai-assistant en pré-release
 ```
 
-Le script active Actions le temps de la release seulement : il désactive tous les workflows sauf
+Le script pousse d'abord le tag par git et crée la pré-release (le jeton du workflow ne peut pas créer un tag
+sur un commit qui modifie `.github/workflows`, ce qu'apportent les fusions d'upstream). Il active Actions le
+temps de la release seulement : il désactive tous les workflows sauf
 `fork_release.yml` (y compris ceux qu'upstream a ajoutés depuis), lance celui-ci, attend la fin (plusieurs
 heures : les dépendances sont recompilées, le fork n'a pas de cache) puis désactive Actions. `fork_release.yml`
 réutilise les workflows de build d'upstream, qui ne publient rien hors de leur `main`, et attache AppImage,

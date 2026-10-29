@@ -28,6 +28,20 @@ if [ "$(git rev-parse HEAD)" != "$(git rev-parse "origin/$FORK_BRANCH")" ]; then
     exit 1
 fi
 
+# The workflow token cannot create the tag when the commit brings changes to .github/workflows
+# (upstream merges do): the tag is pushed over git and the pre-release created here, the
+# workflow then only uploads the packages.
+if tagged=$(git rev-parse -q --verify "refs/tags/$TAG^{commit}"); then
+    [ "$tagged" = "$(git rev-parse HEAD)" ] || { echo "Tag $TAG already exists on another commit." >&2; exit 1; }
+else
+    git tag "$TAG" HEAD
+fi
+git push -q origin "refs/tags/$TAG"
+if ! gh release view -R "$REPO" "$TAG" >/dev/null 2>&1; then
+    gh release create -R "$REPO" "$TAG" --prerelease --verify-tag \
+        --title "Snapmaker Orca + assistant IA $TAG" --notes-file scripts/fork/release-notes.md
+fi
+
 set_actions() {
     gh api -X PUT "repos/$REPO/actions/permissions" -F enabled="$1" >/dev/null
 }
