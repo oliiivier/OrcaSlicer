@@ -1,0 +1,15 @@
+{
+  "description": "Every confirmation answered no: nothing changes and the results say declined.",
+  "confirm": "no",
+  "steps": [
+    { "call": "new_project", "args": {}, "expect": { "done": false, "declined": true } },
+    { "call": "import_models", "args": { "paths": ["${MODELS}/OrcaToleranceTest.stl"] }, "expect": { "done": false, "declined": true } },
+    { "call": "edit_objects", "args": { "reason": "bench", "operations": [{ "action": "arrange" }] }, "expect": { "done": false, "declined": true } },
+    { "call": "edit_plates", "args": { "reason": "bench", "operations": [{ "action": "add" }] }, "expect": { "done": false, "declined": true } },
+    { "call": "edit_plates", "args": { "operations": [{ "action": "select", "plate": 1 }] }, "expect": { "done": true },
+      "note": "selecting needs no confirmation" },
+    { "call": "apply_changes", "args": { "reason": "bench", "changes": [{ "key": "wall_loops", "value": 5 }] },
+      "expect": { "done": false, "declined": true, "unchecked": [{ "key": "wall_loops" }] } },
+    { "call": "get_project", "args": {}, "expect": { "plates": [{ "plate": 1 }] } }
+  ]
+}

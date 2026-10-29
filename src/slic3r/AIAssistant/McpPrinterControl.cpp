@@ -1,4 +1,5 @@
 #include "McpPrinterControl.hpp"
+#include "McpActions.hpp"
 #include "McpPrinterLive.hpp"
 #include "McpSettings.hpp"
 #include "McpToolUtils.hpp"
@@ -193,17 +194,14 @@ std::string channel_error(const json& channel)
 
 // ------------------------------------------------------------ sequence
 
-bool confirm(const json& objects, const std::vector<int>& extruders, const std::string& reason)
+bool confirm_unload(const json& objects, const std::vector<int>& extruders, const std::string& reason)
 {
-    std::string text = reason.empty() ? std::string() : reason + "\n\n";
+    std::vector<std::string> lines;
     for (int e : extruders)
-        text += "- " + _u8L("Toolhead") + " " + std::to_string(e + 1) + ": " + filament_name(objects, e) + "\n";
-    GUI::MessageDialog dlg(wxGetApp().mainframe,
-                           from_u8(text) + "\n" +
-                               _L("The AI assistant asks to unload the filament of these toolheads. The printer heats each "
-                                  "nozzle and moves. Unload now?"),
-                           _L("AI Assistant"), wxYES_NO | wxICON_QUESTION);
-    return dlg.ShowModal() == wxID_YES;
+        lines.push_back(_u8L("Toolhead") + " " + std::to_string(e + 1) + ": " + filament_name(objects, e));
+    return confirm(reason, lines,
+                   _L("The AI assistant asks to unload the filament of these toolheads. The printer heats each nozzle and "
+                      "moves. Unload now?"));
 }
 
 int current_extruder(const json& state) { return state["extruders"][state["next"].get<size_t>()].get<int>(); }
@@ -273,12 +271,12 @@ json begin(const json& args, const std::atomic<bool>& abandoned, json& state)
             to_unload.push_back(e);
     }
     if (to_unload.empty())
-        return { { "unloaded", false }, { "toolheads", std::move(results) }, { "message", "Nothing to unload" } };
+        return { { "done", false }, { "toolheads", std::move(results) }, { "message", "Nothing to unload" } };
 
-    if (!confirm(objects, to_unload, args.value("reason", std::string())))
-        return { { "unloaded", false }, { "message", "The user declined. Ask them what they want instead." } };
+    if (!confirm_unload(objects, to_unload, args.value("reason", std::string())))
+        return declined();
     if (abandoned)
-        return { { "unloaded", false }, { "message", "The request timed out before the user answered" } };
+        return timed_out();
 
     state["extruders"]  = to_unload;
     state["next"]       = 0;
@@ -386,7 +384,7 @@ json advance(json& state)
         const int id = state["script"].get<int>();
         if (!script_done(id))
             throw ToolRetry();
-        json out = { { "unloaded", !state.value("failed", false) },
+        json out = { { "done", !state.value("failed", false) },
                      { "toolheads", state["results"] },
                      { "seconds", (now - state["started_ms"].get<std::int64_t>()) / 1000 } };
         if (const std::string error = script_error(id); !error.empty())
@@ -440,12 +438,10 @@ json begin_print_control(const json& args, const std::atomic<bool>& abandoned, j
     const wxString    question = action.name == std::string("pause")  ? _L("The AI assistant asks to pause the print. Pause it now?") :
                                  action.name == std::string("resume") ? _L("The AI assistant asks to resume the print. Resume it now?") :
                                                                         _L("The AI assistant asks to stop the print. It cannot be resumed afterwards. Stop it now?");
-    GUI::MessageDialog dlg(wxGetApp().mainframe, (why.empty() ? wxString() : from_u8(why) + "\n\n") + question, _L("AI Assistant"),
-                           wxYES_NO | wxICON_QUESTION);
-    if (dlg.ShowModal() != wxID_YES)
-        return { { "done", false }, { "message", "The user declined. Ask them what they want instead." } };
+    if (!confirm(why, {}, question))
+        return declined();
     if (abandoned)
-        return { { "done", false }, { "message", "The request timed out before the user answered" } };
+        return timed_out();
 
     state["action"]      = action.name;
     state["request"]     = send_request(action.method, json::object());

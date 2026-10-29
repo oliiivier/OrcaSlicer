@@ -1,4 +1,5 @@
 #include "McpProject.hpp"
+#include "McpActions.hpp"
 #include "McpIssues.hpp"
 #include "McpSettings.hpp"
 #include "McpToolUtils.hpp"
@@ -34,17 +35,6 @@ namespace fs = boost::filesystem;
 
 namespace {
 
-bool confirm(const std::string& reason, const wxString& question)
-{
-    const wxString text = (reason.empty() ? wxString() : from_u8(reason) + "\n\n") + question;
-    GUI::MessageDialog dlg(wxGetApp().mainframe, text, _L("AI Assistant"), wxYES_NO | wxICON_QUESTION);
-    return dlg.ShowModal() == wxID_YES;
-}
-
-json declined() { return { { "done", false }, { "message", "The user declined. Ask them what they want instead." } }; }
-
-json timed_out() { return { { "done", false }, { "message", "The request timed out before the user answered" } }; }
-
 // Name of an enum value in the project files ("Textured PEI Plate", "by object").
 template<typename T> std::string enum_name(T value)
 {
@@ -66,30 +56,6 @@ template<typename T> T enum_value(const json& arg, const char* what)
     throw ToolError(std::string("'") + what + "' must be one of: default, " + allowed);
 }
 
-// Absolute path of an existing file with one of the extensions; throws ToolError otherwise.
-fs::path existing_file(const json& arg, const std::set<std::string>& extensions)
-{
-    if (!arg.is_string() || arg.get<std::string>().empty())
-        throw ToolError("Each path must be a non-empty string");
-    std::string text = arg.get<std::string>();
-    if (text.size() > 1 && text[0] == '~' && (text[1] == '/' || text[1] == '\\'))
-        text = wxGetHomeDir().ToUTF8().data() + text.substr(1);
-    const fs::path path(text);
-    if (!path.is_absolute())
-        throw ToolError("'" + text + "' is not an absolute path");
-    boost::system::error_code ec;
-    if (!fs::is_regular_file(path, ec))
-        throw ToolError("'" + text + "' is not an existing file");
-    const std::string ext = boost::algorithm::to_lower_copy(path.extension().string());
-    if (extensions.count(ext) == 0) {
-        std::string allowed;
-        for (const std::string& e : extensions)
-            allowed += (allowed.empty() ? "" : ", ") + e;
-        throw ToolError("'" + text + "': unsupported file type (supported: " + allowed + ")");
-    }
-    return path;
-}
-
 json project_summary(GUI::Plater& plater)
 {
     json objects = json::array();
@@ -103,16 +69,6 @@ json project_summary(GUI::Plater& plater)
     return out;
 }
 
-GUI::PartPlate& plate_arg(GUI::PartPlateList& plates, const json& op)
-{
-    if (!op.contains("plate"))
-        return *plates.get_curr_plate();
-    const json& p = op["plate"];
-    if (!p.is_number_integer() || p.get<int>() < 1 || p.get<int>() > plates.get_plate_count())
-        throw ToolError("'plate' must be between 1 and " + std::to_string(plates.get_plate_count()));
-    return *plates.get_plate(p.get<int>() - 1);
-}
-
 int plate_number(GUI::PartPlate& plate) { return plate.get_index() + 1; }
 
 // Description of a plate operation for the user; checks its arguments.
@@ -121,7 +77,7 @@ std::string describe_plate_op(GUI::PartPlateList& plates, const json& op)
     const std::string action = op.value("action", std::string());
     if (action == "add")
         return _u8L("Add a plate");
-    GUI::PartPlate&   plate  = plate_arg(plates, op);
+    GUI::PartPlate&   plate  = plate_ref(op);
     const std::string number = std::to_string(plate_number(plate));
     if (action == "select")
         return (boost::format(_u8L("Show plate %1%")) % number).str();
@@ -177,7 +133,7 @@ void run_plate_op(GUI::Plater& plater, const json& op)
         plater.update();
         return;
     }
-    GUI::PartPlate& plate = plate_arg(plates, op);
+    GUI::PartPlate& plate = plate_ref(op);
     const int       index = plate.get_index();
     if (action == "select") {
         plater.select_plate(index);
@@ -228,15 +184,16 @@ json plates_summary()
 json new_project(const json& args, const std::atomic<bool>& abandoned)
 {
     GUI::Plater& plater = require_plater();
-    if (!confirm(args.value("reason", std::string()),
+    if (!confirm(args.value("reason", std::string()), {},
                  _L("The AI assistant asks to start a new project. The current project is closed; you are asked to "
                     "save it first if it has unsaved changes.")))
         return declined();
     if (abandoned)
         return timed_out();
-    if (plater.new_project() == wxID_CANCEL)
+    // The test mode cannot answer the slicer's own question about unsaved changes: they are dropped.
+    if (plater.new_project(test_confirm_answer().has_value()) == wxID_CANCEL)
         return { { "done", false }, { "message", "The user kept the current project" } };
-    return { { "done", true }, { "project", project_summary(plater) } };
+    return done({ { "project", project_summary(plater) } });
 }
 
 json open_project(const json& args, const std::atomic<bool>& abandoned)
@@ -246,7 +203,7 @@ json open_project(const json& args, const std::atomic<bool>& abandoned)
     if (args.contains("path")) {
         const fs::path path = existing_file(args["path"], { ".3mf" });
         file                = from_u8(path.string());
-        if (!confirm(args.value("reason", std::string()),
+        if (!confirm(args.value("reason", std::string()), {},
                      wxString::Format(_L("The AI assistant asks to open the project %s. The current project is closed; "
                                          "you are asked to save it first if it has unsaved changes."),
                                       file)))
@@ -256,11 +213,14 @@ json open_project(const json& args, const std::atomic<bool>& abandoned)
     }
     // Without a path, the slicer asks for the file: choosing it is the confirmation.
     const wxString before = plater.get_project_filename(".3mf");
+    // The test mode cannot answer the slicer's own question about unsaved changes: they are dropped.
+    if (test_confirm_answer() && !file.empty())
+        plater.new_project(true);
     plater.load_project(file);
     const wxString after = plater.get_project_filename(".3mf");
     if (after.empty() || (file.empty() && after == before))
         return { { "done", false }, { "message", "No project was opened (the user cancelled)" } };
-    return { { "done", true }, { "project", project_summary(plater) } };
+    return done({ { "project", project_summary(plater) } });
 }
 
 json import_models(const json& args, const std::atomic<bool>& abandoned)
@@ -273,11 +233,11 @@ json import_models(const json& args, const std::atomic<bool>& abandoned)
             throw ToolError("'paths' must list the files to import");
         for (const json& p : args["paths"])
             paths.push_back(existing_file(p, { ".stl", ".3mf", ".obj", ".step", ".stp", ".amf", ".svg" }));
-        std::string list;
+        std::vector<std::string> lines;
         for (const fs::path& p : paths)
-            list += "- " + p.string() + "\n";
-        if (!confirm(args.value("reason", std::string()),
-                     from_u8(list) + "\n" + _L("The AI assistant asks to add these models to the current plate. Import them?")))
+            lines.push_back(p.string());
+        if (!confirm(args.value("reason", std::string()), lines,
+                     _L("The AI assistant asks to add these models to the current plate. Import them?")))
             return declined();
         if (abandoned)
             return timed_out();
@@ -293,12 +253,8 @@ json import_models(const json& args, const std::atomic<bool>& abandoned)
         added.push_back({ { "index", i + 1 }, { "name", plater.model().objects[i]->name } });
     if (added.empty())
         return { { "done", false }, { "message", "No model was imported (the user cancelled, or the files hold no model)" } };
-    json out = { { "done", true }, { "added", std::move(added) } };
-    try {
-        out["issues"] = collect_issues()["summary"].get<std::string>() + " (details: get_issues)";
-    } catch (const ToolRetry&) {
-        out["issues"] = "unknown, the slicer is updating (call get_issues)";
-    }
+    json out = done({ { "added", std::move(added) } });
+    add_issues_summary(out);
     return out;
 }
 
@@ -309,7 +265,7 @@ json save_project(const json& args, const std::atomic<bool>& abandoned)
     const bool     save_as = args.value("save_as", false) || file.empty();
     // Saving as goes through the slicer's file dialog, which is the confirmation.
     if (!save_as) {
-        if (!confirm(args.value("reason", std::string()),
+        if (!confirm(args.value("reason", std::string()), {},
                      wxString::Format(_L("The AI assistant asks to save the project to %s. Save it?"), file)))
             return declined();
         if (abandoned)
@@ -318,7 +274,7 @@ json save_project(const json& args, const std::atomic<bool>& abandoned)
     const int result = plater.save_project(save_as);
     if (result != wxID_YES)
         return { { "done", false }, { "message", "The project was not saved (the user cancelled, or saving failed)" } };
-    return { { "done", true }, { "file", into_u8(plater.get_project_filename(".3mf")) } };
+    return done({ { "file", into_u8(plater.get_project_filename(".3mf")) } });
 }
 
 json export_file(const json& args, const std::atomic<bool>& /* abandoned */)
@@ -368,28 +324,27 @@ json edit_plates(const json& args, const std::atomic<bool>& abandoned)
     }
 
     if (changes) {
-        std::string list;
-        for (const std::string& line : lines)
-            list += "- " + line + "\n";
-        if (!confirm(args.value("reason", std::string()),
-                     from_u8(list) + "\n" + _L("The AI assistant asks to change the plates of the project. Apply these operations?")))
+        if (!confirm(args.value("reason", std::string()), lines,
+                     _L("The AI assistant asks to change the plates of the project. Apply these operations?")))
             return declined();
         if (abandoned)
             return timed_out();
     }
 
-    json done = json::array();
-    for (const json& op : args["operations"]) {
+    const json& ops     = args["operations"];
+    json        applied = json::array();
+    for (size_t i = 0; i < ops.size(); ++i) {
         try {
-            describe_plate_op(plates, op);
-            run_plate_op(plater, op);
+            describe_plate_op(plates, ops[i]);
+            run_plate_op(plater, ops[i]);
         } catch (const ToolError& e) {
-            return { { "done", !done.empty() }, { "applied", done }, { "failed", { { "operation", op }, { "error", e.what() } } },
-                     { "plates", plates_summary() } };
+            json out      = operations_failed(applied, ops[i], e.what(), ops.size() - i - 1);
+            out["plates"] = plates_summary();
+            return out;
         }
-        done.push_back(op);
+        applied.push_back(ops[i]);
     }
-    return { { "done", true }, { "plates", plates_summary() } };
+    return done({ { "applied", std::move(applied) }, { "plates", plates_summary() } });
 }
 
 json start_print(const json& /* args */)

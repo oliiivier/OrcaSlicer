@@ -13,6 +13,8 @@ if (SNAPMAKER_AI_ASSISTANT)
         ${_ai_dir}/ChatPanel.hpp
         ${_ai_dir}/ClaudeProcess.cpp
         ${_ai_dir}/ClaudeProcess.hpp
+        ${_ai_dir}/McpActions.cpp
+        ${_ai_dir}/McpActions.hpp
         ${_ai_dir}/McpChanges.cpp
         ${_ai_dir}/McpChanges.hpp
         ${_ai_dir}/McpChangesDialog.cpp
@@ -64,4 +66,12 @@ if (SNAPMAKER_AI_ASSISTANT)
     )
     target_compile_definitions(libslic3r_gui PRIVATE SNAPMAKER_AI_ASSISTANT)
     message(STATUS "AI assistant: enabled")
+
+    # Lets the MCP test bench (scripts/fork/mcp-test.py) answer the confirmations.
+    # Debug configuration only: the packages and the release workflow build Release.
+    option(SNAPMAKER_AI_TEST_HOOKS "Compile the MCP test hooks into Debug builds (fork feature)" OFF)
+    if (SNAPMAKER_AI_TEST_HOOKS)
+        target_compile_definitions(libslic3r_gui PRIVATE $<$<CONFIG:Debug>:SNAPMAKER_AI_TEST_HOOKS>)
+        message(STATUS "AI assistant: test hooks in Debug builds")
+    endif ()
 endif ()

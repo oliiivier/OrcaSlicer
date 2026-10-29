@@ -25,6 +25,10 @@ avec un minimum de conflits.
 2. Les fichiers upstream ne sont touchés qu'aux **points d'accroche** ci-dessous, toujours entourés de
    `#ifdef SNAPMAKER_AI_ASSISTANT // fork`. Si un nouveau point est nécessaire, l'ajouter à cette liste.
 3. Toujours intégrer upstream par **merge** (jamais de rebase de `ai-assistant`, jamais de squash des fusions upstream).
+4. Traductions : les textes du fork sont **ajoutés en fin** de `localization/i18n/Snapmaker_Orca.pot` et des
+   `.po` (fichiers upstream), jamais insérés au milieu, et `localization/i18n/list.txt` liste les sources du
+   fork. Si upstream relance `msgmerge` et que la fusion entre en conflit, prendre sa version puis rajouter les
+   entrées du fork en fin de fichier.
 
 ### Points d'accroche dans le code upstream
 
@@ -115,6 +119,7 @@ ces jetons ; seul un bac à sable (Flatpak, firejail...) l'en empêche.
 |---|---|
 | `McpServer` | Transport Streamable HTTP + JSON-RPC, indépendant de l'interface (testable seul) |
 | `McpTools` | Registre des outils et prompts, exécution sur le thread de l'interface |
+| `McpActions` | Conventions communes des outils d'écriture : confirmation, forme des résultats, références (objet, pièce, plaque, emplacement), chemins de fichiers, mode test |
 | `McpIssues` | Collecte des erreurs et avertissements du slicer (`get_issues`) |
 | `McpChanges` | Validation, confirmation et application des réglages (`apply_changes`) |
 | `McpChangesDialog` | Fenêtre de confirmation : une case par réglage, aide du réglage et commentaire du modèle au survol |
@@ -162,7 +167,7 @@ modèle.
 
 `apply_changes` montre chaque réglage proposé avec une case cochée, l'ancienne et la nouvelle valeur et le
 commentaire du modèle (`comment`) ; le survol affiche aussi l'aide du réglage. L'utilisateur applique tout ou
-décoche des valeurs : celles-ci reviennent au modèle sous `declined` et sont notées dans le journal
+décoche des valeurs : celles-ci reviennent au modèle sous `unchecked` et sont notées dans le journal
 d'expériences (`declined_by_user`), pour le suivi de l'impression.
 
 Instructions de l'utilisateur : champ de la fenêtre MCP, enregistré dans `<data_dir>/ai_assistant/instructions.md`
@@ -178,6 +183,13 @@ de support (API Zendesk Help Center), lecture d'une page en texte avec sa date d
 `wiki.snapmaker.com` et `support.snapmaker.com` sont contactés, en tâche de fond (l'outil attend la réponse
 sans bloquer l'interface), et seulement si la case de la fenêtre MCP est cochée (activée par défaut).
 L'assistant résume dans les notes ce qui sert, avec l'adresse et la date.
+
+Conventions des outils qui modifient quelque chose (`McpActions`) : une seule forme de confirmation (raison
+donnée par le modèle, liste des opérations, question Oui/Non ; `apply_changes` garde sa fenêtre à cases, les
+fichiers et l'impression les dialogues du slicer). Résultat toujours `done` ; refus `declined: true`, délai
+dépassé `timed_out: true` ; liste d'opérations : `applied`, `failed` (opération et erreur), `not_run`. Les
+erreurs de saisie restent des erreurs MCP (`isError`). Les instructions envoyées au client sont un paragraphe
+par domaine d'outils (`INSTRUCTIONS` dans `McpTools.cpp`).
 
 `apply_changes` refuse `post_process` (scripts exécutés sur l'ordinateur à l'export du G-code), même confirmé.
 
@@ -278,6 +290,31 @@ faire enregistrer le précédent avant de passer à un autre emplacement.
 Les instructions envoyées au client imposent l'ordre : erreurs bloquantes, puis avertissements, puis
 optimisations. Toute modification passe par une confirmation dans le slicer ; les surcharges par objet
 s'annulent avec Ctrl+Z, les modifications de presets restent des éditions non enregistrées.
+
+### Banc d'essai
+
+Option CMake `SNAPMAKER_AI_TEST_HOOKS` (désactivée par défaut), qui n'agit que sur la configuration `Debug` :
+les paquets et le workflow de release compilent `Release` et n'en contiennent jamais rien. Elle compile le
+mode test : avec `SNAPMAKER_AI_TEST_CONFIRM=yes|no` dans l'environnement, chaque confirmation de l'assistant
+(question commune, fenêtre des réglages, adaptation) reçoit cette réponse sans s'afficher, `new_project`
+abandonne les modifications sans demander, et une notification rouge permanente signale le mode.
+
+```bash
+PATH=$HOME/.venvs/orca-build/bin:$PATH cmake -S . -B build -DSNAPMAKER_AI_TEST_HOOKS=ON
+PATH=$HOME/.venvs/orca-build/bin:$PATH cmake --build build --config Debug --target Snapmaker_Orca -j 8
+python3 -I scripts/fork/mcp-test.py                  # tous les scénarios sans étiquette
+python3 -I scripts/fork/mcp-test.py 05-objects       # un scénario
+python3 -I scripts/fork/mcp-test.py --tags printer   # avec ceux qui demandent l'imprimante réelle (lecture seule)
+```
+
+Le script copie la configuration de l'utilisateur dans un dossier temporaire (port 13799, accès externe
+activé avec un jeton tiré au hasard, imprimante désactivée sauf `--tags printer`, notes et journal dans la
+copie), lance une instance par réponse nécessaire (`--datadir`, environnement Zink du lanceur sous Wayland +
+NVIDIA), joue les scénarios `scripts/fork/mcp-tests/*.json` (appel, résultat attendu en sous-ensemble du JSON),
+arrête l'instance par son groupe de processus et écrit `build/mcp-test-report.md` avec la taille de
+`tools/list` et des instructions. Les modèles viennent d'une copie de `resources/handy_models`. Étiquettes :
+`printer` (imprimante réelle, lecture seule), `network` (documentation Snapmaker en ligne), `cut` (la coupe
+déclenche une assertion de `cut_mesh()` upstream en Debug, sur des cas que Release traite).
 
 ## Chat Claude
 

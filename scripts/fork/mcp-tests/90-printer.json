@@ -1,0 +1,11 @@
+{
+  "description": "Read-only printer tools on the real printer connected through Snapmaker Connect.",
+  "confirm": "no",
+  "tags": ["printer"],
+  "steps": [
+    { "call": "get_printer_status", "args": {}, "expect": { "connected": true, "toolheads": "$any" } },
+    { "call": "printer_snapshot", "args": {}, "image": true },
+    { "call": "watch_print", "args": { "until": "state_change", "timeout_s": 10 }, "expect": { "event": "$any" } },
+    { "call": "unload_filament", "args": { "toolheads": [1] }, "error": true, "error_contains": "printer control is disabled" }
+  ]
+}

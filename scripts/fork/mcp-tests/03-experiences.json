@@ -1,0 +1,12 @@
+{
+  "description": "Journal of experiences of the disposable configuration.",
+  "confirm": "yes",
+  "steps": [
+    { "call": "record_experience", "args": { "symptom": "bench symptom", "diagnosis": "bench diagnosis" },
+      "expect": { "id": "$any", "status": "awaiting_outcome" } },
+    { "call": "report_outcome", "args": { "result": "success", "notes": "bench" }, "expect": { "status": "confirmed" } },
+    { "call": "search_experiences", "args": { "text": "bench symptom", "status": "confirmed" },
+      "expect": { "experiences": [{ "symptom": "bench symptom" }] } },
+    { "call": "report_outcome", "args": { "result": "nonsense" }, "error": true }
+  ]
+}

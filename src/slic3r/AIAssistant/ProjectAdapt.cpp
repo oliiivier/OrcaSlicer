@@ -1,4 +1,5 @@
 #include "ProjectAdapt.hpp"
+#include "McpActions.hpp"
 #include "McpSettings.hpp"
 #include "McpToolUtils.hpp"
 
@@ -297,6 +298,8 @@ bool confirm(const Plan& plan)
         text += "- " + std::to_string(i + 1) + ". " + plan.types[i] + " " + plan.colors[i] + " -> " +
                 (boost::format(_u8L("slot and toolhead %1%")) % t.number).str() + " (" + t.filament + " " + t.color + ")\n";
     }
+    if (const std::optional<bool> answer = test_confirm_answer())
+        return *answer;
     GUI::MessageDialog dlg(wxGetApp().mainframe,
                            from_u8(text) + "\n" +
                                _L("Adapt this project to the connected printer? The printer, process and filament presets "
@@ -314,7 +317,7 @@ json apply(const Plan& plan)
     // unsaved changes: keeping the current printer stops here.
     wxGetApp().get_tab(Preset::TYPE_PRINTER)->select_preset(plan.printer->name);
     if (bundle.printers.get_edited_preset().name != plan.printer->name)
-        return { { "adapted", false }, { "message", "The printer preset was not changed (the user kept the current one)" } };
+        return { { "done", false }, { "message", "The printer preset was not changed (the user kept the current one)" } };
 
     std::string process = bundle.prints.get_edited_preset().name;
     if (const Preset* p = closest_process_preset(plan.layer_height); p != nullptr && p->name != process) {
@@ -395,7 +398,7 @@ json apply(const Plan& plan)
         if (!obj->config.empty())
             ++overrides;
 
-    return { { "adapted", true },
+    return { { "done", true },
              { "printer", { { "before", plan.source_printer }, { "before_model", plan.source_model }, { "after", plan.printer->name } } },
              { "process", { { "before", plan.source_process }, { "after", process } } },
              { "filaments", std::move(filaments) },
@@ -480,7 +483,7 @@ private:
         try {
             const std::atomic<bool> never_abandoned { false };
             const json              result = adapt_to_printer(json::object(), never_abandoned);
-            if (!result.value("adapted", false))
+            if (!result.value("done", false))
                 return;
             const size_t changed = result["changed_settings"].size();
             GUI::MessageDialog dlg(wxGetApp().mainframe,
@@ -509,9 +512,9 @@ json adapt_to_printer(const json& args, const std::atomic<bool>& abandoned)
     require_plater();
     const Plan plan = make_plan(args);
     if (!confirm(plan))
-        return { { "adapted", false }, { "message", "The user declined the adaptation. Ask what they want instead." } };
+        return declined();
     if (abandoned)
-        return { { "adapted", false }, { "message", "The request timed out before the user answered" } };
+        return timed_out();
     return apply(plan);
 }
 

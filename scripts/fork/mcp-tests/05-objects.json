@@ -1,0 +1,192 @@
+{
+  "description": "Object operations of the Prepare view.",
+  "confirm": "yes",
+  "steps": [
+    {
+      "call": "new_project",
+      "args": {},
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "import_models",
+      "args": {
+        "paths": [
+          "${MODELS}/OrcaToleranceTest.stl"
+        ]
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "edit_objects",
+      "args": {
+        "reason": "bench",
+        "operations": [
+          {
+            "action": "scale",
+            "object": 1,
+            "factor": 0.5
+          },
+          {
+            "action": "rotate",
+            "object": 1,
+            "degrees": {
+              "z": 45
+            }
+          },
+          {
+            "action": "move",
+            "object": 1,
+            "to_mm": {
+              "x": 100,
+              "y": 100
+            }
+          },
+          {
+            "action": "center",
+            "object": 1
+          },
+          {
+            "action": "drop",
+            "object": 1
+          },
+          {
+            "action": "mirror",
+            "object": 1,
+            "axis": "x"
+          },
+          {
+            "action": "rename",
+            "object": 1,
+            "name": "bench"
+          },
+          {
+            "action": "add_part",
+            "object": "bench",
+            "type": "modifier",
+            "shape": "box",
+            "size_mm": {
+              "x": 10,
+              "y": 10,
+              "z": 5
+            }
+          },
+          {
+            "action": "set_filament",
+            "object": "bench",
+            "part": 2,
+            "filament": 1
+          },
+          {
+            "action": "delete_part",
+            "object": "bench",
+            "part": 2
+          },
+          {
+            "action": "duplicate",
+            "object": "bench",
+            "copies": 2
+          },
+          {
+            "action": "arrange"
+          }
+        ]
+      },
+      "expect": {
+        "done": true,
+        "applied": "$any",
+        "objects": [
+          {
+            "name": "bench"
+          }
+        ]
+      }
+    },
+    {
+      "call": "get_project",
+      "args": {},
+      "expect": {
+        "objects": [
+          {
+            "index": 3
+          }
+        ]
+      }
+    },
+    {
+      "call": "edit_objects",
+      "args": {
+        "reason": "bench",
+        "operations": [
+          {
+            "action": "delete",
+            "object": 1
+          }
+        ]
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "edit_objects",
+      "args": {
+        "reason": "bench",
+        "operations": [
+          {
+            "action": "center",
+            "object": 1
+          },
+          {
+            "action": "center",
+            "object": 99
+          },
+          {
+            "action": "center",
+            "object": 1
+          }
+        ]
+      },
+      "error": true,
+      "note": "unknown object, refused before the confirmation"
+    },
+    {
+      "call": "edit_objects",
+      "args": {
+        "reason": "bench",
+        "operations": [
+          {
+            "action": "orient",
+            "object": 1
+          }
+        ]
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "edit_objects",
+      "args": {
+        "reason": "bench",
+        "operations": [
+          {
+            "action": "spin",
+            "object": 1
+          }
+        ]
+      },
+      "error": true
+    },
+    {
+      "call": "new_project",
+      "args": {},
+      "expect": {
+        "done": true
+      }
+    }
+  ]
+}

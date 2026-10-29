@@ -1,5 +1,6 @@
 #include "AIAssistant.hpp"
 #include "ChatPanel.hpp"
+#include "McpActions.hpp"
 #include "McpDialog.hpp"
 #include "McpService.hpp"
 #include "McpSettings.hpp"
@@ -46,6 +47,7 @@ static void init_once()
         std::string       error;
         if (!McpService::apply(settings, error))
             BOOST_LOG_TRIVIAL(error) << "MCP: could not start the server on port " << settings.port << ": " << error;
+        show_test_mode_banner();
     });
 }
 

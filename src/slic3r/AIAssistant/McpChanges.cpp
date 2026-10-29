@@ -1,4 +1,5 @@
 #include "McpChanges.hpp"
+#include "McpActions.hpp"
 #include "McpChangesDialog.hpp"
 #include "McpExperiences.hpp"
 #include "McpToolUtils.hpp"
@@ -250,6 +251,8 @@ std::vector<bool> confirm(const std::vector<Change>& changes, const std::string&
                              display_value(c.value->serialize()), _u8L(c.def->tooltip.c_str()), c.comment });
     }
 
+    if (const std::optional<bool> answer = test_confirm_answer())
+        return std::vector<bool>(changes.size(), *answer);
     McpChangesDialog dlg(wxGetApp().mainframe, reason, proposed);
     if (dlg.ShowModal() != wxID_APPLY)
         return std::vector<bool>(changes.size(), false);
@@ -355,7 +358,7 @@ json apply_changes(const json& args, const std::atomic<bool>& abandoned)
     if (!rejected.empty())
         throw ToolError("No change applied, invalid changes:\n" + rejected.dump(2));
     if (changes.empty())
-        return { { "applied", false }, { "message", "All values are already set" }, { "unchanged", unchanged } };
+        return { { "done", false }, { "message", "All values are already set" }, { "unchanged", unchanged } };
 
     // Only one filament preset can be edited at a time in the slicer.
     std::set<std::string> filament_presets;
@@ -368,24 +371,25 @@ json apply_changes(const json& args, const std::atomic<bool>& abandoned)
 
     const std::vector<bool> selected = confirm(changes, reason);
     if (abandoned)
-        return { { "applied", false }, { "message", "The request timed out before the user answered" } };
+        return timed_out();
 
     std::vector<Change> accepted;
-    json                declined = json::array();
+    json                unchecked = json::array();
     for (size_t i = 0; i < changes.size(); ++i)
         if (selected[i])
             accepted.push_back(std::move(changes[i]));
         else
-            declined.push_back(describe_applied(changes[i]));
+            unchecked.push_back(describe_applied(changes[i]));
     // Declined values are kept in the journal too: the outcome of the print is judged with them.
-    json declined_log = declined;
+    json declined_log = unchecked;
     for (json& d : declined_log)
         d["declined_by_user"] = true;
     log_applied_changes(declined_log, reason);
-    if (accepted.empty())
-        return { { "applied", false },
-                 { "declined", std::move(declined) },
-                 { "message", "The user declined all the changes. Ask them what they want instead." } };
+    if (accepted.empty()) {
+        json out         = declined();
+        out["unchecked"] = std::move(unchecked);
+        return out;
+    }
 
     apply(accepted);
 
@@ -393,15 +397,15 @@ json apply_changes(const json& args, const std::atomic<bool>& abandoned)
     for (const Change& c : accepted)
         applied.push_back(describe_applied(c));
     log_applied_changes(applied, reason);
-    json result = { { "applied", true },
+    json result = { { "done", true },
                     { "changes", std::move(applied) },
                     { "message", "Applied as unsaved preset edits (object overrides can be undone with Ctrl+Z). Filament "
                                  "preset edits are lost when another filament preset is opened unless the user saves them. "
                                  "Call get_issues to check the result." } };
-    if (!declined.empty()) {
-        result["declined"] = std::move(declined);
-        result["message"]  = result["message"].get<std::string>() +
-                            " The user unchecked the 'declined' changes: their settings keep the 'old' value. Do not "
+    if (!unchecked.empty()) {
+        result["unchecked"] = std::move(unchecked);
+        result["message"]   = result["message"].get<std::string>() +
+                            " The user unchecked the 'unchecked' changes: their settings keep the 'old' value. Do not "
                             "propose them again unless asked; take them into account when following the print and "
                             "ask the user why if it matters for the diagnosis.";
     }

@@ -93,8 +93,10 @@ Une base commune dans `McpToolUtils` (ou un nouveau `McpActions`), utilisée par
 ## 4. Mode test et banc d'essai
 
 - Option CMake `SNAPMAKER_AI_TEST_HOOKS`, activée seulement en `Debug` et jamais dans les paquets ni dans
-  le workflow de release. Elle compile une option de lancement `--ai-test-confirm=yes|no` : la
-  confirmation commune répond toute seule, et une bannière rouge dans la fenêtre signale le mode.
+  le workflow de release. Elle compile le mode test : la confirmation commune répond toute seule et une
+  notification rouge permanente signale le mode. **Changé** : la réponse vient de la variable
+  d'environnement `SNAPMAKER_AI_TEST_CONFIRM=yes|no` plutôt que d'une option de lancement, que l'analyse
+  des arguments du slicer (upstream) refuserait sans nouveau point d'accroche.
 - Script `scripts/fork/mcp-test.py` : lance le build de debug sur une configuration jetable (copie de
   test, port dédié, accès externe activé), joue des scénarios JSON (appel, résultat attendu), arrête
   l'instance par son PID et produit un compte rendu. Jamais d'imprimante réelle dans les scénarios par
@@ -102,9 +104,10 @@ Une base commune dans `McpToolUtils` (ou un nouveau `McpActions`), utilisée par
 - Scénarios de non-régression pour les 30 outils actuels, avant le regroupement : ils servent à vérifier
   que la phase 1 ne casse rien.
 
-À vérifier en phase 0 : que le build `Debug` tienne en mémoire avec `-j 8` et que les dépendances en
-`Release` suffisent ; sinon, option activée en `RelWithDebInfo` sur un dossier de build séparé, jamais
-packagé.
+Vérifié en phase 0 : le build `Debug` passe avec `-j 8` (31 Go de RAM) sur les dépendances en `Release` ;
+l'édition des liens (LTO) prend 5 à 10 minutes. Le slicer en Debug tranche lentement (30 à 60 s pour un
+modèle simple). La coupe horizontale déclenche une assertion de `cut_mesh()` (upstream) en Debug sur des
+cas que Release traite : son scénario est étiqueté `cut` et sauté par défaut.
 
 ## 5. Fonctions à ajouter
 
@@ -156,7 +159,7 @@ toi, traductions des nouveaux textes, mise à jour de `FORK.md`, commit.
 
 | Phase | Contenu |
 |---|---|
-| 0 | Base commune (confirmation, résultats, références), instructions par domaine, mode test et banc d'essai, scénarios des outils actuels |
+| 0 ✓ | Base commune (confirmation, résultats, références), instructions par domaine, mode test et banc d'essai, scénarios des outils actuels |
 | 1 | Regroupement vers la liste cible (sans fonction nouvelle) ; `path` pour les exports ; mise à jour des guides et notes qui citent d'anciens noms |
 | 2 | Préréglages et filaments (sauf chargement) |
 | 3 | Plages de hauteur, événements par couche, annulation |

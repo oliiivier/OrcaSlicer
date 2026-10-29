@@ -1,0 +1,15 @@
+{
+  "description": "Notes folder of the disposable configuration.",
+  "confirm": "yes",
+  "steps": [
+    { "call": "list_notes", "args": {}, "expect": { "writable": true, "notes": "$any" } },
+    { "call": "write_note", "args": { "name": "bench/first.md", "content": "# First\nhello", "mode": "create" },
+      "expect": { "name": "bench/first.md", "created": true } },
+    { "call": "write_note", "args": { "name": "bench/first.md", "content": "again", "mode": "create" }, "error": true },
+    { "call": "write_note", "args": { "name": "bench/first.md", "content": "world", "mode": "append" },
+      "expect": { "created": false } },
+    { "call": "read_note", "args": { "name": "bench/first.md" }, "expect": { "content": "# First\nhello\nworld" } },
+    { "call": "list_notes", "args": {}, "expect": { "notes": [{ "name": "bench/first.md" }] } },
+    { "call": "read_note", "args": { "name": "../outside.md" }, "error": true }
+  ]
+}

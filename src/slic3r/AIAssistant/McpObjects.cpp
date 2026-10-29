@@ -1,4 +1,5 @@
 #include "McpObjects.hpp"
+#include "McpActions.hpp"
 #include "McpIssues.hpp"
 #include "McpToolUtils.hpp"
 
@@ -44,20 +45,6 @@ double round2(double v) { return std::round(v * 100.) / 100.; }
 bool changes_object_list(const std::string& action)
 {
     return action == "cut" || action == "split" || action == "duplicate" || action == "delete";
-}
-
-int resolve_object(const json& ref)
-{
-    const ModelObjectPtrs& objects = wxGetApp().model().objects;
-    if (ref.is_number_integer()) {
-        const int idx = ref.get<int>();
-        if (idx < 1 || idx > int(objects.size()))
-            throw ToolError("No object #" + std::to_string(idx) + ", the project has " + std::to_string(objects.size()));
-        return idx - 1;
-    }
-    if (ref.is_string())
-        return find_object(ref.get<std::string>());
-    throw ToolError("'object' must be an object name or its 1-based index from get_project");
 }
 
 double number(const json& op, const char* name)
@@ -163,41 +150,6 @@ Vec3d shape_size(const json& op)
     return out;
 }
 
-int resolve_part(const ModelObject& obj, const json& ref)
-{
-    if (ref.is_number_integer()) {
-        const int idx = ref.get<int>();
-        if (idx < 1 || idx > int(obj.volumes.size()))
-            throw ToolError("No part #" + std::to_string(idx) + " in '" + obj.name + "', it has " + std::to_string(obj.volumes.size()));
-        return idx - 1;
-    }
-    if (!ref.is_string())
-        throw ToolError("'part' must be a part name or its 1-based index from get_project");
-    int found = -1;
-    for (size_t i = 0; i < obj.volumes.size(); ++i) {
-        if (obj.volumes[i]->name != ref.get<std::string>())
-            continue;
-        if (found >= 0)
-            throw ToolError("Several parts are named '" + ref.get<std::string>() + "', use the part index");
-        found = int(i);
-    }
-    if (found < 0)
-        throw ToolError("No part named '" + ref.get<std::string>() + "' in '" + obj.name + "'");
-    return found;
-}
-
-int filament_count() { return int(wxGetApp().plater()->get_extruder_colors_from_plater_config().size()); }
-
-int filament_arg(const json& op)
-{
-    if (!op.contains("filament") || !op["filament"].is_number_integer())
-        throw ToolError("'filament' must be a 1-based filament slot (0: the object's filament, for a part)");
-    const int f = op["filament"].get<int>();
-    if (f < 0 || f > filament_count())
-        throw ToolError("No filament slot " + std::to_string(f) + ", the project has " + std::to_string(filament_count()));
-    return f;
-}
-
 // Rebuilds the parts of an object in the object list and the 3D view.
 void parts_changed(GUI::Plater& plater, int obj_idx)
 {
@@ -250,7 +202,7 @@ void add_part(GUI::Plater& plater, const json& op, int obj_idx)
     volume->set_offset(to_bed * (center - inst.get_offset()));
     volume->name = op.value("name", std::string("Generic-") + shape);
 
-    int filament = op.contains("filament") ? filament_arg(op) : 0;
+    int filament = op.contains("filament") ? filament_slot_ref(op, "filament", true) : 0;
     if (!op.contains("filament") && type.type == ModelVolumeType::MODEL_PART && obj.config.has("extruder"))
         filament = obj.config.opt_int("extruder");
     volume->config.set_key_value("extruder", new ConfigOptionInt(filament));
@@ -262,7 +214,7 @@ void add_part(GUI::Plater& plater, const json& op, int obj_idx)
 void delete_part(GUI::Plater& plater, const json& op, int obj_idx)
 {
     ModelObject& obj = *wxGetApp().model().objects[obj_idx];
-    const int    idx = resolve_part(obj, op["part"]);
+    const int    idx = part_ref(obj, op["part"]);
     const ModelVolume* volume = obj.volumes[idx];
     if (volume->is_model_part() &&
         std::count_if(obj.volumes.begin(), obj.volumes.end(), [](const ModelVolume* v) { return v->is_model_part(); }) == 1)
@@ -282,9 +234,9 @@ void delete_part(GUI::Plater& plater, const json& op, int obj_idx)
 void set_filament(GUI::Plater& plater, const json& op, int obj_idx)
 {
     ModelObject& obj      = *wxGetApp().model().objects[obj_idx];
-    const int    filament = filament_arg(op);
+    const int    filament = filament_slot_ref(op, "filament", true);
     if (op.contains("part")) {
-        ModelVolume* volume = obj.volumes[resolve_part(obj, op["part"])];
+        ModelVolume* volume = obj.volumes[part_ref(obj, op["part"])];
         if (volume->type() != ModelVolumeType::MODEL_PART && volume->type() != ModelVolumeType::PARAMETER_MODIFIER)
             throw ToolError("Only parts and modifiers have a filament");
         volume->config.set_key_value("extruder", new ConfigOptionInt(filament));
@@ -294,7 +246,7 @@ void set_filament(GUI::Plater& plater, const json& op, int obj_idx)
         obj.config.set_key_value("extruder", new ConfigOptionInt(filament));
     }
     if (GUI::ObjectList* list = wxGetApp().obj_list())
-        list->update_filament_values_for_items(size_t(filament_count()));
+        list->update_filament_values_for_items(size_t(filament_slot_count()));
     plater.changed_object(obj);
     plater.notify_filament_usage_changed();
 }
@@ -307,7 +259,7 @@ void rename(const json& op, int obj_idx)
         throw ToolError("'name' must give the new name");
     GUI::ObjectList* list = wxGetApp().obj_list();
     if (op.contains("part")) {
-        const int idx            = resolve_part(obj, op["part"]);
+        const int idx            = part_ref(obj, op["part"]);
         obj.volumes[idx]->name = name;
         if (list != nullptr)
             if (const wxDataViewItem item = list->GetModel()->GetItemByVolumeId(obj_idx, idx))
@@ -417,7 +369,7 @@ std::string describe(const json& op, int obj_idx)
         const PartType& type = part_type(op);
         const Vec3d     size = shape_size(op);
         if (op.contains("filament"))
-            filament_arg(op);
+            filament_slot_ref(op, "filament", true);
         const std::string shape = op.value("shape", std::string("box")) + " " + float_to_string_decimal_point(size.x(), 1) +
                                   " x " + float_to_string_decimal_point(size.y(), 1) + " x " +
                                   float_to_string_decimal_point(size.z(), 1) + " mm";
@@ -435,7 +387,7 @@ std::string describe(const json& op, int obj_idx)
         return text_of(_u8L("Delete part %1% of %2%"), part, name);
     }
     if (action == "set_filament") {
-        const int f = filament_arg(op);
+        const int f = filament_slot_ref(op, "filament", true);
         return on_part ? text_of(_u8L("Print part %1% of %2% with filament %3%"), part, name, f)
                        : text_of(_u8L("Print %1% with filament %2%"), name, f);
     }
@@ -449,19 +401,6 @@ std::string describe(const json& op, int obj_idx)
     throw ToolError("Unknown action '" + action + "'");
 }
 
-
-bool confirm(const std::string& reason, const std::vector<std::string>& lines)
-{
-    std::string text = reason.empty() ? std::string() : reason + "\n\n";
-    for (const std::string& line : lines)
-        text += "- " + line + "\n";
-    GUI::MessageDialog dlg(wxGetApp().mainframe,
-                           from_u8(text) + "\n" +
-                               _L("The AI assistant asks to change the objects of the project. Apply these operations? "
-                                  "Undo restores the previous state."),
-                           _L("AI Assistant"), wxYES_NO | wxICON_QUESTION);
-    return dlg.ShowModal() == wxID_YES;
-}
 
 // Before an operation that removes or replaces objects or parts: a selection
 // left on them makes the object list and the 3D view read deleted volumes
@@ -608,7 +547,7 @@ bool run(GUI::Plater& plater, const json& op)
 {
     const std::string action = op.value("action", std::string());
     describe(op, -1);
-    const int obj_idx = action == "arrange" ? -1 : resolve_object(op["object"]);
+    const int obj_idx = action == "arrange" ? -1 : object_ref(op["object"]);
     // Checks that depend on the object (single part, instances).
     describe(op, obj_idx);
 
@@ -725,14 +664,19 @@ json edit_objects(const json& args, const std::atomic<bool>& abandoned, json& st
             if (!op.is_object())
                 throw ToolError("Each operation must be an object");
             const std::string action  = op.value("action", std::string());
-            const int obj_idx = action == "arrange" || list_changed || !op.contains("object") ? -1 : resolve_object(op["object"]);
+            const int obj_idx = action == "arrange" || list_changed || !op.contains("object") ? -1 : object_ref(op["object"]);
             lines.push_back(describe(op, obj_idx));
-            list_changed = list_changed || changes_object_list(action);
+            // Renaming an object changes what the next operations may call it.
+            list_changed = list_changed || changes_object_list(action) || (action == "rename" && !op.contains("part"));
         }
 
-        if (!confirm(args.value("reason", std::string()), lines) || abandoned)
-            return { { "applied", false }, { "message", "The user declined the operations" } };
-        state = { { "confirmed", true }, { "next", 0 }, { "done", json::array() } };
+        if (!confirm(args.value("reason", std::string()), lines,
+                     _L("The AI assistant asks to change the objects of the project. Apply these operations? Undo restores "
+                        "the previous state.")))
+            return declined();
+        if (abandoned)
+            return timed_out();
+        state = { { "confirmed", true }, { "next", 0 }, { "applied", json::array() } };
         // The result is shown in the Prepare view.
         plater.select_view_3D("3D");
     }
@@ -750,13 +694,11 @@ json edit_objects(const json& args, const std::atomic<bool>& abandoned, json& st
             try {
                 started_job = run(plater, op);
             } catch (const ToolError& e) {
-                return { { "applied", !state["done"].empty() },
-                         { "done", state["done"] },
-                         { "failed", { { "operation", op }, { "error", e.what() } } },
-                         { "not_run", ops.size() - next - 1 },
-                         { "objects", objects_summary() } };
+                json out       = operations_failed(state["applied"], op, e.what(), ops.size() - next - 1);
+                out["objects"] = objects_summary();
+                return out;
             }
-            state["done"].push_back(op.value("action", std::string()) +
+            state["applied"].push_back(op.value("action", std::string()) +
                                     (op.contains("object") ? " " + op["object"].dump() : std::string()));
             state["next"] = ++next;
             if (started_job)
@@ -765,12 +707,8 @@ json edit_objects(const json& args, const std::atomic<bool>& abandoned, json& st
         }
     }
 
-    json out = { { "applied", true }, { "done", state["done"] }, { "objects", objects_summary() } };
-    try {
-        out["issues"] = collect_issues()["summary"].get<std::string>() + " (details: get_issues)";
-    } catch (const ToolRetry&) {
-        out["issues"] = "unknown, the slicer is updating (call get_issues)";
-    }
+    json out = done({ { "applied", state["applied"] }, { "objects", objects_summary() } });
+    add_issues_summary(out);
     return out;
 }
 

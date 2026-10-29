@@ -1,0 +1,98 @@
+{
+  "description": "Project files: new, import, view and slice (opening and saving to a given path: phase 1).",
+  "confirm": "yes",
+  "steps": [
+    {
+      "call": "new_project",
+      "args": {},
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "import_models",
+      "args": {
+        "paths": [
+          "${MODELS}/OrcaToleranceTest.stl"
+        ],
+        "reason": "bench"
+      },
+      "expect": {
+        "done": true,
+        "added": [
+          {
+            "index": 1
+          }
+        ]
+      }
+    },
+    {
+      "call": "import_models",
+      "args": {
+        "paths": [
+          "relative.stl"
+        ]
+      },
+      "error": true
+    },
+    {
+      "call": "import_models",
+      "args": {
+        "paths": [
+          "${MODELS}/missing.stl"
+        ]
+      },
+      "error": true
+    },
+    {
+      "call": "get_project",
+      "args": {},
+      "expect": {
+        "objects": [
+          {
+            "index": 1,
+            "plate": 1
+          }
+        ]
+      }
+    },
+    {
+      "call": "render_view",
+      "args": {
+        "view": "iso",
+        "size": 256
+      },
+      "image": true
+    },
+    {
+      "call": "slice",
+      "args": {},
+      "expect": {
+        "sliced": true,
+        "plate": 1,
+        "print_time_s": "$any"
+      }
+    },
+    {
+      "call": "open_project",
+      "args": {
+        "path": "${MODELS}/nothing.3mf"
+      },
+      "error": true
+    },
+    {
+      "call": "export_file",
+      "args": {
+        "format": "pdf"
+      },
+      "error": true
+    },
+    {
+      "call": "new_project",
+      "args": {},
+      "expect": {
+        "done": true
+      }
+    }
+  ]
+}

@@ -1,0 +1,65 @@
+{
+  "description": "Horizontal cut. Tagged: the Debug build of upstream cut_mesh() asserts (TriangleMeshSlicer.cpp:2408, edge_a_id != -1) on cuts that Release handles; run it with --tags cut on a build without assertions.",
+  "confirm": "yes",
+  "tags": [
+    "cut"
+  ],
+  "steps": [
+    {
+      "call": "new_project",
+      "args": {},
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "import_models",
+      "args": {
+        "paths": [
+          "${MODELS}/OrcaCube_v2.3mf"
+        ]
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "edit_objects",
+      "args": {
+        "reason": "bench",
+        "operations": [
+          {
+            "action": "cut",
+            "object": 1,
+            "height_mm": 7.3
+          },
+          {
+            "action": "delete",
+            "object": 1
+          }
+        ]
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "get_project",
+      "args": {},
+      "expect": {
+        "objects": [
+          {
+            "index": 1
+          }
+        ]
+      }
+    },
+    {
+      "call": "new_project",
+      "args": {},
+      "expect": {
+        "done": true
+      }
+    }
+  ]
+}
