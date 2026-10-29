@@ -19535,6 +19535,37 @@ msgid ""
 "The AI assistant asks to change the color of a filament slot. Change it?"
 msgstr "Yapay zekâ asistanı bir filament yuvasının rengini değiştirmek istiyor. Değiştirilsin mi?"
 
+#, boost-format
+msgid "Add the height range %1% to %2%"
+msgstr "%2% nesnesine %1% yükseklik aralığını ekle"
+
+#, boost-format
+msgid "Remove the height range %1% of %2%"
+msgstr "%2% nesnesinin %1% yükseklik aralığını kaldır"
+
+msgid "(unnamed step)"
+msgstr "(adsız adım)"
+
+msgid "The AI assistant asks to undo these steps, as Ctrl+Z does. Undo them?"
+msgstr "Yapay zekâ asistanı bu adımları Ctrl+Z gibi geri almak istiyor. Geri alınsın mı?"
+
+msgid "The AI assistant asks to redo these steps, as Ctrl+Y does. Redo them?"
+msgstr "Yapay zekâ asistanı bu adımları Ctrl+Y gibi yinelemek istiyor. Yinelensin mi?"
+
+#, boost-format
+msgid "Plate %1%, layer %2% (%3% mm)"
+msgstr "Plaka %1%, katman %2% (%3% mm)"
+
+msgid "pause the print"
+msgstr "baskıyı duraklat"
+
+#, boost-format
+msgid "change to filament %1%"
+msgstr "%1% numaralı filamente geç"
+
+msgid "remove the event"
+msgstr "olayı kaldır"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

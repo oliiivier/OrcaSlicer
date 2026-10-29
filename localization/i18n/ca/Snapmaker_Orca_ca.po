@@ -19622,6 +19622,37 @@ msgid ""
 "The AI assistant asks to change the color of a filament slot. Change it?"
 msgstr "L'assistent d'IA demana canviar el color d'una posició de filament. Voleu canviar-lo?"
 
+#, boost-format
+msgid "Add the height range %1% to %2%"
+msgstr "Afegeix l'interval d'alçada %1% a %2%"
+
+#, boost-format
+msgid "Remove the height range %1% of %2%"
+msgstr "Elimina l'interval d'alçada %1% de %2%"
+
+msgid "(unnamed step)"
+msgstr "(pas sense nom)"
+
+msgid "The AI assistant asks to undo these steps, as Ctrl+Z does. Undo them?"
+msgstr "L'assistent d'IA demana desfer aquests passos, com fa Ctrl+Z. Voleu desfer-los?"
+
+msgid "The AI assistant asks to redo these steps, as Ctrl+Y does. Redo them?"
+msgstr "L'assistent d'IA demana refer aquests passos, com fa Ctrl+Y. Voleu refer-los?"
+
+#, boost-format
+msgid "Plate %1%, layer %2% (%3% mm)"
+msgstr "Placa %1%, capa %2% (%3% mm)"
+
+msgid "pause the print"
+msgstr "posa en pausa la impressió"
+
+#, boost-format
+msgid "change to filament %1%"
+msgstr "canvia al filament %1%"
+
+msgid "remove the event"
+msgstr "elimina l'esdeveniment"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

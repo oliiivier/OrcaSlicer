@@ -18736,6 +18736,37 @@ msgid ""
 "The AI assistant asks to change the color of a filament slot. Change it?"
 msgstr "AI 어시스턴트가 필라멘트 슬롯의 색상을 변경하려고 합니다. 변경할까요?"
 
+#, boost-format
+msgid "Add the height range %1% to %2%"
+msgstr "%2%에 높이 범위 %1% 추가"
+
+#, boost-format
+msgid "Remove the height range %1% of %2%"
+msgstr "%2%의 높이 범위 %1% 제거"
+
+msgid "(unnamed step)"
+msgstr "(이름 없는 단계)"
+
+msgid "The AI assistant asks to undo these steps, as Ctrl+Z does. Undo them?"
+msgstr "AI 어시스턴트가 Ctrl+Z처럼 이 단계들을 실행 취소하려고 합니다. 실행 취소할까요?"
+
+msgid "The AI assistant asks to redo these steps, as Ctrl+Y does. Redo them?"
+msgstr "AI 어시스턴트가 Ctrl+Y처럼 이 단계들을 다시 실행하려고 합니다. 다시 실행할까요?"
+
+#, boost-format
+msgid "Plate %1%, layer %2% (%3% mm)"
+msgstr "플레이트 %1%, 레이어 %2% (%3% mm)"
+
+msgid "pause the print"
+msgstr "출력 일시 정지"
+
+#, boost-format
+msgid "change to filament %1%"
+msgstr "필라멘트 %1%(으)로 변경"
+
+msgid "remove the event"
+msgstr "이벤트 제거"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

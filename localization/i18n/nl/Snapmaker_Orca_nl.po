@@ -18167,6 +18167,37 @@ msgid ""
 "The AI assistant asks to change the color of a filament slot. Change it?"
 msgstr "De AI-assistent vraagt de kleur van een filamentpositie te wijzigen. Wijzigen?"
 
+#, boost-format
+msgid "Add the height range %1% to %2%"
+msgstr "Hoogtebereik %1% toevoegen aan %2%"
+
+#, boost-format
+msgid "Remove the height range %1% of %2%"
+msgstr "Hoogtebereik %1% van %2% verwijderen"
+
+msgid "(unnamed step)"
+msgstr "(naamloze stap)"
+
+msgid "The AI assistant asks to undo these steps, as Ctrl+Z does. Undo them?"
+msgstr "De AI-assistent vraagt deze stappen ongedaan te maken, zoals Ctrl+Z. Ongedaan maken?"
+
+msgid "The AI assistant asks to redo these steps, as Ctrl+Y does. Redo them?"
+msgstr "De AI-assistent vraagt deze stappen opnieuw uit te voeren, zoals Ctrl+Y. Opnieuw uitvoeren?"
+
+#, boost-format
+msgid "Plate %1%, layer %2% (%3% mm)"
+msgstr "Plaat %1%, laag %2% (%3% mm)"
+
+msgid "pause the print"
+msgstr "print pauzeren"
+
+#, boost-format
+msgid "change to filament %1%"
+msgstr "wisselen naar filament %1%"
+
+msgid "remove the event"
+msgstr "gebeurtenis verwijderen"
+
 #~ msgid "Alt + Mouse wheel"
 #~ msgstr "Alt + muiswiel"
 

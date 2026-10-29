@@ -17863,6 +17863,37 @@ msgid ""
 "The AI assistant asks to change the color of a filament slot. Change it?"
 msgstr "Az MI-asszisztens egy filamenthely színének módosítását kéri. Módosítja?"
 
+#, boost-format
+msgid "Add the height range %1% to %2%"
+msgstr "%1% magassági tartomány hozzáadása ehhez: %2%"
+
+#, boost-format
+msgid "Remove the height range %1% of %2%"
+msgstr "%1% magassági tartomány eltávolítása innen: %2%"
+
+msgid "(unnamed step)"
+msgstr "(névtelen lépés)"
+
+msgid "The AI assistant asks to undo these steps, as Ctrl+Z does. Undo them?"
+msgstr "Az MI-asszisztens ezeknek a lépéseknek a visszavonását kéri, mint a Ctrl+Z. Visszavonja?"
+
+msgid "The AI assistant asks to redo these steps, as Ctrl+Y does. Redo them?"
+msgstr "Az MI-asszisztens ezeknek a lépéseknek az újbóli végrehajtását kéri, mint a Ctrl+Y. Végrehajtja újra?"
+
+#, boost-format
+msgid "Plate %1%, layer %2% (%3% mm)"
+msgstr "%1%. tálca, %2%. réteg (%3% mm)"
+
+msgid "pause the print"
+msgstr "nyomtatás szüneteltetése"
+
+#, boost-format
+msgid "change to filament %1%"
+msgstr "váltás a(z) %1%. filamentre"
+
+msgid "remove the event"
+msgstr "esemény eltávolítása"
+
 #~ msgid "Alt + Mouse wheel"
 #~ msgstr "Alt + Egérgörgő"
 

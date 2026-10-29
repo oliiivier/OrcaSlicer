@@ -17421,6 +17421,37 @@ msgid ""
 "The AI assistant asks to change the color of a filament slot. Change it?"
 msgstr "AIアシスタントがフィラメントスロットの色を変更しようとしています。変更しますか？"
 
+#, boost-format
+msgid "Add the height range %1% to %2%"
+msgstr "%2% に高さ範囲 %1% を追加"
+
+#, boost-format
+msgid "Remove the height range %1% of %2%"
+msgstr "%2% の高さ範囲 %1% を削除"
+
+msgid "(unnamed step)"
+msgstr "（名前のない手順）"
+
+msgid "The AI assistant asks to undo these steps, as Ctrl+Z does. Undo them?"
+msgstr "AIアシスタントがCtrl+Zと同様にこれらの手順を元に戻そうとしています。元に戻しますか？"
+
+msgid "The AI assistant asks to redo these steps, as Ctrl+Y does. Redo them?"
+msgstr "AIアシスタントがCtrl+Yと同様にこれらの手順をやり直そうとしています。やり直しますか？"
+
+#, boost-format
+msgid "Plate %1%, layer %2% (%3% mm)"
+msgstr "プレート %1%、レイヤー %2%（%3% mm）"
+
+msgid "pause the print"
+msgstr "印刷を一時停止"
+
+#, boost-format
+msgid "change to filament %1%"
+msgstr "フィラメント %1% に切り替え"
+
+msgid "remove the event"
+msgstr "イベントを削除"
+
 #~ msgid "Alt + Mouse wheel"
 #~ msgstr "Alt + マウスホイール"
 

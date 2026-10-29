@@ -6,6 +6,7 @@
 #include "libslic3r/CutUtils.hpp"
 #include "libslic3r/Format/bbs_3mf.hpp"
 #include "libslic3r/Model.hpp"
+#include "libslic3r/PresetBundle.hpp"
 #include "slic3r/GUI/GLCanvas3D.hpp"
 #include "slic3r/GUI/GUI.hpp"
 #include "slic3r/GUI/GUI_App.hpp"
@@ -272,6 +273,103 @@ void rename(const json& op, int obj_idx)
     }
 }
 
+// ------------------------------------------------------------ height ranges
+
+// Height range [from, to] of op, in mm from the bottom of the object; checked against its height.
+t_layer_height_range range_arg(const json& op, int obj_idx)
+{
+    const double from = number(op, "from_mm");
+    const double to   = number(op, "to_mm");
+    if (from < 0. || to <= from)
+        throw ToolError("The range needs 0 <= from_mm < to_mm");
+    if (obj_idx >= 0) {
+        const double height = wxGetApp().model().objects[obj_idx]->instance_bounding_box(0).size().z();
+        if (from >= height)
+            throw ToolError("'from_mm' is above the object (height " + float_to_string_decimal_point(height, 2) + " mm)");
+    }
+    return { from, to };
+}
+
+// Settings of a height range, as the settings the object list offers for it: the
+// layer height, the filament ('extruder') and the per-region print settings.
+DynamicPrintConfig range_settings(const json& op)
+{
+    DynamicPrintConfig config;
+    if (!op.contains("settings"))
+        return config;
+    if (!op["settings"].is_object())
+        throw ToolError("'settings' must be an object such as {\"layer_height\": 0.12}");
+    static const PrintRegionConfig region;
+    for (const auto& [key, value] : op["settings"].items()) {
+        const ConfigOptionDef* def = print_config_def.get(key);
+        if (def == nullptr || (key != "layer_height" && key != "extruder" && !region.has(key)))
+            throw ToolError("'" + key + "' cannot be set on a height range (layer_height, extruder and the wall, "
+                            "infill, surface and speed settings can)");
+        std::string text = value.is_string() ? value.get<std::string>() : value.is_boolean() ? (value.get<bool>() ? "1" : "0") : value.dump();
+        std::unique_ptr<ConfigOption> opt(def->create_default_option());
+        if (!opt->deserialize(text))
+            throw ToolError("Invalid value '" + text + "' for '" + key + "', see get_docs (setting)");
+        config.set_key_value(key, opt.release());
+    }
+    if (config.has("extruder")) {
+        const int slot = config.opt_int("extruder");
+        if (slot < 0 || slot > filament_slot_count())
+            throw ToolError("'extruder' must be a filament slot between 1 and " + std::to_string(filament_slot_count()) + ", or 0");
+    }
+    return config;
+}
+
+std::string range_text(const t_layer_height_range& range)
+{
+    return float_to_string_decimal_point(range.first, 2) + " - " + float_to_string_decimal_point(range.second, 2) + " mm";
+}
+
+// The range of the object closest to [from, to], within 0.01 mm.
+t_layer_config_ranges::iterator find_range(ModelObject& obj, const t_layer_height_range& range)
+{
+    for (auto it = obj.layer_config_ranges.begin(); it != obj.layer_config_ranges.end(); ++it)
+        if (std::abs(it->first.first - range.first) < 0.01 && std::abs(it->first.second - range.second) < 0.01)
+            return it;
+    throw ToolError("No height range " + range_text(range) + " on '" + obj.name + "' (see get_project.objects[].height_ranges)");
+}
+
+// Rebuilds the height ranges of an object in the object list.
+void ranges_changed(GUI::Plater& plater, int obj_idx)
+{
+    if (GUI::ObjectList* list = wxGetApp().obj_list()) {
+        GUI::ObjectDataViewModel* items    = list->GetModel();
+        const wxDataViewItem      obj_item = items->GetItemById(obj_idx);
+        if (const wxDataViewItem root = items->GetLayerRootItem(obj_item); root.IsOk())
+            items->Delete(root);
+        list->add_layer_root_item(obj_item);
+    }
+    plater.changed_object(*wxGetApp().model().objects[obj_idx]);
+}
+
+void add_height_range(GUI::Plater& plater, const json& op, int obj_idx)
+{
+    ModelObject&               obj   = *wxGetApp().model().objects[obj_idx];
+    const t_layer_height_range range = range_arg(op, obj_idx);
+    for (const auto& [r, config] : obj.layer_config_ranges)
+        if (range.first < r.second - EPSILON && r.first < range.second - EPSILON)
+            throw ToolError("The range overlaps the range " + range_text(r) + " of '" + obj.name + "'");
+    // As Height range Modifier in the object list: the object's layer height and filament by default.
+    DynamicPrintConfig config;
+    config.set_key_value("layer_height", new ConfigOptionFloat(obj.config.has("layer_height") ? obj.config.opt_float("layer_height") :
+                                                               wxGetApp().preset_bundle->prints.get_edited_preset().config.opt_float("layer_height")));
+    config.set_key_value("extruder", new ConfigOptionInt(0));
+    config.apply(range_settings(op));
+    obj.layer_config_ranges[range].assign_config(config);
+    ranges_changed(plater, obj_idx);
+}
+
+void remove_height_range(GUI::Plater& plater, const json& op, int obj_idx)
+{
+    ModelObject& obj = *wxGetApp().model().objects[obj_idx];
+    obj.layer_config_ranges.erase(find_range(obj, range_arg(op, -1)));
+    ranges_changed(plater, obj_idx);
+}
+
 // A translated description with its arguments put in (%1%, %2%...): whole sentences, so
 // that each language can order the words its own way.
 template<typename... Args> std::string text_of(const std::string& format, const Args&... args)
@@ -377,6 +475,20 @@ std::string describe(const json& op, int obj_idx)
         if (op.contains("at_mm"))
             text += ", " + text_of(_u8L("at %1%"), axes_text(axes(op, "at_mm"), " mm"));
         return text;
+    }
+    if (action == "add_height_range") {
+        const t_layer_height_range range = range_arg(op, obj_idx);
+        std::string text = text_of(_u8L("Add the height range %1% to %2%"), range_text(range), name);
+        const DynamicPrintConfig settings = range_settings(op);
+        for (const std::string& key : settings.keys())
+            text += ", " + key + " = " + settings.opt_serialize(key);
+        return text;
+    }
+    if (action == "remove_height_range") {
+        const t_layer_height_range range = range_arg(op, -1);
+        if (obj_idx >= 0)
+            find_range(*wxGetApp().model().objects[obj_idx], range);
+        return text_of(_u8L("Remove the height range %1% of %2%"), range_text(range), name);
     }
     // The operations below apply to the whole object, or to one of its parts.
     const bool        on_part = op.contains("part");
@@ -591,6 +703,13 @@ bool run(GUI::Plater& plater, const json& op)
         set_filament(plater, op, obj_idx);
     else if (action == "rename")
         rename(op, obj_idx);
+    else if (action == "add_height_range") {
+        clear_selection(plater);
+        add_height_range(plater, op, obj_idx);
+    } else if (action == "remove_height_range") {
+        clear_selection(plater);
+        remove_height_range(plater, op, obj_idx);
+    }
     else {
         start_job(plater, action, obj_idx);
         return true;
@@ -624,6 +743,62 @@ json object_parts(const ModelObject& obj)
             part["filament"] = v->config.opt_int("extruder");
         out.push_back(std::move(part));
     }
+    return out;
+}
+
+json object_height_ranges(const ModelObject& obj)
+{
+    json out = json::array();
+    for (const auto& [range, config] : obj.layer_config_ranges) {
+        json settings = json::object();
+        for (const std::string& key : config.keys())
+            settings[key] = config.opt_serialize(key);
+        out.push_back({ { "from_mm", round2(range.first) }, { "to_mm", round2(range.second) }, { "settings", std::move(settings) } });
+    }
+    return out;
+}
+
+json undo_redo(const json& args, const std::atomic<bool>& abandoned)
+{
+    GUI::Plater& plater = require_plater();
+    const std::string action = args.contains("action") && args["action"].is_string() ? args["action"].get<std::string>() : std::string();
+    if (action != "undo" && action != "redo")
+        throw ToolError("'action' must be undo or redo");
+    const json& steps_arg = args.contains("steps") ? args["steps"] : json(1);
+    if (!steps_arg.is_number_integer() || steps_arg.get<int>() < 1)
+        throw ToolError("'steps' must be a positive integer");
+    if (!plater.get_ui_job_worker().is_idle() || plater.is_background_process_slicing())
+        throw ToolRetry();
+    if (plater.canvas3D()->get_gizmos_manager().get_current_type() != GUI::GLGizmosManager::Undefined)
+        throw ToolError("A tool (cut, paint...) is open in the 3D view: ask the user to close it first");
+
+    const bool               undo  = action == "undo";
+    const int                steps = steps_arg.get<int>();
+    std::vector<std::string> names;
+    for (int i = 0; i < steps; ++i) {
+        const char* name = nullptr;
+        if (!plater.undo_redo_string_getter(undo, i, &name) || name == nullptr)
+            break;
+        names.push_back(*name == 0 ? _u8L("(unnamed step)") : _u8L(name));
+    }
+    if (names.empty())
+        throw ToolError(undo ? "Nothing to undo" : "Nothing to redo");
+    if (int(names.size()) < steps)
+        throw ToolError("Only " + std::to_string(names.size()) + " step(s) to " + action);
+
+    if (!confirm(args.value("reason", std::string()), names,
+                 undo ? _L("The AI assistant asks to undo these steps, as Ctrl+Z does. Undo them?") :
+                        _L("The AI assistant asks to redo these steps, as Ctrl+Y does. Redo them?")))
+        return declined();
+    if (abandoned)
+        return timed_out();
+    clear_selection(plater);
+    if (undo)
+        plater.undo_to(steps - 1);
+    else
+        plater.redo_to(steps - 1);
+    json out = done({ { "steps", names }, { "objects", objects_summary() } });
+    add_issues_summary(out);
     return out;
 }
 

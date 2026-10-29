@@ -145,7 +145,7 @@ ces jetons ; seul un bac à sable (Flatpak, firejail...) l'en empêche.
 Outils (regroupés par domaine, le paramètre `action` choisit l'opération) : `get_issues`, `get_project`,
 `get_config`, `get_docs` (setting, page), `apply_changes`, `edit_presets` (select, save, add_slot, remove_slot,
 set_color), `edit_objects`, `edit_plates`, `edit_project` (new,
-open, import, save, export), `adapt_to_printer`, `slice`, `get_view` (model), `get_printer` (status, snapshot,
+open, import, save, export), `undo` (undo, redo), `adapt_to_printer`, `slice`, `get_view` (model), `get_printer` (status, snapshot,
 watch), `control_printer` (start_print, pause, resume, cancel, unload_filament), `notes` (list, read, write),
 `experiences` (search, record, report), `manufacturer_docs` (search, read). Le chat affiche l'action à côté du
 nom de l'outil.
@@ -224,6 +224,14 @@ gizmos ; un gizmo ouvert bloque l'outil. La sélection est vidée avant les opé
 remplacent un objet ou une pièce (la liste des objets la redessinerait sur des volumes supprimés). Pièces
 coupées : `<nom>_A` (haut), `<nom>_B` (bas).
 
+Plages de hauteur (`edit_objects` add_height_range, remove_height_range) : comme *Plage de hauteur* de la liste
+des objets, avec la hauteur de couche, le filament (`extruder`) et les réglages par région (parois, remplissage,
+surfaces, vitesses) ; les plages ne se chevauchent pas, la liste des objets est reconstruite pour l'objet.
+Événements par couche (`edit_plates` add_layer_event, remove_layer_event) : pause ou changement de filament
+vers un emplacement, à une couche de la plaque courante tranchée (numéro ou hauteur la plus proche), écrits
+dans `Model::plates_custom_gcodes` comme le curseur de l'aperçu ; jamais de G-code libre. `undo` défait ou
+refait des étapes de l'historique du slicer (Ctrl+Z / Ctrl+Y) après confirmation listant leurs noms.
+
 Fichiers et plaques : `edit_project` appelle les commandes du slicer. Nouveau projet, ouverture, import et
 enregistrement d'un chemin donné, exports vers un chemin donné (G-code de la plaque courante copié tel que
 tranché, sans les scripts de post-traitement ; 3MF tranché de la plaque courante ; STL de tous les objets en
@@ -273,12 +281,14 @@ Plan de réalisation et regroupement des outils : [`src/slic3r/AIAssistant/PLAN.
 - [ ] Chargement du filament (piste : même séquence `AUTO_FEEDING_BATCH` que le déchargement).
 - [x] Préréglages : enregistrer un préréglage utilisateur, choisir un autre préréglage d'imprimante, de
   traitement ou de filament, ajouter ou retirer un emplacement de filament, changer sa couleur.
-- [ ] Plages de hauteur avec réglages propres, hauteur de couche variable.
-- [ ] Pause, changement de couleur ou G-code personnalisé à une couche.
+- [x] Plages de hauteur avec réglages propres. (Reste : hauteur de couche variable.)
+- [x] Pause ou changement de filament à une couche (pas de G-code personnalisé : il partirait tel quel à
+  l'imprimante).
 - [ ] Peinture (supports, couture, couleurs, fuzzy skin) et outils de la vue 3D (texte, SVG, mesure, coupe
   inclinée ou avec connecteurs, simplification, réparation, booléens, poser sur une face, oreilles de bordure).
 - [ ] Aperçu tranché en image (trajectoires, supports, couche précise).
-- [ ] Calibrations, préférences de l'application, compte Snapmaker et MakerWorld, annulation par l'assistant.
+- [ ] Calibrations, préférences de l'application, compte Snapmaker et MakerWorld.
+- [x] Annulation par l'assistant (`undo`).
 
 Écartés volontairement : chauffe, déplacement des axes et mise à l'origine de l'imprimante.
 

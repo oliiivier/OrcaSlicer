@@ -19995,6 +19995,37 @@ msgid ""
 "The AI assistant asks to change the color of a filament slot. Change it?"
 msgstr "Der KI-Assistent möchte die Farbe eines Filamentplatzes ändern. Ändern?"
 
+#, boost-format
+msgid "Add the height range %1% to %2%"
+msgstr "Höhenbereich %1% zu %2% hinzufügen"
+
+#, boost-format
+msgid "Remove the height range %1% of %2%"
+msgstr "Höhenbereich %1% von %2% entfernen"
+
+msgid "(unnamed step)"
+msgstr "(unbenannter Schritt)"
+
+msgid "The AI assistant asks to undo these steps, as Ctrl+Z does. Undo them?"
+msgstr "Der KI-Assistent möchte diese Schritte rückgängig machen, wie Strg+Z. Rückgängig machen?"
+
+msgid "The AI assistant asks to redo these steps, as Ctrl+Y does. Redo them?"
+msgstr "Der KI-Assistent möchte diese Schritte wiederherstellen, wie Strg+Y. Wiederherstellen?"
+
+#, boost-format
+msgid "Plate %1%, layer %2% (%3% mm)"
+msgstr "Platte %1%, Schicht %2% (%3% mm)"
+
+msgid "pause the print"
+msgstr "Druck pausieren"
+
+#, boost-format
+msgid "change to filament %1%"
+msgstr "zu Filament %1% wechseln"
+
+msgid "remove the event"
+msgstr "Ereignis entfernen"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

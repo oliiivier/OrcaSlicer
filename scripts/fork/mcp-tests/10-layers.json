@@ -1,0 +1,278 @@
+{
+  "description": "Height ranges, layer events and undo.",
+  "confirm": "yes",
+  "steps": [
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "new"
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "import",
+        "paths": [
+          "${MODELS}/OrcaToleranceTest.stl"
+        ]
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "edit_objects",
+      "args": {
+        "reason": "bench",
+        "operations": [
+          {
+            "action": "add_height_range",
+            "object": 1,
+            "from_mm": 2,
+            "to_mm": 4,
+            "settings": {
+              "layer_height": 0.12,
+              "wall_loops": 4
+            }
+          }
+        ]
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "get_project",
+      "args": {},
+      "expect": {
+        "objects": [
+          {
+            "height_ranges": [
+              {
+                "from_mm": 2,
+                "to_mm": 4,
+                "settings": {
+                  "layer_height": "0.12",
+                  "wall_loops": "4"
+                }
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "call": "edit_objects",
+      "args": {
+        "reason": "bench",
+        "operations": [
+          {
+            "action": "add_height_range",
+            "object": 1,
+            "from_mm": 3,
+            "to_mm": 5
+          }
+        ]
+      },
+      "expect": {
+        "done": false,
+        "failed": {
+          "error": "$any"
+        }
+      },
+      "note": "overlap"
+    },
+    {
+      "call": "edit_objects",
+      "args": {
+        "reason": "bench",
+        "operations": [
+          {
+            "action": "add_height_range",
+            "object": 1,
+            "from_mm": 5,
+            "to_mm": 6,
+            "settings": {
+              "nozzle_temperature": 200
+            }
+          }
+        ]
+      },
+      "error": true,
+      "note": "not a range setting"
+    },
+    {
+      "call": "edit_objects",
+      "args": {
+        "reason": "bench",
+        "operations": [
+          {
+            "action": "remove_height_range",
+            "object": 1,
+            "from_mm": 2,
+            "to_mm": 4
+          }
+        ]
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "get_project",
+      "args": {},
+      "expect": {
+        "objects": [
+          {
+            "height_ranges": []
+          }
+        ]
+      }
+    },
+    {
+      "call": "undo",
+      "args": {
+        "action": "undo",
+        "steps": 1
+      },
+      "expect": {
+        "done": true,
+        "steps": "$any"
+      }
+    },
+    {
+      "call": "get_project",
+      "args": {},
+      "expect": {
+        "objects": [
+          {
+            "height_ranges": [
+              {
+                "from_mm": 2
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "call": "undo",
+      "args": {
+        "action": "redo"
+      },
+      "expect": {
+        "done": true
+      }
+    },
+    {
+      "call": "undo",
+      "args": {
+        "action": "undo",
+        "steps": 500
+      },
+      "error": true
+    },
+    {
+      "call": "edit_plates",
+      "args": {
+        "operations": [
+          {
+            "action": "add_layer_event",
+            "layer": 5,
+            "type": "pause"
+          }
+        ]
+      },
+      "error": true,
+      "error_contains": "slice it first"
+    },
+    {
+      "call": "slice",
+      "args": {},
+      "expect": {
+        "sliced": true
+      }
+    },
+    {
+      "call": "edit_plates",
+      "args": {
+        "reason": "bench",
+        "operations": [
+          {
+            "action": "add_layer_event",
+            "layer": 5,
+            "type": "pause"
+          }
+        ]
+      },
+      "expect": {
+        "done": true,
+        "plates": [
+          {
+            "plate": 1,
+            "layer_events": [
+              {
+                "type": "pause"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "call": "slice",
+      "args": {},
+      "expect": {
+        "sliced": true
+      }
+    },
+    {
+      "call": "edit_plates",
+      "args": {
+        "operations": [
+          {
+            "action": "add_layer_event",
+            "layer": 6,
+            "type": "filament_change",
+            "filament_slot": 99
+          }
+        ]
+      },
+      "error": true,
+      "error_contains": "No filament slot 99"
+    },
+    {
+      "call": "edit_plates",
+      "args": {
+        "reason": "bench",
+        "operations": [
+          {
+            "action": "remove_layer_event",
+            "layer": 5
+          }
+        ]
+      },
+      "expect": {
+        "done": true,
+        "plates": [
+          {
+            "plate": 1,
+            "layer_events": []
+          }
+        ]
+      }
+    },
+    {
+      "call": "edit_project",
+      "args": {
+        "action": "new"
+      },
+      "expect": {
+        "done": true
+      }
+    }
+  ]
+}

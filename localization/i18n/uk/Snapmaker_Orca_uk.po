@@ -19456,6 +19456,37 @@ msgid ""
 "The AI assistant asks to change the color of a filament slot. Change it?"
 msgstr "ШІ-асистент просить змінити колір слота філаменту. Змінити?"
 
+#, boost-format
+msgid "Add the height range %1% to %2%"
+msgstr "Додати діапазон висот %1% до %2%"
+
+#, boost-format
+msgid "Remove the height range %1% of %2%"
+msgstr "Видалити діапазон висот %1% з %2%"
+
+msgid "(unnamed step)"
+msgstr "(крок без назви)"
+
+msgid "The AI assistant asks to undo these steps, as Ctrl+Z does. Undo them?"
+msgstr "ШІ-асистент просить скасувати ці кроки, як Ctrl+Z. Скасувати?"
+
+msgid "The AI assistant asks to redo these steps, as Ctrl+Y does. Redo them?"
+msgstr "ШІ-асистент просить повторити ці кроки, як Ctrl+Y. Повторити?"
+
+#, boost-format
+msgid "Plate %1%, layer %2% (%3% mm)"
+msgstr "Пластина %1%, шар %2% (%3% мм)"
+
+msgid "pause the print"
+msgstr "призупинити друк"
+
+#, boost-format
+msgid "change to filament %1%"
+msgstr "змінити на філамент %1%"
+
+msgid "remove the event"
+msgstr "видалити подію"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

@@ -18187,6 +18187,37 @@ msgid ""
 "The AI assistant asks to change the color of a filament slot. Change it?"
 msgstr "Asistent AI žádá o změnu barvy pozice filamentu. Změnit?"
 
+#, boost-format
+msgid "Add the height range %1% to %2%"
+msgstr "Přidat výškový rozsah %1% k %2%"
+
+#, boost-format
+msgid "Remove the height range %1% of %2%"
+msgstr "Odebrat výškový rozsah %1% z %2%"
+
+msgid "(unnamed step)"
+msgstr "(nepojmenovaný krok)"
+
+msgid "The AI assistant asks to undo these steps, as Ctrl+Z does. Undo them?"
+msgstr "Asistent AI žádá o vrácení těchto kroků, jako Ctrl+Z. Vrátit je?"
+
+msgid "The AI assistant asks to redo these steps, as Ctrl+Y does. Redo them?"
+msgstr "Asistent AI žádá o zopakování těchto kroků, jako Ctrl+Y. Zopakovat je?"
+
+#, boost-format
+msgid "Plate %1%, layer %2% (%3% mm)"
+msgstr "Podložka %1%, vrstva %2% (%3% mm)"
+
+msgid "pause the print"
+msgstr "pozastavit tisk"
+
+#, boost-format
+msgid "change to filament %1%"
+msgstr "změnit na filament %1%"
+
+msgid "remove the event"
+msgstr "odebrat událost"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

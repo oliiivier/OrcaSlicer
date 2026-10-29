@@ -18825,3 +18825,34 @@ msgstr "線材槽 %1%：顏色 %2%"
 msgid ""
 "The AI assistant asks to change the color of a filament slot. Change it?"
 msgstr "AI 助理請求變更一個線材槽的顏色。是否變更？"
+
+#, boost-format
+msgid "Add the height range %1% to %2%"
+msgstr "為 %2% 新增高度範圍 %1%"
+
+#, boost-format
+msgid "Remove the height range %1% of %2%"
+msgstr "移除 %2% 的高度範圍 %1%"
+
+msgid "(unnamed step)"
+msgstr "（未命名步驟）"
+
+msgid "The AI assistant asks to undo these steps, as Ctrl+Z does. Undo them?"
+msgstr "AI 助理請求像 Ctrl+Z 一樣復原這些步驟。是否復原？"
+
+msgid "The AI assistant asks to redo these steps, as Ctrl+Y does. Redo them?"
+msgstr "AI 助理請求像 Ctrl+Y 一樣重做這些步驟。是否重做？"
+
+#, boost-format
+msgid "Plate %1%, layer %2% (%3% mm)"
+msgstr "列印板 %1%，第 %2% 層（%3% mm）"
+
+msgid "pause the print"
+msgstr "暫停列印"
+
+#, boost-format
+msgid "change to filament %1%"
+msgstr "切換到線材 %1%"
+
+msgid "remove the event"
+msgstr "移除該事件"

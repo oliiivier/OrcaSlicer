@@ -19328,6 +19328,37 @@ msgid ""
 "The AI assistant asks to change the color of a filament slot. Change it?"
 msgstr "DI asistentas prašo pakeisti gijos vietos spalvą. Pakeisti?"
 
+#, boost-format
+msgid "Add the height range %1% to %2%"
+msgstr "Pridėti aukščio intervalą %1% prie %2%"
+
+#, boost-format
+msgid "Remove the height range %1% of %2%"
+msgstr "Pašalinti %2% aukščio intervalą %1%"
+
+msgid "(unnamed step)"
+msgstr "(nepavadintas žingsnis)"
+
+msgid "The AI assistant asks to undo these steps, as Ctrl+Z does. Undo them?"
+msgstr "DI asistentas prašo atšaukti šiuos žingsnius, kaip Ctrl+Z. Atšaukti?"
+
+msgid "The AI assistant asks to redo these steps, as Ctrl+Y does. Redo them?"
+msgstr "DI asistentas prašo pakartoti šiuos žingsnius, kaip Ctrl+Y. Pakartoti?"
+
+#, boost-format
+msgid "Plate %1%, layer %2% (%3% mm)"
+msgstr "Plokštė %1%, sluoksnis %2% (%3% mm)"
+
+msgid "pause the print"
+msgstr "pristabdyti spausdinimą"
+
+#, boost-format
+msgid "change to filament %1%"
+msgstr "pakeisti į giją %1%"
+
+msgid "remove the event"
+msgstr "pašalinti įvykį"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

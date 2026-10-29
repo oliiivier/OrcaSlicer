@@ -19762,6 +19762,37 @@ msgid ""
 "The AI assistant asks to change the color of a filament slot. Change it?"
 msgstr "O assistente de IA pede para mudar a cor de uma posição de filamento. Mudar?"
 
+#, boost-format
+msgid "Add the height range %1% to %2%"
+msgstr "Adicionar o intervalo de altura %1% a %2%"
+
+#, boost-format
+msgid "Remove the height range %1% of %2%"
+msgstr "Remover o intervalo de altura %1% de %2%"
+
+msgid "(unnamed step)"
+msgstr "(etapa sem nome)"
+
+msgid "The AI assistant asks to undo these steps, as Ctrl+Z does. Undo them?"
+msgstr "O assistente de IA pede para desfazer estas etapas, como Ctrl+Z. Desfazer?"
+
+msgid "The AI assistant asks to redo these steps, as Ctrl+Y does. Redo them?"
+msgstr "O assistente de IA pede para refazer estas etapas, como Ctrl+Y. Refazer?"
+
+#, boost-format
+msgid "Plate %1%, layer %2% (%3% mm)"
+msgstr "Placa %1%, camada %2% (%3% mm)"
+
+msgid "pause the print"
+msgstr "pausar a impressão"
+
+#, boost-format
+msgid "change to filament %1%"
+msgstr "trocar para o filamento %1%"
+
+msgid "remove the event"
+msgstr "remover o evento"
+
 #~ msgid "Enable filament ramming."
 #~ msgstr "Ativar moldeamento de ponta de filamento."
 

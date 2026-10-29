@@ -67,7 +67,7 @@ json get_project(const json& /* args */)
                    { "parts", object_parts(*obj) },
                    { "filaments", object_filaments(*obj) },
                    { "setting_overrides", std::move(overrides) },
-                   { "height_range_overrides", obj->layer_config_ranges.size() } };
+                   { "height_ranges", object_height_ranges(*obj) } };
         o.update(object_geometry(idx));
         objects.push_back(std::move(o));
     }
@@ -245,7 +245,8 @@ const std::vector<Tool>& tools()
           "Summary of the open project: printer toolheads, filament slots (preset, type, color, temperature, toolhead, "
           "used on the plate), mixed filaments, filament assigned to walls/infill/supports, for each object its "
           "index, size, plate and position on it (center x/y, bottom z), parts (name, type, filament), filaments and "
-          "per-object setting overrides, and the plates (objects, bed type, print sequence, sliced, current one).",
+          "per-object setting overrides and height ranges, the plates (objects, bed type, print sequence, sliced, "
+          "current one, layer events) and the presets (selected, available, unsaved edits).",
           simple(&get_project),
           { { "type", "object" }, { "properties", json::object() } },
           60s },
@@ -344,7 +345,10 @@ const std::vector<Tool>& tools()
           "duplicate, delete, auto-orient (orient), arrange the current plate, add_part (a box, cylinder, cone or "
           "sphere of size_mm added to an object as a solid part, negative part, modifier, support blocker or support "
           "enforcer, at_mm = center x/y on the plate and bottom z; e.g. a block to fill a gap or a blocker under an "
-          "overhang), delete_part, set_filament (of an object, or of one 'part'), rename (an object or one 'part'). "
+          "overhang), delete_part, set_filament (of an object, or of one 'part'), rename (an object or one 'part'), "
+          "add_height_range (from_mm to to_mm above the object bottom, with its own 'settings': layer_height, extruder "
+          "= filament slot, wall, infill, surface and speed settings, as the Height range Modifier of the object list), "
+          "remove_height_range (from_mm, to_mm). "
           "Operations run in order; 'object' is a name or the 1-based index of get_project, 'part' a name or the "
           "1-based index of its parts, both looked up when the operation runs (cut, split, duplicate and delete "
           "change the list). Returns the objects afterwards. Check sizes and positions with get_project and the "
@@ -364,7 +368,7 @@ const std::vector<Tool>& tools()
                                 { "enum",
                                   { "scale", "rotate", "move", "move_to_plate", "center", "drop", "mirror", "cut", "split", "duplicate",
                                     "delete", "orient", "arrange", "add_part", "delete_part", "set_filament",
-                                    "rename" } } } },
+                                    "rename", "add_height_range", "remove_height_range" } } } },
                             { "object",
                               { { "type", { "string", "integer" } },
                                 { "description", "Object name or 1-based index; not used by arrange." } } },
@@ -395,7 +399,11 @@ const std::vector<Tool>& tools()
                               { { "type", "integer" },
                                 { "minimum", 0 },
                                 { "description", "set_filament, add_part: 1-based slot; 0 = the object's filament for a part." } } },
-                            { "name", { { "type", "string" }, { "description", "rename, add_part." } } } } },
+                            { "name", { { "type", "string" }, { "description", "rename, add_part." } } },
+                            { "from_mm", { { "type", "number" }, { "description", "height ranges: from the object bottom." } } },
+                            { "to_mm", { { "type", "number" } } },
+                            { "settings",
+                              { { "type", "object" }, { "description", "add_height_range: e.g. {\"layer_height\": 0.12, \"wall_loops\": 4}." } } } } },
                         { "required", { "action" } } } } } } } },
             { "required", { "reason", "operations" } } },
           // The user has to confirm the operations.
@@ -406,7 +414,10 @@ const std::vector<Tool>& tools()
           "Changes the plates, in order, after the user's confirmation (none needed to only select): select (show it; "
           "get_issues, slice and get_view work on the current plate), add (a new plate, then current), delete (an "
           "empty plate), rename, set (bed_type: e.g. \"Textured PEI Plate\", \"Cool Plate\", \"High Temp Plate\"; "
-          "print_sequence: \"by layer\" or \"by object\"; \"default\" follows the project or process settings). "
+          "print_sequence: \"by layer\" or \"by object\"; \"default\" follows the project or process settings), "
+          "add_layer_event (at the 1-based 'layer' or the layer closest to 'height_mm' of the sliced current plate: "
+          "type pause, or filament_change to 'filament_slot', like the layer slider of the preview; no custom G-code), "
+          "remove_layer_event. "
           "'plate' is the 1-based number of get_project.plates, the current plate by default. Move objects between "
           "plates with edit_objects (move_to_plate).",
           [](const json& args, ToolContext& ctx) { return edit_plates(args, ctx.abandoned); },
@@ -419,11 +430,15 @@ const std::vector<Tool>& tools()
                     { "items",
                       { { "type", "object" },
                         { "properties",
-                          { { "action", { { "type", "string" }, { "enum", { "select", "add", "delete", "rename", "set" } } } },
+                          { { "action", { { "type", "string" }, { "enum", { "select", "add", "delete", "rename", "set", "add_layer_event", "remove_layer_event" } } } },
                             { "plate", { { "type", "integer" }, { "minimum", 1 } } },
                             { "name", { { "type", "string" } } },
                             { "bed_type", { { "type", "string" } } },
-                            { "print_sequence", { { "type", "string" } } } } },
+                            { "print_sequence", { { "type", "string" } } },
+                            { "type", { { "type", "string" }, { "enum", { "pause", "filament_change" } } } },
+                            { "layer", { { "type", "integer" }, { "minimum", 1 } } },
+                            { "height_mm", { { "type", "number" } } },
+                            { "filament_slot", { { "type", "integer" }, { "minimum", 1 } } } } },
                         { "required", { "action" } } } } } } } },
             { "required", { "operations" } } },
           10min },
@@ -452,6 +467,18 @@ const std::vector<Tool>& tools()
                 { "format", { { "type", "string" }, { "enum", { "gcode", "sliced_3mf", "stl" } } } },
                 { "overwrite", { { "type", "boolean" }, { "default", false } } },
                 { "save_as", { { "type", "boolean" }, { "default", false } } },
+                { "reason", REASON } } },
+            { "required", { "action" } } },
+          10min },
+        { "undo",
+          "Undoes (or redoes) the last 'steps' steps of the slicer's history, like Ctrl+Z / Ctrl+Y, after the user's "
+          "confirmation listing them: object, part, plate and height range changes, including those made by edit_objects "
+          "and edit_plates. Files, preset edits and the printer are not in the history.",
+          [](const json& args, ToolContext& ctx) { return undo_redo(args, ctx.abandoned); },
+          { { "type", "object" },
+            { "properties",
+              { { "action", action_schema({ "undo", "redo" }) },
+                { "steps", { { "type", "integer" }, { "minimum", 1 }, { "maximum", 50 }, { "default", 1 } } },
                 { "reason", REASON } } },
             { "required", { "action" } } },
           10min },
@@ -674,7 +701,9 @@ const char* const INSTRUCTIONS[] = {
     "objects like the Prepare view; use it for placement issues (outside the build volume, too big, overhangs to "
     "reorient) and when the user asks, then check with get_issues and get_view. get_issues, slice and get_view work "
     "on the current plate: edit_plates selects, adds, deletes and sets up plates; slice all_plates for the whole "
-    "project. edit_project creates, opens, imports, saves and exports files. Issues fixed in the slicer UI rather "
+    "project. Height ranges (edit_objects) give part of an object other settings; layer events (edit_plates) pause "
+    "the print or change the filament at a layer. undo reverts the last steps when the user is not satisfied. "
+    "edit_project creates, opens, imports, saves and exports files. Issues fixed in the slicer UI rather "
     "than through these tools must be explained to the user step by step.\n"
     "When the user describes a visual problem (missing supports, stringing, wrong colors...), look at the model with "
     "get_view from the relevant side and slice to get the supports and per-feature results; the user may also paste "

@@ -17,9 +17,16 @@ nlohmann::json object_geometry(size_t obj_idx);
 // filament (0 = the object's filament).
 nlohmann::json object_parts(const ModelObject& obj);
 
+// Height ranges of an object with their own settings: from_mm, to_mm, settings.
+nlohmann::json object_height_ranges(const ModelObject& obj);
+
+// Undoes or redoes args.steps steps of the slicer's history (args.action), after
+// the user's confirmation listing them.
+nlohmann::json undo_redo(const nlohmann::json& args, const std::atomic<bool>& abandoned);
+
 // Runs the object operations of the Prepare view (scale, rotate, move, mirror,
 // cut, split, duplicate, delete, add or delete a part or modifier, filament,
-// rename, orient, arrange) one after the other once the
+// rename, height ranges, orient, arrange) one after the other once the
 // user confirmed them. Orient and arrange are background jobs: the call answers
 // ToolRetry until they end and resumes with `state`. `abandoned` is set by the
 // server thread when the client stopped waiting: nothing more is changed then.

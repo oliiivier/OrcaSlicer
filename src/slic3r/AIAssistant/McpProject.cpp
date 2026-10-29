@@ -7,6 +7,8 @@
 #include "libslic3r/Format/STL.hpp"
 #include "libslic3r/Format/bbs_3mf.hpp"
 #include "libslic3r/Model.hpp"
+#include "libslic3r/GCode/GCodeProcessor.hpp"
+#include "libslic3r/PresetBundle.hpp"
 #include "libslic3r/PrintConfig.hpp"
 #include "libslic3r/Utils.hpp"
 #include "slic3r/GUI/Event.hpp"
@@ -25,6 +27,8 @@
 
 #include <wx/utils.h>
 
+#include <algorithm>
+#include <cmath>
 #include <set>
 
 namespace Slic3r { namespace AIAssistant {
@@ -36,6 +40,64 @@ using GUI::wxGetApp;
 namespace fs = boost::filesystem;
 
 namespace {
+
+// ------------------------------------------------------------ layer events
+
+// Top of each layer of the sliced current plate, lowest first: the heights of its
+// extrusions, as the layer slider of the preview lists them.
+std::vector<double> layer_heights(GUI::Plater& plater, GUI::PartPlate& plate)
+{
+    const GCodeProcessorResult* result = plate.get_slice_result();
+    if (plate.get_index() != plater.get_partplate_list().get_curr_plate_index() || !plate.is_slice_result_valid() || result == nullptr)
+        throw ToolError("Layer events need the layers of the plate: select it (edit_plates select) and slice it first");
+    std::vector<double> zs;
+    for (const GCodeProcessorResult::MoveVertex& move : result->moves)
+        if (move.type == EMoveType::Extrude)
+            zs.push_back(std::round(double(move.position.z()) * 1000.) / 1000.);
+    std::sort(zs.begin(), zs.end());
+    zs.erase(std::unique(zs.begin(), zs.end(), [](double a, double b) { return std::abs(a - b) < 0.002; }), zs.end());
+    if (zs.empty())
+        throw ToolError("The plate has no layer: slice it first");
+    return zs;
+}
+
+// Layer of op (1-based 'layer', or the layer whose top is closest to 'height_mm'): its index in `zs`.
+size_t layer_arg(const json& op, const std::vector<double>& zs)
+{
+    if (op.contains("layer")) {
+        if (!op["layer"].is_number_integer() || op["layer"].get<int>() < 1 || op["layer"].get<size_t>() > zs.size())
+            throw ToolError("'layer' must be between 1 and " + std::to_string(zs.size()));
+        return op["layer"].get<size_t>() - 1;
+    }
+    if (!op.contains("height_mm") || !op["height_mm"].is_number())
+        throw ToolError("A layer event needs 'layer' (1-based) or 'height_mm'");
+    const double height = op["height_mm"].get<double>();
+    size_t       best   = 0;
+    for (size_t i = 1; i < zs.size(); ++i)
+        if (std::abs(zs[i] - height) < std::abs(zs[best] - height))
+            best = i;
+    return best;
+}
+
+std::string event_type_name(CustomGCode::Type type)
+{
+    return type == CustomGCode::PausePrint ? "pause" : type == CustomGCode::ToolChange ? "filament_change" :
+           type == CustomGCode::ColorChange ? "color_change" : type == CustomGCode::Custom ? "custom_gcode" : "other";
+}
+
+json layer_events(int plate_idx)
+{
+    json        out    = json::array();
+    const auto& gcodes = wxGetApp().model().plates_custom_gcodes;
+    if (const auto it = gcodes.find(plate_idx); it != gcodes.end())
+        for (const CustomGCode::Item& item : it->second.gcodes) {
+            json e = { { "height_mm", std::round(item.print_z * 1000.) / 1000. }, { "type", event_type_name(item.type) } };
+            if (item.type == CustomGCode::ToolChange || item.type == CustomGCode::ColorChange)
+                e["filament_slot"] = item.extruder;
+            out.push_back(std::move(e));
+        }
+    return out;
+}
 
 // Name of an enum value in the project files ("Textured PEI Plate", "by object").
 template<typename T> std::string enum_name(T value)
@@ -128,7 +190,34 @@ std::string describe_plate_op(GUI::PartPlateList& plates, const json& op)
             text += (i == 0 ? "" : ", ") + parts[i];
         return text;
     }
-    throw ToolError("Unknown action '" + action + "' (select, add, delete, rename or set)");
+    if (action == "add_layer_event") {
+        const std::vector<double> zs   = layer_heights(*wxGetApp().plater(), plate);
+        const size_t              i    = layer_arg(op, zs);
+        const std::string         type = op.value("type", std::string());
+        const std::string         where = (boost::format(_u8L("Plate %1%, layer %2% (%3% mm)")) % number % (i + 1) %
+                                           float_to_string_decimal_point(zs[i], 2)).str();
+        if (type == "pause")
+            return where + ": " + _u8L("pause the print");
+        if (type == "filament_change") {
+            if (filament_slot_count() < 2)
+                throw ToolError("A filament change needs at least two filament slots (edit_presets add_slot)");
+            return where + ": " + (boost::format(_u8L("change to filament %1%")) % filament_slot_ref(op, "filament_slot")).str();
+        }
+        throw ToolError("'type' must be pause or filament_change (custom G-code is not allowed)");
+    }
+    if (action == "remove_layer_event") {
+        const std::vector<double> zs = layer_heights(*wxGetApp().plater(), plate);
+        const size_t              i  = layer_arg(op, zs);
+        const auto&               gcodes = wxGetApp().model().plates_custom_gcodes;
+        const auto                it     = gcodes.find(plate.get_index());
+        if (it == gcodes.end() ||
+            std::none_of(it->second.gcodes.begin(), it->second.gcodes.end(),
+                         [&](const CustomGCode::Item& item) { return std::abs(item.print_z - zs[i]) < EPSILON; }))
+            throw ToolError("No layer event at layer " + std::to_string(i + 1) + " of plate " + number + " (see get_project.plates[].layer_events)");
+        return (boost::format(_u8L("Plate %1%, layer %2% (%3% mm)")) % number % (i + 1) % float_to_string_decimal_point(zs[i], 2)).str() +
+               ": " + _u8L("remove the event");
+    }
+    throw ToolError("Unknown action '" + action + "' (select, add, delete, rename, set, add_layer_event or remove_layer_event)");
 }
 
 void run_plate_op(GUI::Plater& plater, const json& op)
@@ -165,6 +254,30 @@ void run_plate_op(GUI::Plater& plater, const json& op)
         plater.update_project_dirty_from_presets();
         plater.set_plater_dirty(true);
         plater.update();
+    } else if (action == "add_layer_event" || action == "remove_layer_event") {
+        // As the + and - of the layer slider of the preview.
+        const std::vector<double> zs   = layer_heights(plater, plate);
+        const double              z    = zs[layer_arg(op, zs)];
+        CustomGCode::Info&        info = plater.model().plates_custom_gcodes[index];
+        auto& gcodes = info.gcodes;
+        gcodes.erase(std::remove_if(gcodes.begin(), gcodes.end(), [z](const CustomGCode::Item& item) { return std::abs(item.print_z - z) < EPSILON; }),
+                     gcodes.end());
+        if (action == "add_layer_event") {
+            CustomGCode::Item item { z, CustomGCode::PausePrint, 0, "", "" };
+            if (op.value("type", std::string()) == "filament_change") {
+                const int   slot   = filament_slot_ref(op, "filament_slot");
+                const auto* colors = wxGetApp().preset_bundle->project_config.option<ConfigOptionStrings>("filament_colour");
+                item.type          = CustomGCode::ToolChange;
+                item.extruder      = slot;
+                item.color         = colors != nullptr && size_t(slot) <= colors->values.size() ? colors->values[slot - 1] : "";
+            }
+            gcodes.push_back(item);
+            std::sort(gcodes.begin(), gcodes.end());
+        }
+        CustomGCode::check_mode_for_custom_gcode_per_print_z(info);
+        plate.update_slice_result_valid_state(false);
+        plater.set_plater_dirty(true);
+        plater.update();
     }
 }
 
@@ -187,7 +300,8 @@ json plates_summary()
                         { "objects", std::move(objects) },
                         { "bed_type", bed == btDefault ? std::string("default") : enum_name(bed) },
                         { "print_sequence", seq == PrintSequence::ByDefault ? std::string("default") : enum_name(seq) },
-                        { "sliced", plate->is_slice_result_valid() } });
+                        { "sliced", plate->is_slice_result_valid() },
+                        { "layer_events", layer_events(i) } });
     }
     return out;
 }

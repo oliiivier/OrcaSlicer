@@ -170,6 +170,11 @@ int list_item(const PresetType& type, int slot, const std::string& name)
 // volumes...) and may ask what to do with unsaved changes. True when selected.
 bool click(const PresetType& type, int slot, const std::string& name, int item)
 {
+    // The test mode cannot answer the slicer's own question about unsaved changes: they are dropped.
+    if (test_confirm_answer())
+        for (const PresetType& t : PRESET_TYPES)
+            if (collection(t.type).current_is_dirty())
+                collection(t.type).discard_current_changes();
     if (item < 0) {
         // What the list of the settings tab calls.
         wxGetApp().get_tab(type.type)->select_preset(name);
