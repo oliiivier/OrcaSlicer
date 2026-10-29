@@ -16324,3 +16324,402 @@ msgstr ""
 msgid "Rebuild toolpath geometry on the GPU: much faster preview loading and lower memory on capable graphics cards. If the preview moves slower than before (for example on basic integrated graphics), turn this off to use the compatible renderer. Takes effect when the preview is reloaded."
 msgstr ""
 
+msgid "AI Assistant (MCP server): running"
+msgstr ""
+
+msgid "AI Assistant (MCP server): stopped"
+msgstr ""
+
+msgid "Chat with Claude"
+msgstr ""
+
+msgid ""
+"Ask Claude about this project and let it propose setting changes (requires "
+"Claude Code)"
+msgstr ""
+
+msgid ""
+"Let Claude, Gemini or another MCP client analyze and fix the print settings"
+msgstr ""
+
+msgid "Claude"
+msgstr ""
+
+msgid "Chat with Claude about this project"
+msgstr ""
+
+msgid ""
+"Ask about this project, a print problem, a setting... (Enter to send, "
+"Shift+Enter for a new line, paste a screenshot)"
+msgstr ""
+
+msgid "New conversation"
+msgstr ""
+
+msgid "MCP server settings"
+msgstr ""
+
+msgid ""
+"Claude can read the project, explain the slicer warnings, propose setting "
+"changes (you confirm each one in the slicer) and follow the connected "
+"printer."
+msgstr ""
+
+msgid "Starting Claude Code..."
+msgstr ""
+
+msgid "Thinking..."
+msgstr ""
+
+msgid "Stopped."
+msgstr ""
+
+msgid ""
+"The MCP server of the slicer is off: Claude cannot see the project. Turn it "
+"on in the MCP server settings."
+msgstr ""
+
+msgid "Claude Code could not connect to the MCP server of the slicer."
+msgstr ""
+
+msgid ""
+"Claude Code was not found. Install it (https://claude.com/claude-code), run "
+"\"claude\" once in a terminal to log in, then try again."
+msgstr ""
+
+msgid ""
+"Claude Code stopped. Your next message restarts it and continues the "
+"conversation."
+msgstr ""
+
+msgid "If you are not logged in, run \"claude\" once in a terminal to log in."
+msgstr ""
+
+msgid "3D view"
+msgstr ""
+
+msgid "Attach a screenshot of the 3D view"
+msgstr ""
+
+msgid "Window"
+msgstr ""
+
+msgid "Attach a screenshot of the whole slicer window"
+msgstr ""
+
+msgid "The screenshot could not be taken."
+msgstr ""
+
+msgid "Dock next to the 3D view"
+msgstr ""
+
+msgid "Close this conversation"
+msgstr ""
+
+msgid "Float in its own window"
+msgstr ""
+
+msgid "Choose the model"
+msgstr ""
+
+msgid "Compacting the conversation..."
+msgstr ""
+
+msgid "Conversation compacted: Claude keeps a summary of it."
+msgstr ""
+
+msgid "Conversation cleared: Claude starts from scratch."
+msgstr ""
+
+#, c-format, boost-format
+msgid "Could not start the MCP server: %s"
+msgstr ""
+
+msgid "Claude Code was not found."
+msgstr ""
+
+msgid "Could not send the message to Claude Code."
+msgstr ""
+
+msgid "filament"
+msgstr ""
+
+msgid "toolhead"
+msgstr ""
+
+msgid "AI assistant:"
+msgstr ""
+
+msgid "AI Assistant"
+msgstr ""
+
+msgid "Changes proposed by the AI assistant"
+msgstr ""
+
+msgid "Parameter name"
+msgstr ""
+
+msgid "AI Assistant (MCP server)"
+msgstr ""
+
+msgid ""
+"Lets an AI assistant (Claude, Gemini...) analyze the open project, fix the "
+"problems reported by the slicer and tune the print settings. Every change "
+"has to be confirmed here. The server only accepts connections from this "
+"computer."
+msgstr ""
+
+msgid "Regenerate"
+msgstr ""
+
+msgid "Port"
+msgstr ""
+
+msgid "Found automatically"
+msgstr ""
+
+msgid "Browse..."
+msgstr ""
+
+msgid "Claude Code"
+msgstr ""
+
+msgid "Notes folder"
+msgstr ""
+
+msgid "Let the assistant add and edit notes"
+msgstr ""
+
+msgid ""
+"e.g. Answer in French. I print mostly PETG on the U1 and prefer strong parts "
+"over speed."
+msgstr ""
+
+#, c-format, boost-format
+msgid ""
+"Added to the assistant's instructions at the start of each conversation. "
+"Also editable in %s."
+msgstr ""
+
+msgid "Enable MCP server"
+msgstr ""
+
+msgid ""
+"Allow other MCP clients on this computer (Claude Code, Gemini CLI...) to "
+"connect with the token below. The built-in chat does not need it. Any "
+"program that can read the token can use the server."
+msgstr ""
+
+msgid ""
+"Allow reading the state of the connected printer (loaded filaments, nozzles, "
+"print status and errors). The printer is never controlled."
+msgstr ""
+
+msgid ""
+"Allow unloading filament from the toolheads. Each request has to be "
+"confirmed here, and it is refused while a print is running."
+msgstr ""
+
+msgid "At startup, connect to the printer when it is the only one available."
+msgstr ""
+
+msgid ""
+"Offer to adapt projects made for another printer (e.g. downloaded 3MF files) "
+"to the connected one."
+msgstr ""
+
+msgid ""
+"Allow searching the Snapmaker wiki and support site for the manufacturer's "
+"recommendations (the searches are sent to Snapmaker)."
+msgstr ""
+
+msgid "Instructions for the assistant"
+msgstr ""
+
+msgid "Token"
+msgstr ""
+
+msgid "Client configuration"
+msgstr ""
+
+msgid "All files"
+msgstr ""
+
+msgid "Choose the Claude Code executable"
+msgstr ""
+
+msgid "Choose the notes folder"
+msgstr ""
+
+#, c-format, boost-format
+msgid "Running on %s"
+msgstr ""
+
+#, c-format, boost-format
+msgid "Could not start the server: %s"
+msgstr ""
+
+msgid "Stopped"
+msgstr ""
+
+#, c-format, boost-format
+msgid "Used by the chat: %s"
+msgstr ""
+
+msgid "Claude Code not found: install it, or choose its executable."
+msgstr ""
+
+#, boost-format
+msgid "Add a part (%1%) to %2%"
+msgstr ""
+
+#, boost-format
+msgid "Add a negative part (%1%) to %2%"
+msgstr ""
+
+#, boost-format
+msgid "Add a modifier (%1%) to %2%"
+msgstr ""
+
+#, boost-format
+msgid "Add a support blocker (%1%) to %2%"
+msgstr ""
+
+#, boost-format
+msgid "Add a support enforcer (%1%) to %2%"
+msgstr ""
+
+msgid "Arrange the objects of the current plate"
+msgstr ""
+
+#, boost-format
+msgid "Scale %1% to %2% %%"
+msgstr ""
+
+#, boost-format
+msgid "Resize %1% to %2%, keeping its proportions"
+msgstr ""
+
+#, boost-format
+msgid "Resize %1% to %2%"
+msgstr ""
+
+#, boost-format
+msgid "Rotate %1% by %2%"
+msgstr ""
+
+#, boost-format
+msgid "Move %1% to %2%"
+msgstr ""
+
+#, boost-format
+msgid "Move %1% by %2%"
+msgstr ""
+
+#, boost-format
+msgid "Center %1% on its plate"
+msgstr ""
+
+#, boost-format
+msgid "Drop %1% to the bed"
+msgstr ""
+
+#, boost-format
+msgid "Mirror %1% along %2%"
+msgstr ""
+
+#, boost-format
+msgid "Cut %1% at %2% mm from its bottom"
+msgstr ""
+
+msgid "keep the upper part"
+msgstr ""
+
+msgid "keep the lower part"
+msgstr ""
+
+msgid "upper part placed on its cut face"
+msgstr ""
+
+#, boost-format
+msgid "Split %1% into objects"
+msgstr ""
+
+#, boost-format
+msgid "Duplicate %1% x%2%"
+msgstr ""
+
+#, boost-format
+msgid "Delete %1%"
+msgstr ""
+
+#, boost-format
+msgid "Auto-orient %1%"
+msgstr ""
+
+#, boost-format
+msgid "at %1%"
+msgstr ""
+
+#, boost-format
+msgid "Delete part %1% of %2%"
+msgstr ""
+
+#, boost-format
+msgid "Print part %1% of %2% with filament %3%"
+msgstr ""
+
+#, boost-format
+msgid "Print %1% with filament %2%"
+msgstr ""
+
+#, boost-format
+msgid "Rename part %1% of %2% to %3%"
+msgstr ""
+
+#, boost-format
+msgid "Rename %1% to %2%"
+msgstr ""
+
+msgid ""
+"The AI assistant asks to change the objects of the project. Apply these "
+"operations? Undo restores the previous state."
+msgstr ""
+
+msgid "Toolhead"
+msgstr ""
+
+msgid ""
+"The AI assistant asks to unload the filament of these toolheads. The printer "
+"heats each nozzle and moves. Unload now?"
+msgstr ""
+
+#, boost-format
+msgid "the closest profile for a layer height of %1% mm"
+msgstr ""
+
+#, boost-format
+msgid "slot and toolhead %1%"
+msgstr ""
+
+msgid ""
+"Adapt this project to the connected printer? The printer, process and "
+"filament presets change; the toolheads can still be changed when printing."
+msgstr ""
+
+msgid "Adapt the project"
+msgstr ""
+
+#, boost-format
+msgid "This project is set up for %1% but the connected printer is a %2%."
+msgstr ""
+
+msgid "Adapt it to this printer"
+msgstr ""
+
+#, c-format
+msgid ""
+"The project now uses %s. %zu settings of the original project differ from "
+"the new profile: ask the AI assistant (/adapt_project) to restore the "
+"original intent where it suits this printer."
+msgstr ""

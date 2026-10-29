@@ -15242,6 +15242,406 @@ msgstr "提示：当前耗材与特效纹理热床的粘附力较低，打印失
 msgid "Note: Using a %s mm %s nozzle for %s is not recommended."
 msgstr "提示：不推荐使用 %s mm %s热端打印 %s。"
 
+msgid "AI Assistant (MCP server): running"
+msgstr "AI 助手（MCP 服务器）：运行中"
+
+msgid "AI Assistant (MCP server): stopped"
+msgstr "AI 助手（MCP 服务器）：已停止"
+
+msgid "Chat with Claude"
+msgstr "与 Claude 聊天"
+
+msgid ""
+"Ask Claude about this project and let it propose setting changes (requires "
+"Claude Code)"
+msgstr "向 Claude 询问此项目，并让它提出设置修改建议（需要 Claude Code）"
+
+msgid ""
+"Let Claude, Gemini or another MCP client analyze and fix the print settings"
+msgstr "让 Claude、Gemini 或其他 MCP 客户端分析并修正打印设置"
+
+msgid "Claude"
+msgstr "Claude"
+
+msgid "Chat with Claude about this project"
+msgstr "与 Claude 聊聊这个项目"
+
+msgid ""
+"Ask about this project, a print problem, a setting... (Enter to send, "
+"Shift+Enter for a new line, paste a screenshot)"
+msgstr "询问此项目、打印问题或某项设置...（Enter 发送，Shift+Enter 换行，可粘贴截图）"
+
+msgid "New conversation"
+msgstr "新对话"
+
+msgid "MCP server settings"
+msgstr "MCP 服务器设置"
+
+msgid ""
+"Claude can read the project, explain the slicer warnings, propose setting "
+"changes (you confirm each one in the slicer) and follow the connected "
+"printer."
+msgstr "Claude 可以读取项目、解释切片软件的警告、提出设置修改建议（每项都由您在切片软件中确认），并跟踪已连接的打印机。"
+
+msgid "Starting Claude Code..."
+msgstr "正在启动 Claude Code..."
+
+msgid "Thinking..."
+msgstr "思考中..."
+
+msgid "Stopped."
+msgstr "已停止。"
+
+msgid ""
+"The MCP server of the slicer is off: Claude cannot see the project. Turn it "
+"on in the MCP server settings."
+msgstr "切片软件的 MCP 服务器已关闭：Claude 无法看到项目。请在 MCP 服务器设置中开启。"
+
+msgid "Claude Code could not connect to the MCP server of the slicer."
+msgstr "Claude Code 无法连接到切片软件的 MCP 服务器。"
+
+msgid ""
+"Claude Code was not found. Install it (https://claude.com/claude-code), run "
+"\"claude\" once in a terminal to log in, then try again."
+msgstr "未找到 Claude Code。请安装（https://claude.com/claude-code），在终端中运行一次“claude”登录，然后重试。"
+
+msgid ""
+"Claude Code stopped. Your next message restarts it and continues the "
+"conversation."
+msgstr "Claude Code 已停止。您的下一条消息会重新启动它并继续对话。"
+
+msgid "If you are not logged in, run \"claude\" once in a terminal to log in."
+msgstr "如果您尚未登录，请在终端中运行一次“claude”进行登录。"
+
+msgid "3D view"
+msgstr "3D 视图"
+
+msgid "Attach a screenshot of the 3D view"
+msgstr "附加 3D 视图截图"
+
+msgid "Window"
+msgstr "窗口"
+
+msgid "Attach a screenshot of the whole slicer window"
+msgstr "附加整个切片软件窗口的截图"
+
+msgid "The screenshot could not be taken."
+msgstr "无法截取屏幕。"
+
+msgid "Dock next to the 3D view"
+msgstr "停靠在 3D 视图旁"
+
+msgid "Close this conversation"
+msgstr "关闭此对话"
+
+msgid "Float in its own window"
+msgstr "在独立窗口中浮动"
+
+msgid "Choose the model"
+msgstr "选择模型"
+
+msgid "Compacting the conversation..."
+msgstr "正在压缩对话..."
+
+msgid "Conversation compacted: Claude keeps a summary of it."
+msgstr "对话已压缩：Claude 保留了它的摘要。"
+
+msgid "Conversation cleared: Claude starts from scratch."
+msgstr "对话已清除：Claude 从头开始。"
+
+#, c-format, boost-format
+msgid "Could not start the MCP server: %s"
+msgstr "无法启动 MCP 服务器：%s"
+
+msgid "Claude Code was not found."
+msgstr "未找到 Claude Code。"
+
+msgid "Could not send the message to Claude Code."
+msgstr "无法将消息发送给 Claude Code。"
+
+msgid "filament"
+msgstr "耗材丝"
+
+msgid "toolhead"
+msgstr "打印头"
+
+msgid "AI assistant:"
+msgstr "AI 助手："
+
+msgid "AI Assistant"
+msgstr "AI 助手"
+
+msgid "Changes proposed by the AI assistant"
+msgstr "AI 助手建议的修改"
+
+msgid "Parameter name"
+msgstr "参数名称"
+
+msgid "AI Assistant (MCP server)"
+msgstr "AI 助手（MCP 服务器）"
+
+msgid ""
+"Lets an AI assistant (Claude, Gemini...) analyze the open project, fix the "
+"problems reported by the slicer and tune the print settings. Every change "
+"has to be confirmed here. The server only accepts connections from this "
+"computer."
+msgstr "让 AI 助手（Claude、Gemini...）分析打开的项目，修复切片软件报告的问题并调整打印设置。每项修改都必须在此确认。服务器只接受来自本机的连接。"
+
+msgid "Regenerate"
+msgstr "重新生成"
+
+msgid "Port"
+msgstr "端口"
+
+msgid "Found automatically"
+msgstr "自动找到"
+
+msgid "Browse..."
+msgstr "浏览..."
+
+msgid "Claude Code"
+msgstr "Claude Code"
+
+msgid "Notes folder"
+msgstr "笔记文件夹"
+
+msgid "Let the assistant add and edit notes"
+msgstr "允许助手添加和编辑笔记"
+
+msgid ""
+"e.g. Answer in French. I print mostly PETG on the U1 and prefer strong parts "
+"over speed."
+msgstr "例如：用中文回答。我主要在 U1 上打印 PETG，比起速度更看重零件强度。"
+
+#, c-format, boost-format
+msgid ""
+"Added to the assistant's instructions at the start of each conversation. "
+"Also editable in %s."
+msgstr "在每次对话开始时添加到助手的指令中。也可以在 %s 中编辑。"
+
+msgid "Enable MCP server"
+msgstr "启用 MCP 服务器"
+
+msgid ""
+"Allow other MCP clients on this computer (Claude Code, Gemini CLI...) to "
+"connect with the token below. The built-in chat does not need it. Any "
+"program that can read the token can use the server."
+msgstr "允许本机上的其他 MCP 客户端（Claude Code、Gemini CLI...）使用下面的令牌连接。内置聊天不需要它。任何能读取该令牌的程序都可以使用服务器。"
+
+msgid ""
+"Allow reading the state of the connected printer (loaded filaments, nozzles, "
+"print status and errors). The printer is never controlled."
+msgstr "允许读取已连接打印机的状态（已装载的耗材丝、喷嘴、打印状态和错误）。打印机永远不会被控制。"
+
+msgid ""
+"Allow unloading filament from the toolheads. Each request has to be "
+"confirmed here, and it is refused while a print is running."
+msgstr "允许从打印头退出耗材丝。每个请求都必须在此确认，打印过程中会被拒绝。"
+
+msgid "At startup, connect to the printer when it is the only one available."
+msgstr "启动时，如果只有一台可用打印机则自动连接。"
+
+msgid ""
+"Offer to adapt projects made for another printer (e.g. downloaded 3MF files) "
+"to the connected one."
+msgstr "建议将为其他打印机制作的项目（如下载的 3MF 文件）适配到已连接的打印机。"
+
+msgid ""
+"Allow searching the Snapmaker wiki and support site for the manufacturer's "
+"recommendations (the searches are sent to Snapmaker)."
+msgstr "允许在 Snapmaker wiki 和支持网站上搜索厂商建议（搜索内容会发送给 Snapmaker）。"
+
+msgid "Instructions for the assistant"
+msgstr "给助手的指令"
+
+msgid "Token"
+msgstr "令牌"
+
+msgid "Client configuration"
+msgstr "客户端配置"
+
+msgid "All files"
+msgstr "所有文件"
+
+msgid "Choose the Claude Code executable"
+msgstr "选择 Claude Code 可执行文件"
+
+msgid "Choose the notes folder"
+msgstr "选择笔记文件夹"
+
+#, c-format, boost-format
+msgid "Running on %s"
+msgstr "运行于 %s"
+
+#, c-format, boost-format
+msgid "Could not start the server: %s"
+msgstr "无法启动服务器：%s"
+
+msgid "Stopped"
+msgstr "已停止"
+
+#, c-format, boost-format
+msgid "Used by the chat: %s"
+msgstr "聊天使用：%s"
+
+msgid "Claude Code not found: install it, or choose its executable."
+msgstr "未找到 Claude Code：请安装，或选择其可执行文件。"
+
+#, boost-format
+msgid "Add a part (%1%) to %2%"
+msgstr "向 %2% 添加部件（%1%）"
+
+#, boost-format
+msgid "Add a negative part (%1%) to %2%"
+msgstr "向 %2% 添加负零件（%1%）"
+
+#, boost-format
+msgid "Add a modifier (%1%) to %2%"
+msgstr "向 %2% 添加修改器（%1%）"
+
+#, boost-format
+msgid "Add a support blocker (%1%) to %2%"
+msgstr "向 %2% 添加支撑屏蔽（%1%）"
+
+#, boost-format
+msgid "Add a support enforcer (%1%) to %2%"
+msgstr "向 %2% 添加支撑生成器（%1%）"
+
+msgid "Arrange the objects of the current plate"
+msgstr "自动摆放当前盘上的对象"
+
+#, boost-format
+msgid "Scale %1% to %2% %%"
+msgstr "将 %1% 缩放到 %2% %%"
+
+#, boost-format
+msgid "Resize %1% to %2%, keeping its proportions"
+msgstr "将 %1% 等比缩放到 %2%"
+
+#, boost-format
+msgid "Resize %1% to %2%"
+msgstr "将 %1% 调整为 %2%"
+
+#, boost-format
+msgid "Rotate %1% by %2%"
+msgstr "将 %1% 旋转 %2%"
+
+#, boost-format
+msgid "Move %1% to %2%"
+msgstr "将 %1% 移动到 %2%"
+
+#, boost-format
+msgid "Move %1% by %2%"
+msgstr "将 %1% 平移 %2%"
+
+#, boost-format
+msgid "Center %1% on its plate"
+msgstr "将 %1% 在其盘上居中"
+
+#, boost-format
+msgid "Drop %1% to the bed"
+msgstr "将 %1% 下降到热床"
+
+#, boost-format
+msgid "Mirror %1% along %2%"
+msgstr "沿 %2% 镜像 %1%"
+
+#, boost-format
+msgid "Cut %1% at %2% mm from its bottom"
+msgstr "在距底部 %2% mm 处切割 %1%"
+
+msgid "keep the upper part"
+msgstr "保留上半部分"
+
+msgid "keep the lower part"
+msgstr "保留下半部分"
+
+msgid "upper part placed on its cut face"
+msgstr "上半部分以切割面放置"
+
+#, boost-format
+msgid "Split %1% into objects"
+msgstr "将 %1% 拆分为对象"
+
+#, boost-format
+msgid "Duplicate %1% x%2%"
+msgstr "复制 %1% x%2%"
+
+#, boost-format
+msgid "Delete %1%"
+msgstr "删除 %1%"
+
+#, boost-format
+msgid "Auto-orient %1%"
+msgstr "自动朝向 %1%"
+
+#, boost-format
+msgid "at %1%"
+msgstr "位于 %1%"
+
+#, boost-format
+msgid "Delete part %1% of %2%"
+msgstr "删除 %2% 的部件 %1%"
+
+#, boost-format
+msgid "Print part %1% of %2% with filament %3%"
+msgstr "用耗材丝 %3% 打印 %2% 的部件 %1%"
+
+#, boost-format
+msgid "Print %1% with filament %2%"
+msgstr "用耗材丝 %2% 打印 %1%"
+
+#, boost-format
+msgid "Rename part %1% of %2% to %3%"
+msgstr "将 %2% 的部件 %1% 重命名为 %3%"
+
+#, boost-format
+msgid "Rename %1% to %2%"
+msgstr "将 %1% 重命名为 %2%"
+
+msgid ""
+"The AI assistant asks to change the objects of the project. Apply these "
+"operations? Undo restores the previous state."
+msgstr "AI 助手请求修改项目中的对象。应用这些操作吗？撤销可恢复之前的状态。"
+
+msgid "Toolhead"
+msgstr "打印头"
+
+msgid ""
+"The AI assistant asks to unload the filament of these toolheads. The printer "
+"heats each nozzle and moves. Unload now?"
+msgstr "AI 助手请求退出这些打印头的耗材丝。打印机会加热每个喷嘴并移动。现在退出吗？"
+
+#, boost-format
+msgid "the closest profile for a layer height of %1% mm"
+msgstr "层高 %1% mm 最接近的配置"
+
+#, boost-format
+msgid "slot and toolhead %1%"
+msgstr "槽位和打印头 %1%"
+
+msgid ""
+"Adapt this project to the connected printer? The printer, process and "
+"filament presets change; the toolheads can still be changed when printing."
+msgstr "将此项目适配到已连接的打印机吗？打印机、工艺和耗材丝预设会改变；打印时仍可更换打印头。"
+
+msgid "Adapt the project"
+msgstr "适配项目"
+
+#, boost-format
+msgid "This project is set up for %1% but the connected printer is a %2%."
+msgstr "此项目是为 %1% 设置的，但已连接的打印机是 %2%。"
+
+msgid "Adapt it to this printer"
+msgstr "适配到此打印机"
+
+#, c-format
+msgid ""
+"The project now uses %s. %zu settings of the original project differ from "
+"the new profile: ask the AI assistant (/adapt_project) to restore the "
+"original intent where it suits this printer."
+msgstr "项目现在使用 %s。原项目有 %zu 项设置与新配置不同：请让 AI 助手（/adapt_project）在适合此打印机的地方恢复原始意图。"
+
 #~ msgid "Improve shell precision by adjusting outer wall spacing. This also improves layer consistency."
 #~ msgstr "优化外墙刀路以提高外墙精度。这个优化同时减少层纹"
 

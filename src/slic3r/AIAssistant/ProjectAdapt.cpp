@@ -287,12 +287,15 @@ Plan make_plan(const json& args)
 bool confirm(const Plan& plan)
 {
     std::string text = _u8L("Printer") + ": " + plan.source_printer + " -> " + plan.printer->name + "\n" + _u8L("Process") + ": " +
-                       plan.source_process + " -> " + _u8L("the closest profile for a layer height of") + " " +
-                       float_to_string_decimal_point(plan.layer_height, 2) + " mm\n\n" + _u8L("Filaments") + ":\n";
+                       plan.source_process + " -> " +
+                       (boost::format(_u8L("the closest profile for a layer height of %1% mm")) %
+                        float_to_string_decimal_point(plan.layer_height, 2))
+                           .str() +
+                       "\n\n" + _u8L("Filaments") + ":\n";
     for (size_t i = 0; i < plan.slot_toolhead.size(); ++i) {
         const Toolhead& t = plan.toolhead_of(i);
-        text += "- " + std::to_string(i + 1) + ". " + plan.types[i] + " " + plan.colors[i] + " -> " + _u8L("slot and toolhead") + " " +
-                std::to_string(t.number) + " (" + t.filament + " " + t.color + ")\n";
+        text += "- " + std::to_string(i + 1) + ". " + plan.types[i] + " " + plan.colors[i] + " -> " +
+                (boost::format(_u8L("slot and toolhead %1%")) % t.number).str() + " (" + t.filament + " " + t.color + ")\n";
     }
     GUI::MessageDialog dlg(wxGetApp().mainframe,
                            from_u8(text) + "\n" +

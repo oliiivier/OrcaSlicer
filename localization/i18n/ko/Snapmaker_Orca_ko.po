@@ -18179,6 +18179,406 @@ msgstr ""
 "ABS와 같이 뒤틀림이 발생하기 쉬운 소재를 출력할 때, 히트베드 온도를 적절하게 "
 "높이면 뒤틀림 가능성을 줄일 수 있다는 사실을 알고 계셨나요?"
 
+msgid "AI Assistant (MCP server): running"
+msgstr "AI 어시스턴트 (MCP 서버): 실행 중"
+
+msgid "AI Assistant (MCP server): stopped"
+msgstr "AI 어시스턴트 (MCP 서버): 중지됨"
+
+msgid "Chat with Claude"
+msgstr "Claude와 채팅"
+
+msgid ""
+"Ask Claude about this project and let it propose setting changes (requires "
+"Claude Code)"
+msgstr "이 프로젝트에 대해 Claude에게 묻고 설정 변경을 제안하게 합니다 (Claude Code 필요)"
+
+msgid ""
+"Let Claude, Gemini or another MCP client analyze and fix the print settings"
+msgstr "Claude, Gemini 또는 다른 MCP 클라이언트가 출력 설정을 분석하고 수정하게 합니다"
+
+msgid "Claude"
+msgstr "Claude"
+
+msgid "Chat with Claude about this project"
+msgstr "이 프로젝트에 대해 Claude와 채팅"
+
+msgid ""
+"Ask about this project, a print problem, a setting... (Enter to send, "
+"Shift+Enter for a new line, paste a screenshot)"
+msgstr "이 프로젝트, 출력 문제, 설정에 대해 물어보세요... (Enter로 보내기, Shift+Enter로 줄 바꿈, 스크린샷 붙여넣기 가능)"
+
+msgid "New conversation"
+msgstr "새 대화"
+
+msgid "MCP server settings"
+msgstr "MCP 서버 설정"
+
+msgid ""
+"Claude can read the project, explain the slicer warnings, propose setting "
+"changes (you confirm each one in the slicer) and follow the connected "
+"printer."
+msgstr "Claude는 프로젝트를 읽고, 슬라이서 경고를 설명하고, 설정 변경을 제안하며(각각 슬라이서에서 확인합니다) 연결된 프린터를 추적할 수 있습니다."
+
+msgid "Starting Claude Code..."
+msgstr "Claude Code 시작 중..."
+
+msgid "Thinking..."
+msgstr "생각 중..."
+
+msgid "Stopped."
+msgstr "중지되었습니다."
+
+msgid ""
+"The MCP server of the slicer is off: Claude cannot see the project. Turn it "
+"on in the MCP server settings."
+msgstr "슬라이서의 MCP 서버가 꺼져 있습니다: Claude가 프로젝트를 볼 수 없습니다. MCP 서버 설정에서 켜세요."
+
+msgid "Claude Code could not connect to the MCP server of the slicer."
+msgstr "Claude Code가 슬라이서의 MCP 서버에 연결하지 못했습니다."
+
+msgid ""
+"Claude Code was not found. Install it (https://claude.com/claude-code), run "
+"\"claude\" once in a terminal to log in, then try again."
+msgstr "Claude Code를 찾을 수 없습니다. 설치한 후(https://claude.com/claude-code) 터미널에서 \"claude\"를 한 번 실행해 로그인하고 다시 시도하세요."
+
+msgid ""
+"Claude Code stopped. Your next message restarts it and continues the "
+"conversation."
+msgstr "Claude Code가 중지되었습니다. 다음 메시지를 보내면 다시 시작되어 대화를 이어 갑니다."
+
+msgid "If you are not logged in, run \"claude\" once in a terminal to log in."
+msgstr "로그인하지 않았다면 터미널에서 \"claude\"를 한 번 실행해 로그인하세요."
+
+msgid "3D view"
+msgstr "3D 보기"
+
+msgid "Attach a screenshot of the 3D view"
+msgstr "3D 보기의 스크린샷 첨부"
+
+msgid "Window"
+msgstr "창"
+
+msgid "Attach a screenshot of the whole slicer window"
+msgstr "슬라이서 창 전체의 스크린샷 첨부"
+
+msgid "The screenshot could not be taken."
+msgstr "스크린샷을 찍을 수 없습니다."
+
+msgid "Dock next to the 3D view"
+msgstr "3D 보기 옆에 고정"
+
+msgid "Close this conversation"
+msgstr "이 대화 닫기"
+
+msgid "Float in its own window"
+msgstr "별도 창으로 분리"
+
+msgid "Choose the model"
+msgstr "모델 선택"
+
+msgid "Compacting the conversation..."
+msgstr "대화 압축 중..."
+
+msgid "Conversation compacted: Claude keeps a summary of it."
+msgstr "대화가 압축되었습니다: Claude가 요약을 보관합니다."
+
+msgid "Conversation cleared: Claude starts from scratch."
+msgstr "대화가 지워졌습니다: Claude가 처음부터 시작합니다."
+
+#, c-format, boost-format
+msgid "Could not start the MCP server: %s"
+msgstr "MCP 서버를 시작할 수 없습니다: %s"
+
+msgid "Claude Code was not found."
+msgstr "Claude Code를 찾을 수 없습니다."
+
+msgid "Could not send the message to Claude Code."
+msgstr "Claude Code에 메시지를 보낼 수 없습니다."
+
+msgid "filament"
+msgstr "필라멘트"
+
+msgid "toolhead"
+msgstr "툴헤드"
+
+msgid "AI assistant:"
+msgstr "AI 어시스턴트:"
+
+msgid "AI Assistant"
+msgstr "AI 어시스턴트"
+
+msgid "Changes proposed by the AI assistant"
+msgstr "AI 어시스턴트가 제안한 변경 사항"
+
+msgid "Parameter name"
+msgstr "매개변수 이름"
+
+msgid "AI Assistant (MCP server)"
+msgstr "AI 어시스턴트 (MCP 서버)"
+
+msgid ""
+"Lets an AI assistant (Claude, Gemini...) analyze the open project, fix the "
+"problems reported by the slicer and tune the print settings. Every change "
+"has to be confirmed here. The server only accepts connections from this "
+"computer."
+msgstr "AI 어시스턴트(Claude, Gemini...)가 열린 프로젝트를 분석하고, 슬라이서가 보고한 문제를 수정하고, 출력 설정을 조정할 수 있게 합니다. 모든 변경은 여기에서 확인해야 합니다. 서버는 이 컴퓨터에서 오는 연결만 받습니다."
+
+msgid "Regenerate"
+msgstr "다시 생성"
+
+msgid "Port"
+msgstr "포트"
+
+msgid "Found automatically"
+msgstr "자동으로 찾음"
+
+msgid "Browse..."
+msgstr "찾아보기..."
+
+msgid "Claude Code"
+msgstr "Claude Code"
+
+msgid "Notes folder"
+msgstr "메모 폴더"
+
+msgid "Let the assistant add and edit notes"
+msgstr "어시스턴트가 메모를 추가하고 편집하도록 허용"
+
+msgid ""
+"e.g. Answer in French. I print mostly PETG on the U1 and prefer strong parts "
+"over speed."
+msgstr "예: 한국어로 답해 줘. U1에서 주로 PETG를 출력하고 속도보다 튼튼한 부품을 선호해."
+
+#, c-format, boost-format
+msgid ""
+"Added to the assistant's instructions at the start of each conversation. "
+"Also editable in %s."
+msgstr "각 대화를 시작할 때 어시스턴트의 지침에 추가됩니다. %s 에서도 편집할 수 있습니다."
+
+msgid "Enable MCP server"
+msgstr "MCP 서버 사용"
+
+msgid ""
+"Allow other MCP clients on this computer (Claude Code, Gemini CLI...) to "
+"connect with the token below. The built-in chat does not need it. Any "
+"program that can read the token can use the server."
+msgstr "이 컴퓨터의 다른 MCP 클라이언트(Claude Code, Gemini CLI...)가 아래 토큰으로 연결하도록 허용합니다. 내장 채팅에는 필요하지 않습니다. 토큰을 읽을 수 있는 모든 프로그램이 서버를 사용할 수 있습니다."
+
+msgid ""
+"Allow reading the state of the connected printer (loaded filaments, nozzles, "
+"print status and errors). The printer is never controlled."
+msgstr "연결된 프린터의 상태(장착된 필라멘트, 노즐, 출력 상태 및 오류) 읽기를 허용합니다. 프린터는 절대 제어되지 않습니다."
+
+msgid ""
+"Allow unloading filament from the toolheads. Each request has to be "
+"confirmed here, and it is refused while a print is running."
+msgstr "툴헤드에서 필라멘트 언로드를 허용합니다. 각 요청은 여기에서 확인해야 하며 출력 중에는 거부됩니다."
+
+msgid "At startup, connect to the printer when it is the only one available."
+msgstr "시작할 때 사용 가능한 프린터가 하나뿐이면 연결합니다."
+
+msgid ""
+"Offer to adapt projects made for another printer (e.g. downloaded 3MF files) "
+"to the connected one."
+msgstr "다른 프린터용으로 만든 프로젝트(예: 다운로드한 3MF 파일)를 연결된 프린터에 맞게 조정하도록 제안합니다."
+
+msgid ""
+"Allow searching the Snapmaker wiki and support site for the manufacturer's "
+"recommendations (the searches are sent to Snapmaker)."
+msgstr "Snapmaker 위키와 지원 사이트에서 제조사 권장 사항 검색을 허용합니다(검색어는 Snapmaker로 전송됩니다)."
+
+msgid "Instructions for the assistant"
+msgstr "어시스턴트 지침"
+
+msgid "Token"
+msgstr "토큰"
+
+msgid "Client configuration"
+msgstr "클라이언트 구성"
+
+msgid "All files"
+msgstr "모든 파일"
+
+msgid "Choose the Claude Code executable"
+msgstr "Claude Code 실행 파일 선택"
+
+msgid "Choose the notes folder"
+msgstr "메모 폴더 선택"
+
+#, c-format, boost-format
+msgid "Running on %s"
+msgstr "%s 에서 실행 중"
+
+#, c-format, boost-format
+msgid "Could not start the server: %s"
+msgstr "서버를 시작할 수 없습니다: %s"
+
+msgid "Stopped"
+msgstr "중지됨"
+
+#, c-format, boost-format
+msgid "Used by the chat: %s"
+msgstr "채팅에서 사용: %s"
+
+msgid "Claude Code not found: install it, or choose its executable."
+msgstr "Claude Code를 찾을 수 없습니다: 설치하거나 실행 파일을 선택하세요."
+
+#, boost-format
+msgid "Add a part (%1%) to %2%"
+msgstr "%2%에 부품(%1%) 추가"
+
+#, boost-format
+msgid "Add a negative part (%1%) to %2%"
+msgstr "%2%에 비우기 부품(%1%) 추가"
+
+#, boost-format
+msgid "Add a modifier (%1%) to %2%"
+msgstr "%2%에 수정자(%1%) 추가"
+
+#, boost-format
+msgid "Add a support blocker (%1%) to %2%"
+msgstr "%2%에 서포트 차단기(%1%) 추가"
+
+#, boost-format
+msgid "Add a support enforcer (%1%) to %2%"
+msgstr "%2%에 서포트 강제기(%1%) 추가"
+
+msgid "Arrange the objects of the current plate"
+msgstr "현재 플레이트의 객체 정렬"
+
+#, boost-format
+msgid "Scale %1% to %2% %%"
+msgstr "%1%의 크기를 %2% %%로 조정"
+
+#, boost-format
+msgid "Resize %1% to %2%, keeping its proportions"
+msgstr "%1%의 비율을 유지하며 %2%(으)로 크기 변경"
+
+#, boost-format
+msgid "Resize %1% to %2%"
+msgstr "%1%의 크기를 %2%(으)로 변경"
+
+#, boost-format
+msgid "Rotate %1% by %2%"
+msgstr "%1%을(를) %2% 회전"
+
+#, boost-format
+msgid "Move %1% to %2%"
+msgstr "%1%을(를) %2%(으)로 이동"
+
+#, boost-format
+msgid "Move %1% by %2%"
+msgstr "%1%을(를) %2%만큼 이동"
+
+#, boost-format
+msgid "Center %1% on its plate"
+msgstr "%1%을(를) 플레이트 중앙에 배치"
+
+#, boost-format
+msgid "Drop %1% to the bed"
+msgstr "%1%을(를) 베드로 내리기"
+
+#, boost-format
+msgid "Mirror %1% along %2%"
+msgstr "%1%을(를) %2% 축으로 대칭"
+
+#, boost-format
+msgid "Cut %1% at %2% mm from its bottom"
+msgstr "%1%을(를) 바닥에서 %2% mm 높이에서 자르기"
+
+msgid "keep the upper part"
+msgstr "위쪽 부분 유지"
+
+msgid "keep the lower part"
+msgstr "아래쪽 부분 유지"
+
+msgid "upper part placed on its cut face"
+msgstr "위쪽 부분을 절단면 위에 배치"
+
+#, boost-format
+msgid "Split %1% into objects"
+msgstr "%1%을(를) 객체로 분할"
+
+#, boost-format
+msgid "Duplicate %1% x%2%"
+msgstr "%1%을(를) x%2% 복제"
+
+#, boost-format
+msgid "Delete %1%"
+msgstr "%1% 삭제"
+
+#, boost-format
+msgid "Auto-orient %1%"
+msgstr "%1% 자동 방향 지정"
+
+#, boost-format
+msgid "at %1%"
+msgstr "위치 %1%"
+
+#, boost-format
+msgid "Delete part %1% of %2%"
+msgstr "%2%의 부품 %1% 삭제"
+
+#, boost-format
+msgid "Print part %1% of %2% with filament %3%"
+msgstr "%2%의 부품 %1%을(를) 필라멘트 %3%(으)로 출력"
+
+#, boost-format
+msgid "Print %1% with filament %2%"
+msgstr "%1%을(를) 필라멘트 %2%(으)로 출력"
+
+#, boost-format
+msgid "Rename part %1% of %2% to %3%"
+msgstr "%2%의 부품 %1% 이름을 %3%(으)로 변경"
+
+#, boost-format
+msgid "Rename %1% to %2%"
+msgstr "%1% 이름을 %2%(으)로 변경"
+
+msgid ""
+"The AI assistant asks to change the objects of the project. Apply these "
+"operations? Undo restores the previous state."
+msgstr "AI 어시스턴트가 프로젝트의 객체 변경을 요청합니다. 이 작업을 적용할까요? 실행 취소하면 이전 상태로 돌아갑니다."
+
+msgid "Toolhead"
+msgstr "툴헤드"
+
+msgid ""
+"The AI assistant asks to unload the filament of these toolheads. The printer "
+"heats each nozzle and moves. Unload now?"
+msgstr "AI 어시스턴트가 이 툴헤드들의 필라멘트 언로드를 요청합니다. 프린터가 각 노즐을 가열하고 움직입니다. 지금 언로드할까요?"
+
+#, boost-format
+msgid "the closest profile for a layer height of %1% mm"
+msgstr "레이어 높이 %1% mm에 가장 가까운 프로필"
+
+#, boost-format
+msgid "slot and toolhead %1%"
+msgstr "슬롯 및 툴헤드 %1%"
+
+msgid ""
+"Adapt this project to the connected printer? The printer, process and "
+"filament presets change; the toolheads can still be changed when printing."
+msgstr "이 프로젝트를 연결된 프린터에 맞게 조정할까요? 프린터, 프로세스, 필라멘트 사전 설정이 바뀝니다. 툴헤드는 출력할 때 계속 변경할 수 있습니다."
+
+msgid "Adapt the project"
+msgstr "프로젝트 조정"
+
+#, boost-format
+msgid "This project is set up for %1% but the connected printer is a %2%."
+msgstr "이 프로젝트는 %1%용으로 설정되었지만 연결된 프린터는 %2%입니다."
+
+msgid "Adapt it to this printer"
+msgstr "이 프린터에 맞게 조정"
+
+#, c-format
+msgid ""
+"The project now uses %s. %zu settings of the original project differ from "
+"the new profile: ask the AI assistant (/adapt_project) to restore the "
+"original intent where it suits this printer."
+msgstr "이제 프로젝트에서 %s을(를) 사용합니다. 원래 프로젝트의 설정 %zu개가 새 프로필과 다릅니다: 이 프린터에 맞는 곳에서 원래 의도를 복원하도록 AI 어시스턴트(/adapt_project)에 요청하세요."
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."
@@ -18773,9 +19173,6 @@ msgstr ""
 
 #~ msgid "Current Cabin humidity"
 #~ msgstr "현재 기내 습도"
-
-#~ msgid "Stopped."
-#~ msgstr "중지됨."
 
 #, c-format, boost-format
 #~ msgid "Connect failed [%d]!"

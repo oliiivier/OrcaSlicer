@@ -143,16 +143,12 @@ McpDialog::McpDialog(wxWindow* parent)
                             wxTE_READONLY);
     auto* regenerate = new Button(this, _L("Regenerate"));
     regenerate->SetStyle(ButtonStyle::Regular, ButtonType::Choice);
-    m_regenerate = regenerate;
 
     auto* grid = new wxFlexGridSizer(3, FromDIP(8), FromDIP(8));
     grid->AddGrowableCol(1);
     grid->Add(label(this, _L("Port")), 0, wxALIGN_CENTER_VERTICAL);
     grid->Add(m_port, 0, wxALIGN_CENTER_VERTICAL);
     grid->AddSpacer(0);
-    grid->Add(label(this, _L("Token")), 0, wxALIGN_CENTER_VERTICAL);
-    grid->Add(m_token, 1, wxEXPAND | wxALIGN_CENTER_VERTICAL);
-    grid->Add(regenerate, 0, wxALIGN_CENTER_VERTICAL);
 
     m_claude_path = new TextInput(this, from_u8(settings.claude_path), wxEmptyString, wxEmptyString);
     m_claude_path->GetTextCtrl()->SetHint(_L("Found automatically"));
@@ -234,9 +230,18 @@ McpDialog::McpDialog(wxWindow* parent)
     sizer->Add(grid, 0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, margin);
     sizer->Add(label(this, _L("Instructions for the assistant"), Label::Head_14), 0, wxLEFT | wxRIGHT | wxTOP, margin);
     sizer->Add(user_instructions_hint, 0, wxLEFT | wxRIGHT | wxTOP, FromDIP(4));
-    sizer->Add(m_user_instructions, 0, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(8));
-    sizer->Add(label(this, _L("Client configuration"), Label::Head_14), 0, wxLEFT | wxRIGHT | wxTOP, margin);
-    sizer->Add(m_instructions, 1, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(8));
+    // Grows with the dialog, sharing the height with the client configuration when it is shown.
+    sizer->Add(m_user_instructions, 1, wxEXPAND | wxLEFT | wxRIGHT | wxTOP, FromDIP(8));
+    // What the other clients need: shown only when they are allowed in.
+    auto* token_row = new wxBoxSizer(wxHORIZONTAL);
+    token_row->Add(label(this, _L("Token")), 0, wxALIGN_CENTER_VERTICAL);
+    token_row->Add(m_token, 1, wxEXPAND | wxALIGN_CENTER_VERTICAL | wxLEFT, FromDIP(8));
+    token_row->Add(regenerate, 0, wxALIGN_CENTER_VERTICAL | wxLEFT, FromDIP(8));
+    m_external_section = new wxBoxSizer(wxVERTICAL);
+    m_external_section->Add(label(this, _L("Client configuration"), Label::Head_14), 0, wxTOP, margin);
+    m_external_section->Add(token_row, 0, wxEXPAND | wxTOP, FromDIP(8));
+    m_external_section->Add(m_instructions, 1, wxEXPAND | wxTOP, FromDIP(8));
+    sizer->Add(m_external_section, 1, wxEXPAND | wxLEFT | wxRIGHT, margin);
     sizer->Add(buttons, 0, wxEXPAND);
     SetSizerAndFit(sizer);
 
@@ -405,11 +410,16 @@ void McpDialog::refresh()
     m_status_dot->SetForegroundColour(color);
     m_status->SetForegroundColour(color);
     m_status->Wrap(FromDIP(580));
-    m_token->Enable(s.external_access);
-    m_regenerate->Enable(s.external_access);
-    m_copy->Enable(s.external_access);
-    m_instructions->SetValue(s.external_access ? from_u8(connection_instructions(s))
-                                               : _L("Allow other MCP clients above to get their configuration."));
+    m_instructions->SetValue(from_u8(connection_instructions(s)));
+    // The dialog grows or shrinks only when the section appears or goes.
+    const bool resize = m_instructions->IsShown() != s.external_access;
+    m_external_section->ShowItems(s.external_access);
+    m_copy->Show(s.external_access);
+    if (resize) {
+        // Shrinking needs the minimum size of the section that has gone.
+        SetMinSize(wxDefaultSize);
+        Fit();
+    }
     Layout();
     Refresh();
 }

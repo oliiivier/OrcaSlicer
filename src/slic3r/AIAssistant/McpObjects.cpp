@@ -21,7 +21,10 @@
 #include "slic3r/GUI/Plater.hpp"
 #include "slic3r/GUI/Selection.hpp"
 
+#include <boost/format.hpp>
+
 #include <cmath>
+#include <initializer_list>
 #include <set>
 
 namespace Slic3r { namespace AIAssistant {
@@ -113,15 +116,16 @@ struct PartType
 {
     const char*     name;
     ModelVolumeType type;
-    const char*     label;
+    // Description of the operation adding one: %1% the shape and its size, %2% the object.
+    const char*     add_text;
 };
 
 const PartType PART_TYPES[] = {
-    { "part", ModelVolumeType::MODEL_PART, "part" },
-    { "negative", ModelVolumeType::NEGATIVE_VOLUME, "negative part" },
-    { "modifier", ModelVolumeType::PARAMETER_MODIFIER, "modifier" },
-    { "support_blocker", ModelVolumeType::SUPPORT_BLOCKER, "support blocker" },
-    { "support_enforcer", ModelVolumeType::SUPPORT_ENFORCER, "support enforcer" },
+    { "part", ModelVolumeType::MODEL_PART, L("Add a part (%1%) to %2%") },
+    { "negative", ModelVolumeType::NEGATIVE_VOLUME, L("Add a negative part (%1%) to %2%") },
+    { "modifier", ModelVolumeType::PARAMETER_MODIFIER, L("Add a modifier (%1%) to %2%") },
+    { "support_blocker", ModelVolumeType::SUPPORT_BLOCKER, L("Add a support blocker (%1%) to %2%") },
+    { "support_enforcer", ModelVolumeType::SUPPORT_ENFORCER, L("Add a support enforcer (%1%) to %2%") },
 };
 
 const PartType& part_type(const json& op)
@@ -316,6 +320,15 @@ void rename(const json& op, int obj_idx)
     }
 }
 
+// A translated description with its arguments put in (%1%, %2%...): whole sentences, so
+// that each language can order the words its own way.
+template<typename... Args> std::string text_of(const std::string& format, const Args&... args)
+{
+    boost::format f(format);
+    (void) std::initializer_list<int>{ ((f % args), 0)... };
+    return f.str();
+}
+
 // Checks the arguments of one operation and returns its description for the
 // user. `obj_idx` is the object it applies to when already known, otherwise -1.
 std::string describe(const json& op, int obj_idx)
@@ -333,29 +346,30 @@ std::string describe(const json& op, int obj_idx)
             const double f = number(op, "factor");
             if (f <= 0.)
                 throw ToolError("'factor' must be positive");
-            return _u8L("Scale") + " " + name + " " + float_to_string_decimal_point(f * 100., 1) + " %";
+            return text_of(_u8L("Scale %1% to %2% %%"), name, float_to_string_decimal_point(f * 100., 1));
         }
         const Vec3d size = axes(op, "size_mm");
         for (int i = 0; i < 3; ++i)
             if (!std::isnan(size[i]) && size[i] <= 0.)
                 throw ToolError("'size_mm' must be positive");
-        return _u8L("Resize") + " " + name + " " + _u8L("to") + " " + axes_text(size, " mm") +
-               (op.value("keep_proportions", true) ? " (" + _u8L("proportional") + ")" : "");
+        return text_of(op.value("keep_proportions", true) ? _u8L("Resize %1% to %2%, keeping its proportions")
+                                                          : _u8L("Resize %1% to %2%"),
+                       name, axes_text(size, " mm"));
     }
     if (action == "rotate")
-        return _u8L("Rotate") + " " + name + " " + axes_text(axes(op, "degrees"), "°");
+        return text_of(_u8L("Rotate %1% by %2%"), name, axes_text(axes(op, "degrees"), "°"));
     if (action == "move") {
         if (op.contains("to_mm"))
-            return _u8L("Move") + " " + name + " " + _u8L("to") + " " + axes_text(axes(op, "to_mm", false), " mm");
-        return _u8L("Move") + " " + name + " " + _u8L("by") + " " + axes_text(axes(op, "by_mm", false), " mm");
+            return text_of(_u8L("Move %1% to %2%"), name, axes_text(axes(op, "to_mm", false), " mm"));
+        return text_of(_u8L("Move %1% by %2%"), name, axes_text(axes(op, "by_mm", false), " mm"));
     }
     if (action == "center")
-        return _u8L("Center") + " " + name + " " + _u8L("on its plate");
+        return text_of(_u8L("Center %1% on its plate"), name);
     if (action == "drop")
-        return _u8L("Drop") + " " + name + " " + _u8L("to the bed");
+        return text_of(_u8L("Drop %1% to the bed"), name);
     if (action == "mirror") {
         const Axis axis = axis_arg(op);
-        return _u8L("Mirror") + " " + name + " " + _u8L("along") + " " + std::string(axis == X ? "X" : axis == Y ? "Y" : "Z");
+        return text_of(_u8L("Mirror %1% along %2%"), name, std::string(axis == X ? "X" : axis == Y ? "Y" : "Z"));
     }
     if (action == "cut") {
         const double h = number(op, "height_mm");
@@ -366,8 +380,7 @@ std::string describe(const json& op, int obj_idx)
             throw ToolError("'keep' must be both, upper or lower");
         if (obj_idx >= 0 && wxGetApp().model().objects[obj_idx]->instances.size() != 1)
             throw ToolError("Cut needs an object with a single instance");
-        std::string text = _u8L("Cut") + " " + name + " " + _u8L("at") + " " + float_to_string_decimal_point(h, 2) + " mm " +
-                           _u8L("from its bottom");
+        std::string text = text_of(_u8L("Cut %1% at %2% mm from its bottom"), name, float_to_string_decimal_point(h, 2));
         if (keep == "upper")
             text += ", " + _u8L("keep the upper part");
         else if (keep == "lower")
@@ -382,44 +395,50 @@ std::string describe(const json& op, int obj_idx)
             if (obj->volumes.size() == 1 && !obj->volumes.front()->is_splittable())
                 throw ToolError(name + " is a single part and cannot be split");
         }
-        return _u8L("Split") + " " + name + " " + _u8L("into objects");
+        return text_of(_u8L("Split %1% into objects"), name);
     }
     if (action == "duplicate") {
         const int copies = op.value("copies", 1);
         if (copies < 1 || copies > MAX_COPIES)
             throw ToolError("'copies' must be between 1 and " + std::to_string(MAX_COPIES));
-        return _u8L("Duplicate") + " " + name + " x" + std::to_string(copies);
+        return text_of(_u8L("Duplicate %1% x%2%"), name, copies);
     }
     if (action == "delete")
-        return _u8L("Delete") + " " + name;
+        return text_of(_u8L("Delete %1%"), name);
     if (action == "orient")
-        return _u8L("Auto-orient") + " " + name;
+        return text_of(_u8L("Auto-orient %1%"), name);
     if (action == "add_part") {
         const PartType& type = part_type(op);
         const Vec3d     size = shape_size(op);
         if (op.contains("filament"))
             filament_arg(op);
-        std::string text = _u8L("Add a") + " " + _u8L(type.label) + " (" + op.value("shape", std::string("box")) + " " +
-                           float_to_string_decimal_point(size.x(), 1) + " x " + float_to_string_decimal_point(size.y(), 1) +
-                           " x " + float_to_string_decimal_point(size.z(), 1) + " mm) " + _u8L("to") + " " + name;
+        const std::string shape = op.value("shape", std::string("box")) + " " + float_to_string_decimal_point(size.x(), 1) +
+                                  " x " + float_to_string_decimal_point(size.y(), 1) + " x " +
+                                  float_to_string_decimal_point(size.z(), 1) + " mm";
+        std::string text = text_of(_u8L(type.add_text), shape, name);
         if (op.contains("at_mm"))
-            text += " " + _u8L("at") + " " + axes_text(axes(op, "at_mm"), " mm");
+            text += ", " + text_of(_u8L("at %1%"), axes_text(axes(op, "at_mm"), " mm"));
         return text;
     }
-    const std::string part = op.contains("part") ? " " + _u8L("part") + " " + op["part"].dump() + " " + _u8L("of") : std::string();
+    // The operations below apply to the whole object, or to one of its parts.
+    const bool        on_part = op.contains("part");
+    const std::string part    = on_part ? op["part"].dump() : std::string();
     if (action == "delete_part") {
-        if (!op.contains("part"))
+        if (!on_part)
             throw ToolError("'delete_part' needs 'part'");
-        return _u8L("Delete") + part + " " + name;
+        return text_of(_u8L("Delete part %1% of %2%"), part, name);
     }
     if (action == "set_filament") {
         const int f = filament_arg(op);
-        return _u8L("Print") + part + " " + name + " " + _u8L("with filament") + " " + std::to_string(f);
+        return on_part ? text_of(_u8L("Print part %1% of %2% with filament %3%"), part, name, f)
+                       : text_of(_u8L("Print %1% with filament %2%"), name, f);
     }
     if (action == "rename") {
         if (op.value("name", std::string()).empty())
             throw ToolError("'rename' needs 'name'");
-        return _u8L("Rename") + part + " " + name + " " + _u8L("to") + " '" + op["name"].get<std::string>() + "'";
+        const std::string new_name = "'" + op["name"].get<std::string>() + "'";
+        return on_part ? text_of(_u8L("Rename part %1% of %2% to %3%"), part, name, new_name)
+                       : text_of(_u8L("Rename %1% to %2%"), name, new_name);
     }
     throw ToolError("Unknown action '" + action + "'");
 }

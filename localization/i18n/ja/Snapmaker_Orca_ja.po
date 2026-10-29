@@ -16864,6 +16864,406 @@ msgstr ""
 "ABSのような反りやすい素材を印刷する場合、ヒートベッドの温度を適切に上げること"
 "で、反りが発生する確率を下げることができることをご存知ですか？"
 
+msgid "AI Assistant (MCP server): running"
+msgstr "AIアシスタント (MCPサーバー): 実行中"
+
+msgid "AI Assistant (MCP server): stopped"
+msgstr "AIアシスタント (MCPサーバー): 停止中"
+
+msgid "Chat with Claude"
+msgstr "Claudeとチャット"
+
+msgid ""
+"Ask Claude about this project and let it propose setting changes (requires "
+"Claude Code)"
+msgstr "このプロジェクトについてClaudeに質問し、設定の変更を提案させます (Claude Codeが必要)"
+
+msgid ""
+"Let Claude, Gemini or another MCP client analyze and fix the print settings"
+msgstr "Claude、Geminiなどの MCPクライアントに印刷設定を分析・修正させます"
+
+msgid "Claude"
+msgstr "Claude"
+
+msgid "Chat with Claude about this project"
+msgstr "このプロジェクトについてClaudeとチャット"
+
+msgid ""
+"Ask about this project, a print problem, a setting... (Enter to send, "
+"Shift+Enter for a new line, paste a screenshot)"
+msgstr "このプロジェクト、印刷の問題、設定について質問してください... (Enterで送信、Shift+Enterで改行、スクリーンショットを貼り付け可能)"
+
+msgid "New conversation"
+msgstr "新しい会話"
+
+msgid "MCP server settings"
+msgstr "MCPサーバーの設定"
+
+msgid ""
+"Claude can read the project, explain the slicer warnings, propose setting "
+"changes (you confirm each one in the slicer) and follow the connected "
+"printer."
+msgstr "Claudeはプロジェクトを読み取り、スライサーの警告を説明し、設定の変更を提案し (それぞれスライサーで確認します)、接続されたプリンターを追跡できます。"
+
+msgid "Starting Claude Code..."
+msgstr "Claude Codeを起動しています..."
+
+msgid "Thinking..."
+msgstr "考え中..."
+
+msgid "Stopped."
+msgstr "停止しました。"
+
+msgid ""
+"The MCP server of the slicer is off: Claude cannot see the project. Turn it "
+"on in the MCP server settings."
+msgstr "スライサーのMCPサーバーがオフです: Claudeはプロジェクトを見られません。MCPサーバーの設定でオンにしてください。"
+
+msgid "Claude Code could not connect to the MCP server of the slicer."
+msgstr "Claude CodeがスライサーのMCPサーバーに接続できませんでした。"
+
+msgid ""
+"Claude Code was not found. Install it (https://claude.com/claude-code), run "
+"\"claude\" once in a terminal to log in, then try again."
+msgstr "Claude Codeが見つかりません。インストールし (https://claude.com/claude-code)、ターミナルで一度「claude」を実行してログインしてから、もう一度お試しください。"
+
+msgid ""
+"Claude Code stopped. Your next message restarts it and continues the "
+"conversation."
+msgstr "Claude Codeが停止しました。次のメッセージで再起動し、会話を続けます。"
+
+msgid "If you are not logged in, run \"claude\" once in a terminal to log in."
+msgstr "ログインしていない場合は、ターミナルで一度「claude」を実行してログインしてください。"
+
+msgid "3D view"
+msgstr "3Dビュー"
+
+msgid "Attach a screenshot of the 3D view"
+msgstr "3Dビューのスクリーンショットを添付"
+
+msgid "Window"
+msgstr "ウィンドウ"
+
+msgid "Attach a screenshot of the whole slicer window"
+msgstr "スライサーのウィンドウ全体のスクリーンショットを添付"
+
+msgid "The screenshot could not be taken."
+msgstr "スクリーンショットを撮れませんでした。"
+
+msgid "Dock next to the 3D view"
+msgstr "3Dビューの横にドッキング"
+
+msgid "Close this conversation"
+msgstr "この会話を閉じる"
+
+msgid "Float in its own window"
+msgstr "別ウィンドウに切り離す"
+
+msgid "Choose the model"
+msgstr "モデルを選択"
+
+msgid "Compacting the conversation..."
+msgstr "会話を圧縮しています..."
+
+msgid "Conversation compacted: Claude keeps a summary of it."
+msgstr "会話を圧縮しました: Claudeは要約を保持します。"
+
+msgid "Conversation cleared: Claude starts from scratch."
+msgstr "会話を消去しました: Claudeは最初からやり直します。"
+
+#, c-format, boost-format
+msgid "Could not start the MCP server: %s"
+msgstr "MCPサーバーを起動できませんでした: %s"
+
+msgid "Claude Code was not found."
+msgstr "Claude Codeが見つかりません。"
+
+msgid "Could not send the message to Claude Code."
+msgstr "Claude Codeにメッセージを送信できませんでした。"
+
+msgid "filament"
+msgstr "フィラメント"
+
+msgid "toolhead"
+msgstr "ツールヘッド"
+
+msgid "AI assistant:"
+msgstr "AIアシスタント:"
+
+msgid "AI Assistant"
+msgstr "AIアシスタント"
+
+msgid "Changes proposed by the AI assistant"
+msgstr "AIアシスタントが提案した変更"
+
+msgid "Parameter name"
+msgstr "パラメーター名"
+
+msgid "AI Assistant (MCP server)"
+msgstr "AIアシスタント (MCPサーバー)"
+
+msgid ""
+"Lets an AI assistant (Claude, Gemini...) analyze the open project, fix the "
+"problems reported by the slicer and tune the print settings. Every change "
+"has to be confirmed here. The server only accepts connections from this "
+"computer."
+msgstr "AIアシスタント (Claude、Gemini...) が開いているプロジェクトを分析し、スライサーが報告する問題を修正し、印刷設定を調整できるようにします。すべての変更はここで確認する必要があります。サーバーはこのコンピューターからの接続のみを受け付けます。"
+
+msgid "Regenerate"
+msgstr "再生成"
+
+msgid "Port"
+msgstr "ポート"
+
+msgid "Found automatically"
+msgstr "自動検出"
+
+msgid "Browse..."
+msgstr "参照..."
+
+msgid "Claude Code"
+msgstr "Claude Code"
+
+msgid "Notes folder"
+msgstr "メモのフォルダー"
+
+msgid "Let the assistant add and edit notes"
+msgstr "アシスタントにメモの追加と編集を許可"
+
+msgid ""
+"e.g. Answer in French. I print mostly PETG on the U1 and prefer strong parts "
+"over speed."
+msgstr "例: 日本語で答えて。U1でおもにPETGを印刷し、速度より丈夫な部品を優先します。"
+
+#, c-format, boost-format
+msgid ""
+"Added to the assistant's instructions at the start of each conversation. "
+"Also editable in %s."
+msgstr "各会話の開始時にアシスタントの指示に追加されます。%s でも編集できます。"
+
+msgid "Enable MCP server"
+msgstr "MCPサーバーを有効化"
+
+msgid ""
+"Allow other MCP clients on this computer (Claude Code, Gemini CLI...) to "
+"connect with the token below. The built-in chat does not need it. Any "
+"program that can read the token can use the server."
+msgstr "このコンピューター上の他のMCPクライアント (Claude Code、Gemini CLI...) が下のトークンで接続することを許可します。内蔵チャットには不要です。トークンを読み取れるプログラムはすべてサーバーを使用できます。"
+
+msgid ""
+"Allow reading the state of the connected printer (loaded filaments, nozzles, "
+"print status and errors). The printer is never controlled."
+msgstr "接続されたプリンターの状態 (装填済みフィラメント、ノズル、印刷状態、エラー) の読み取りを許可します。プリンターが操作されることはありません。"
+
+msgid ""
+"Allow unloading filament from the toolheads. Each request has to be "
+"confirmed here, and it is refused while a print is running."
+msgstr "ツールヘッドからのフィラメントのアンロードを許可します。各要求はここで確認する必要があり、印刷中は拒否されます。"
+
+msgid "At startup, connect to the printer when it is the only one available."
+msgstr "起動時、利用可能なプリンターが1台だけの場合はそれに接続します。"
+
+msgid ""
+"Offer to adapt projects made for another printer (e.g. downloaded 3MF files) "
+"to the connected one."
+msgstr "他のプリンター用に作られたプロジェクト (ダウンロードした3MFファイルなど) を接続中のプリンターに合わせることを提案します。"
+
+msgid ""
+"Allow searching the Snapmaker wiki and support site for the manufacturer's "
+"recommendations (the searches are sent to Snapmaker)."
+msgstr "Snapmakerのwikiとサポートサイトでメーカーの推奨事項を検索することを許可します (検索内容はSnapmakerに送信されます)。"
+
+msgid "Instructions for the assistant"
+msgstr "アシスタントへの指示"
+
+msgid "Token"
+msgstr "トークン"
+
+msgid "Client configuration"
+msgstr "クライアントの設定"
+
+msgid "All files"
+msgstr "すべてのファイル"
+
+msgid "Choose the Claude Code executable"
+msgstr "Claude Codeの実行ファイルを選択"
+
+msgid "Choose the notes folder"
+msgstr "メモのフォルダーを選択"
+
+#, c-format, boost-format
+msgid "Running on %s"
+msgstr "%s で実行中"
+
+#, c-format, boost-format
+msgid "Could not start the server: %s"
+msgstr "サーバーを起動できませんでした: %s"
+
+msgid "Stopped"
+msgstr "停止中"
+
+#, c-format, boost-format
+msgid "Used by the chat: %s"
+msgstr "チャットで使用: %s"
+
+msgid "Claude Code not found: install it, or choose its executable."
+msgstr "Claude Codeが見つかりません: インストールするか、実行ファイルを選択してください。"
+
+#, boost-format
+msgid "Add a part (%1%) to %2%"
+msgstr "%2% にパーツ (%1%) を追加"
+
+#, boost-format
+msgid "Add a negative part (%1%) to %2%"
+msgstr "%2% にマイナスパーツ (%1%) を追加"
+
+#, boost-format
+msgid "Add a modifier (%1%) to %2%"
+msgstr "%2% にモディファイア (%1%) を追加"
+
+#, boost-format
+msgid "Add a support blocker (%1%) to %2%"
+msgstr "%2% にサポートブロッカー (%1%) を追加"
+
+#, boost-format
+msgid "Add a support enforcer (%1%) to %2%"
+msgstr "%2% にサポート補強 (%1%) を追加"
+
+msgid "Arrange the objects of the current plate"
+msgstr "現在のプレートのオブジェクトをレイアウト"
+
+#, boost-format
+msgid "Scale %1% to %2% %%"
+msgstr "%1% を %2% %% に拡大縮小"
+
+#, boost-format
+msgid "Resize %1% to %2%, keeping its proportions"
+msgstr "%1% を縦横比を保って %2% にリサイズ"
+
+#, boost-format
+msgid "Resize %1% to %2%"
+msgstr "%1% を %2% にリサイズ"
+
+#, boost-format
+msgid "Rotate %1% by %2%"
+msgstr "%1% を %2% 回転"
+
+#, boost-format
+msgid "Move %1% to %2%"
+msgstr "%1% を %2% に移動"
+
+#, boost-format
+msgid "Move %1% by %2%"
+msgstr "%1% を %2% ずらす"
+
+#, boost-format
+msgid "Center %1% on its plate"
+msgstr "%1% をプレートの中央に配置"
+
+#, boost-format
+msgid "Drop %1% to the bed"
+msgstr "%1% をベッドに下ろす"
+
+#, boost-format
+msgid "Mirror %1% along %2%"
+msgstr "%1% を %2% 軸で反転"
+
+#, boost-format
+msgid "Cut %1% at %2% mm from its bottom"
+msgstr "%1% を底面から %2% mm でカット"
+
+msgid "keep the upper part"
+msgstr "上部を残す"
+
+msgid "keep the lower part"
+msgstr "下部を残す"
+
+msgid "upper part placed on its cut face"
+msgstr "上部をカット面で配置"
+
+#, boost-format
+msgid "Split %1% into objects"
+msgstr "%1% をオブジェクトに分割"
+
+#, boost-format
+msgid "Duplicate %1% x%2%"
+msgstr "%1% を x%2% 複製"
+
+#, boost-format
+msgid "Delete %1%"
+msgstr "%1% を削除"
+
+#, boost-format
+msgid "Auto-orient %1%"
+msgstr "%1% を自動で向き調整"
+
+#, boost-format
+msgid "at %1%"
+msgstr "位置 %1%"
+
+#, boost-format
+msgid "Delete part %1% of %2%"
+msgstr "%2% のパーツ %1% を削除"
+
+#, boost-format
+msgid "Print part %1% of %2% with filament %3%"
+msgstr "%2% のパーツ %1% をフィラメント %3% で印刷"
+
+#, boost-format
+msgid "Print %1% with filament %2%"
+msgstr "%1% をフィラメント %2% で印刷"
+
+#, boost-format
+msgid "Rename part %1% of %2% to %3%"
+msgstr "%2% のパーツ %1% の名前を %3% に変更"
+
+#, boost-format
+msgid "Rename %1% to %2%"
+msgstr "%1% の名前を %2% に変更"
+
+msgid ""
+"The AI assistant asks to change the objects of the project. Apply these "
+"operations? Undo restores the previous state."
+msgstr "AIアシスタントがプロジェクトのオブジェクトの変更を求めています。これらの操作を適用しますか? 元に戻すと以前の状態に戻ります。"
+
+msgid "Toolhead"
+msgstr "ツールヘッド"
+
+msgid ""
+"The AI assistant asks to unload the filament of these toolheads. The printer "
+"heats each nozzle and moves. Unload now?"
+msgstr "AIアシスタントがこれらのツールヘッドのフィラメントのアンロードを求めています。プリンターは各ノズルを加熱し、動作します。今すぐアンロードしますか?"
+
+#, boost-format
+msgid "the closest profile for a layer height of %1% mm"
+msgstr "積層ピッチ %1% mm に最も近いプロファイル"
+
+#, boost-format
+msgid "slot and toolhead %1%"
+msgstr "スロットとツールヘッド %1%"
+
+msgid ""
+"Adapt this project to the connected printer? The printer, process and "
+"filament presets change; the toolheads can still be changed when printing."
+msgstr "このプロジェクトを接続中のプリンターに合わせますか? プリンター、プロセス、フィラメントのプリセットが変わります。ツールヘッドは印刷時にまだ変更できます。"
+
+msgid "Adapt the project"
+msgstr "プロジェクトを合わせる"
+
+#, boost-format
+msgid "This project is set up for %1% but the connected printer is a %2%."
+msgstr "このプロジェクトは %1% 用に設定されていますが、接続中のプリンターは %2% です。"
+
+msgid "Adapt it to this printer"
+msgstr "このプリンターに合わせる"
+
+#, c-format
+msgid ""
+"The project now uses %s. %zu settings of the original project differ from "
+"the new profile: ask the AI assistant (/adapt_project) to restore the "
+"original intent where it suits this printer."
+msgstr "プロジェクトは %s を使用するようになりました。元のプロジェクトの %zu 個の設定が新しいプロファイルと異なります: このプリンターに合う範囲で元の意図を復元するよう、AIアシスタント (/adapt_project) に依頼してください。"
+
 #~ msgid "Alt + Mouse wheel"
 #~ msgstr "Alt + マウスホイール"
 
@@ -17194,9 +17594,6 @@ msgstr ""
 
 #~ msgid "Current Cabin humidity"
 #~ msgstr "現在の庫内湿度"
-
-#~ msgid "Stopped."
-#~ msgstr "中止しました"
 
 #, c-format, boost-format
 #~ msgid "Connect failed [%d]!"

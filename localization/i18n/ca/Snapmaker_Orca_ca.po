@@ -19065,6 +19065,406 @@ msgstr ""
 "augmentar adequadament la temperatura del llit pot reduir la probabilitat de "
 "deformació?"
 
+msgid "AI Assistant (MCP server): running"
+msgstr "Assistent d'IA (servidor MCP): en marxa"
+
+msgid "AI Assistant (MCP server): stopped"
+msgstr "Assistent d'IA (servidor MCP): aturat"
+
+msgid "Chat with Claude"
+msgstr "Xatejar amb Claude"
+
+msgid ""
+"Ask Claude about this project and let it propose setting changes (requires "
+"Claude Code)"
+msgstr "Preguntar a Claude sobre aquest projecte i deixar que proposi canvis de configuració (cal Claude Code)"
+
+msgid ""
+"Let Claude, Gemini or another MCP client analyze and fix the print settings"
+msgstr "Deixar que Claude, Gemini o un altre client MCP analitzi i corregeixi la configuració d'impressió"
+
+msgid "Claude"
+msgstr "Claude"
+
+msgid "Chat with Claude about this project"
+msgstr "Xatejar amb Claude sobre aquest projecte"
+
+msgid ""
+"Ask about this project, a print problem, a setting... (Enter to send, "
+"Shift+Enter for a new line, paste a screenshot)"
+msgstr "Pregunteu sobre aquest projecte, un problema d'impressió, un paràmetre... (Retorn per enviar, Maj+Retorn per a una línia nova, enganxeu una captura de pantalla)"
+
+msgid "New conversation"
+msgstr "Conversa nova"
+
+msgid "MCP server settings"
+msgstr "Configuració del servidor MCP"
+
+msgid ""
+"Claude can read the project, explain the slicer warnings, propose setting "
+"changes (you confirm each one in the slicer) and follow the connected "
+"printer."
+msgstr "Claude pot llegir el projecte, explicar els avisos del laminador, proposar canvis de configuració (els confirmeu un per un al laminador) i seguir la impressora connectada."
+
+msgid "Starting Claude Code..."
+msgstr "S'està iniciant Claude Code..."
+
+msgid "Thinking..."
+msgstr "Pensant..."
+
+msgid "Stopped."
+msgstr "Aturat."
+
+msgid ""
+"The MCP server of the slicer is off: Claude cannot see the project. Turn it "
+"on in the MCP server settings."
+msgstr "El servidor MCP del laminador està apagat: Claude no veu el projecte. Activeu-lo a la configuració del servidor MCP."
+
+msgid "Claude Code could not connect to the MCP server of the slicer."
+msgstr "Claude Code no s'ha pogut connectar al servidor MCP del laminador."
+
+msgid ""
+"Claude Code was not found. Install it (https://claude.com/claude-code), run "
+"\"claude\" once in a terminal to log in, then try again."
+msgstr "No s'ha trobat Claude Code. Instal·leu-lo (https://claude.com/claude-code), executeu «claude» una vegada en un terminal per iniciar la sessió i torneu-ho a provar."
+
+msgid ""
+"Claude Code stopped. Your next message restarts it and continues the "
+"conversation."
+msgstr "Claude Code s'ha aturat. El vostre proper missatge el reinicia i continua la conversa."
+
+msgid "If you are not logged in, run \"claude\" once in a terminal to log in."
+msgstr "Si no heu iniciat la sessió, executeu «claude» una vegada en un terminal per iniciar-la."
+
+msgid "3D view"
+msgstr "Vista 3D"
+
+msgid "Attach a screenshot of the 3D view"
+msgstr "Adjuntar una captura de la vista 3D"
+
+msgid "Window"
+msgstr "Finestra"
+
+msgid "Attach a screenshot of the whole slicer window"
+msgstr "Adjuntar una captura de tota la finestra del laminador"
+
+msgid "The screenshot could not be taken."
+msgstr "No s'ha pogut fer la captura de pantalla."
+
+msgid "Dock next to the 3D view"
+msgstr "Acoblar al costat de la vista 3D"
+
+msgid "Close this conversation"
+msgstr "Tancar aquesta conversa"
+
+msgid "Float in its own window"
+msgstr "Separar en una finestra pròpia"
+
+msgid "Choose the model"
+msgstr "Triar el model"
+
+msgid "Compacting the conversation..."
+msgstr "S'està compactant la conversa..."
+
+msgid "Conversation compacted: Claude keeps a summary of it."
+msgstr "Conversa compactada: Claude en conserva un resum."
+
+msgid "Conversation cleared: Claude starts from scratch."
+msgstr "Conversa esborrada: Claude comença de zero."
+
+#, c-format, boost-format
+msgid "Could not start the MCP server: %s"
+msgstr "No s'ha pogut iniciar el servidor MCP: %s"
+
+msgid "Claude Code was not found."
+msgstr "No s'ha trobat Claude Code."
+
+msgid "Could not send the message to Claude Code."
+msgstr "No s'ha pogut enviar el missatge a Claude Code."
+
+msgid "filament"
+msgstr "filament"
+
+msgid "toolhead"
+msgstr "capçal"
+
+msgid "AI assistant:"
+msgstr "Assistent d'IA:"
+
+msgid "AI Assistant"
+msgstr "Assistent d'IA"
+
+msgid "Changes proposed by the AI assistant"
+msgstr "Canvis proposats per l'assistent d'IA"
+
+msgid "Parameter name"
+msgstr "Nom del paràmetre"
+
+msgid "AI Assistant (MCP server)"
+msgstr "Assistent d'IA (servidor MCP)"
+
+msgid ""
+"Lets an AI assistant (Claude, Gemini...) analyze the open project, fix the "
+"problems reported by the slicer and tune the print settings. Every change "
+"has to be confirmed here. The server only accepts connections from this "
+"computer."
+msgstr "Permet que un assistent d'IA (Claude, Gemini...) analitzi el projecte obert, corregeixi els problemes indicats pel laminador i ajusti la configuració d'impressió. Cada canvi s'ha de confirmar aquí. El servidor només accepta connexions des d'aquest ordinador."
+
+msgid "Regenerate"
+msgstr "Regenerar"
+
+msgid "Port"
+msgstr "Port"
+
+msgid "Found automatically"
+msgstr "Trobat automàticament"
+
+msgid "Browse..."
+msgstr "Navega..."
+
+msgid "Claude Code"
+msgstr "Claude Code"
+
+msgid "Notes folder"
+msgstr "Carpeta de notes"
+
+msgid "Let the assistant add and edit notes"
+msgstr "Permetre que l'assistent afegeixi i editi notes"
+
+msgid ""
+"e.g. Answer in French. I print mostly PETG on the U1 and prefer strong parts "
+"over speed."
+msgstr "p. ex. Respon en català. Imprimeixo sobretot PETG a la U1 i prefereixo peces resistents a la velocitat."
+
+#, c-format, boost-format
+msgid ""
+"Added to the assistant's instructions at the start of each conversation. "
+"Also editable in %s."
+msgstr "S'afegeixen a les instruccions de l'assistent al començament de cada conversa. També editables a %s."
+
+msgid "Enable MCP server"
+msgstr "Activar el servidor MCP"
+
+msgid ""
+"Allow other MCP clients on this computer (Claude Code, Gemini CLI...) to "
+"connect with the token below. The built-in chat does not need it. Any "
+"program that can read the token can use the server."
+msgstr "Permetre que altres clients MCP d'aquest ordinador (Claude Code, Gemini CLI...) es connectin amb el testimoni de sota. El xat integrat no ho necessita. Qualsevol programa que pugui llegir el testimoni pot fer servir el servidor."
+
+msgid ""
+"Allow reading the state of the connected printer (loaded filaments, nozzles, "
+"print status and errors). The printer is never controlled."
+msgstr "Permetre llegir l'estat de la impressora connectada (filaments carregats, broquets, estat de la impressió i errors). La impressora no es controla mai."
+
+msgid ""
+"Allow unloading filament from the toolheads. Each request has to be "
+"confirmed here, and it is refused while a print is running."
+msgstr "Permetre descarregar el filament dels capçals. Cada sol·licitud s'ha de confirmar aquí i es rebutja durant una impressió."
+
+msgid "At startup, connect to the printer when it is the only one available."
+msgstr "En iniciar, connectar a la impressora quan sigui l'única disponible."
+
+msgid ""
+"Offer to adapt projects made for another printer (e.g. downloaded 3MF files) "
+"to the connected one."
+msgstr "Oferir adaptar els projectes fets per a una altra impressora (p. ex. fitxers 3MF baixats) a la connectada."
+
+msgid ""
+"Allow searching the Snapmaker wiki and support site for the manufacturer's "
+"recommendations (the searches are sent to Snapmaker)."
+msgstr "Permetre cercar les recomanacions del fabricant al wiki i al lloc d'assistència de Snapmaker (les cerques s'envien a Snapmaker)."
+
+msgid "Instructions for the assistant"
+msgstr "Instruccions per a l'assistent"
+
+msgid "Token"
+msgstr "Testimoni"
+
+msgid "Client configuration"
+msgstr "Configuració dels clients"
+
+msgid "All files"
+msgstr "Tots els fitxers"
+
+msgid "Choose the Claude Code executable"
+msgstr "Triar l'executable de Claude Code"
+
+msgid "Choose the notes folder"
+msgstr "Triar la carpeta de notes"
+
+#, c-format, boost-format
+msgid "Running on %s"
+msgstr "En marxa a %s"
+
+#, c-format, boost-format
+msgid "Could not start the server: %s"
+msgstr "No s'ha pogut iniciar el servidor: %s"
+
+msgid "Stopped"
+msgstr "Aturat"
+
+#, c-format, boost-format
+msgid "Used by the chat: %s"
+msgstr "Utilitzat pel xat: %s"
+
+msgid "Claude Code not found: install it, or choose its executable."
+msgstr "No s'ha trobat Claude Code: instal·leu-lo o trieu-ne l'executable."
+
+#, boost-format
+msgid "Add a part (%1%) to %2%"
+msgstr "Afegir una peça (%1%) a %2%"
+
+#, boost-format
+msgid "Add a negative part (%1%) to %2%"
+msgstr "Afegir una part negativa (%1%) a %2%"
+
+#, boost-format
+msgid "Add a modifier (%1%) to %2%"
+msgstr "Afegir un modificador (%1%) a %2%"
+
+#, boost-format
+msgid "Add a support blocker (%1%) to %2%"
+msgstr "Afegir un bloqueig de suports (%1%) a %2%"
+
+#, boost-format
+msgid "Add a support enforcer (%1%) to %2%"
+msgstr "Afegir un forçat de suports (%1%) a %2%"
+
+msgid "Arrange the objects of the current plate"
+msgstr "Ordenar els objectes de la safata actual"
+
+#, boost-format
+msgid "Scale %1% to %2% %%"
+msgstr "Escalar %1% al %2% %%"
+
+#, boost-format
+msgid "Resize %1% to %2%, keeping its proportions"
+msgstr "Redimensionar %1% a %2% mantenint-ne les proporcions"
+
+#, boost-format
+msgid "Resize %1% to %2%"
+msgstr "Redimensionar %1% a %2%"
+
+#, boost-format
+msgid "Rotate %1% by %2%"
+msgstr "Girar %1% %2%"
+
+#, boost-format
+msgid "Move %1% to %2%"
+msgstr "Moure %1% a %2%"
+
+#, boost-format
+msgid "Move %1% by %2%"
+msgstr "Desplaçar %1% %2%"
+
+#, boost-format
+msgid "Center %1% on its plate"
+msgstr "Centrar %1% a la seva safata"
+
+#, boost-format
+msgid "Drop %1% to the bed"
+msgstr "Baixar %1% fins al llit"
+
+#, boost-format
+msgid "Mirror %1% along %2%"
+msgstr "Emmirallar %1% segons %2%"
+
+#, boost-format
+msgid "Cut %1% at %2% mm from its bottom"
+msgstr "Tallar %1% a %2% mm de la base"
+
+msgid "keep the upper part"
+msgstr "conservar la part superior"
+
+msgid "keep the lower part"
+msgstr "conservar la part inferior"
+
+msgid "upper part placed on its cut face"
+msgstr "part superior recolzada a la cara de tall"
+
+#, boost-format
+msgid "Split %1% into objects"
+msgstr "Separar %1% en objectes"
+
+#, boost-format
+msgid "Duplicate %1% x%2%"
+msgstr "Duplicar %1% x%2%"
+
+#, boost-format
+msgid "Delete %1%"
+msgstr "Esborrar %1%"
+
+#, boost-format
+msgid "Auto-orient %1%"
+msgstr "Orientar automàticament %1%"
+
+#, boost-format
+msgid "at %1%"
+msgstr "a %1%"
+
+#, boost-format
+msgid "Delete part %1% of %2%"
+msgstr "Esborrar la peça %1% de %2%"
+
+#, boost-format
+msgid "Print part %1% of %2% with filament %3%"
+msgstr "Imprimir la peça %1% de %2% amb el filament %3%"
+
+#, boost-format
+msgid "Print %1% with filament %2%"
+msgstr "Imprimir %1% amb el filament %2%"
+
+#, boost-format
+msgid "Rename part %1% of %2% to %3%"
+msgstr "Renombrar la peça %1% de %2% a %3%"
+
+#, boost-format
+msgid "Rename %1% to %2%"
+msgstr "Renombrar %1% a %2%"
+
+msgid ""
+"The AI assistant asks to change the objects of the project. Apply these "
+"operations? Undo restores the previous state."
+msgstr "L'assistent d'IA demana canviar els objectes del projecte. Voleu aplicar aquestes operacions? Desfer restaura l'estat anterior."
+
+msgid "Toolhead"
+msgstr "Capçal"
+
+msgid ""
+"The AI assistant asks to unload the filament of these toolheads. The printer "
+"heats each nozzle and moves. Unload now?"
+msgstr "L'assistent d'IA demana descarregar el filament d'aquests capçals. La impressora escalfa cada broquet i es mou. Voleu descarregar ara?"
+
+#, boost-format
+msgid "the closest profile for a layer height of %1% mm"
+msgstr "el perfil més proper per a una alçada de capa de %1% mm"
+
+#, boost-format
+msgid "slot and toolhead %1%"
+msgstr "ranura i capçal %1%"
+
+msgid ""
+"Adapt this project to the connected printer? The printer, process and "
+"filament presets change; the toolheads can still be changed when printing."
+msgstr "Voleu adaptar aquest projecte a la impressora connectada? Canvien els perfils d'impressora, procés i filament; els capçals encara es poden canviar en imprimir."
+
+msgid "Adapt the project"
+msgstr "Adaptar el projecte"
+
+#, boost-format
+msgid "This project is set up for %1% but the connected printer is a %2%."
+msgstr "Aquest projecte està configurat per a %1%, però la impressora connectada és una %2%."
+
+msgid "Adapt it to this printer"
+msgstr "Adaptar-lo a aquesta impressora"
+
+#, c-format
+msgid ""
+"The project now uses %s. %zu settings of the original project differ from "
+"the new profile: ask the AI assistant (/adapt_project) to restore the "
+"original intent where it suits this printer."
+msgstr "El projecte ara fa servir %s. %zu paràmetres del projecte original difereixen del perfil nou: demaneu a l'assistent d'IA (/adapt_project) que restauri la intenció original on convingui a aquesta impressora."
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

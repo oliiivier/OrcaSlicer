@@ -7,6 +7,7 @@
 class CheckBox;
 class SpinInput;
 class TextInput;
+class wxSizer;
 class wxStaticText;
 class wxTextCtrl;
 
@@ -39,8 +40,8 @@ private:
     ::CheckBox*   m_manufacturer_docs { nullptr };
     SpinInput*    m_port { nullptr };
     TextInput*    m_token { nullptr };
-    wxWindow*     m_regenerate { nullptr };
     wxWindow*     m_copy { nullptr };
+    wxSizer*      m_external_section { nullptr };
     TextInput*    m_claude_path { nullptr };
     wxStaticText* m_claude_found { nullptr };
     wxStaticText* m_status_dot { nullptr };

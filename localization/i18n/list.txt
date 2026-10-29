@@ -182,3 +182,11 @@ src/slic3r/GUI/BackgroundSlicingProcess.cpp
 src/slic3r/GUI/Gizmos/GLGizmoBrimEars.cpp
 src/slic3r/GUI/MixedFilamentBatchDialog.cpp
 src/slic3r/GUI/MixedColorMatchHelpers.cpp
+src/slic3r/AIAssistant/AIAssistant.cpp
+src/slic3r/AIAssistant/ChatPanel.cpp
+src/slic3r/AIAssistant/McpChanges.cpp
+src/slic3r/AIAssistant/McpChangesDialog.cpp
+src/slic3r/AIAssistant/McpDialog.cpp
+src/slic3r/AIAssistant/McpObjects.cpp
+src/slic3r/AIAssistant/McpPrinterControl.cpp
+src/slic3r/AIAssistant/ProjectAdapt.cpp

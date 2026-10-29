@@ -18771,6 +18771,406 @@ msgid ""
 "probability of warping?"
 msgstr ""
 
+msgid "AI Assistant (MCP server): running"
+msgstr "DI asistentas (MCP serveris): veikia"
+
+msgid "AI Assistant (MCP server): stopped"
+msgstr "DI asistentas (MCP serveris): sustabdytas"
+
+msgid "Chat with Claude"
+msgstr "Kalbėtis su Claude"
+
+msgid ""
+"Ask Claude about this project and let it propose setting changes (requires "
+"Claude Code)"
+msgstr "Klausti Claude apie šį projektą ir leisti jam siūlyti nustatymų pakeitimus (reikia Claude Code)"
+
+msgid ""
+"Let Claude, Gemini or another MCP client analyze and fix the print settings"
+msgstr "Leisti Claude, Gemini ar kitam MCP klientui analizuoti ir taisyti spausdinimo nustatymus"
+
+msgid "Claude"
+msgstr "Claude"
+
+msgid "Chat with Claude about this project"
+msgstr "Kalbėtis su Claude apie šį projektą"
+
+msgid ""
+"Ask about this project, a print problem, a setting... (Enter to send, "
+"Shift+Enter for a new line, paste a screenshot)"
+msgstr "Klauskite apie šį projektą, spausdinimo problemą, nustatymą... (Enter – siųsti, Shift+Enter – nauja eilutė, įklijuokite ekrano kopiją)"
+
+msgid "New conversation"
+msgstr "Naujas pokalbis"
+
+msgid "MCP server settings"
+msgstr "MCP serverio nustatymai"
+
+msgid ""
+"Claude can read the project, explain the slicer warnings, propose setting "
+"changes (you confirm each one in the slicer) and follow the connected "
+"printer."
+msgstr "Claude gali skaityti projektą, paaiškinti pjaustyklės įspėjimus, siūlyti nustatymų pakeitimus (kiekvieną patvirtinate pjaustyklėje) ir stebėti prijungtą spausdintuvą."
+
+msgid "Starting Claude Code..."
+msgstr "Paleidžiamas Claude Code..."
+
+msgid "Thinking..."
+msgstr "Galvoju..."
+
+msgid "Stopped."
+msgstr "Sustabdyta."
+
+msgid ""
+"The MCP server of the slicer is off: Claude cannot see the project. Turn it "
+"on in the MCP server settings."
+msgstr "Pjaustyklės MCP serveris išjungtas: Claude nemato projekto. Įjunkite jį MCP serverio nustatymuose."
+
+msgid "Claude Code could not connect to the MCP server of the slicer."
+msgstr "Claude Code nepavyko prisijungti prie pjaustyklės MCP serverio."
+
+msgid ""
+"Claude Code was not found. Install it (https://claude.com/claude-code), run "
+"\"claude\" once in a terminal to log in, then try again."
+msgstr "Claude Code nerastas. Įdiekite jį (https://claude.com/claude-code), vieną kartą paleiskite „claude“ terminale, kad prisijungtumėte, ir bandykite dar kartą."
+
+msgid ""
+"Claude Code stopped. Your next message restarts it and continues the "
+"conversation."
+msgstr "Claude Code sustojo. Kita jūsų žinutė jį vėl paleis ir pratęs pokalbį."
+
+msgid "If you are not logged in, run \"claude\" once in a terminal to log in."
+msgstr "Jei nesate prisijungę, vieną kartą paleiskite „claude“ terminale, kad prisijungtumėte."
+
+msgid "3D view"
+msgstr "3D vaizdas"
+
+msgid "Attach a screenshot of the 3D view"
+msgstr "Pridėti 3D vaizdo ekrano kopiją"
+
+msgid "Window"
+msgstr "Langas"
+
+msgid "Attach a screenshot of the whole slicer window"
+msgstr "Pridėti viso pjaustyklės lango ekrano kopiją"
+
+msgid "The screenshot could not be taken."
+msgstr "Nepavyko padaryti ekrano kopijos."
+
+msgid "Dock next to the 3D view"
+msgstr "Prisegti šalia 3D vaizdo"
+
+msgid "Close this conversation"
+msgstr "Uždaryti šį pokalbį"
+
+msgid "Float in its own window"
+msgstr "Atskirti į atskirą langą"
+
+msgid "Choose the model"
+msgstr "Pasirinkti modelį"
+
+msgid "Compacting the conversation..."
+msgstr "Pokalbis glaudinamas..."
+
+msgid "Conversation compacted: Claude keeps a summary of it."
+msgstr "Pokalbis suglaudintas: Claude išsaugo jo santrauką."
+
+msgid "Conversation cleared: Claude starts from scratch."
+msgstr "Pokalbis išvalytas: Claude pradeda iš naujo."
+
+#, c-format, boost-format
+msgid "Could not start the MCP server: %s"
+msgstr "Nepavyko paleisti MCP serverio: %s"
+
+msgid "Claude Code was not found."
+msgstr "Claude Code nerastas."
+
+msgid "Could not send the message to Claude Code."
+msgstr "Nepavyko išsiųsti žinutės į Claude Code."
+
+msgid "filament"
+msgstr "gija"
+
+msgid "toolhead"
+msgstr "spausdinimo galvutė"
+
+msgid "AI assistant:"
+msgstr "DI asistentas:"
+
+msgid "AI Assistant"
+msgstr "DI asistentas"
+
+msgid "Changes proposed by the AI assistant"
+msgstr "DI asistento siūlomi pakeitimai"
+
+msgid "Parameter name"
+msgstr "Parametro pavadinimas"
+
+msgid "AI Assistant (MCP server)"
+msgstr "DI asistentas (MCP serveris)"
+
+msgid ""
+"Lets an AI assistant (Claude, Gemini...) analyze the open project, fix the "
+"problems reported by the slicer and tune the print settings. Every change "
+"has to be confirmed here. The server only accepts connections from this "
+"computer."
+msgstr "Leidžia DI asistentui (Claude, Gemini...) analizuoti atidarytą projektą, taisyti pjaustyklės praneštas problemas ir derinti spausdinimo nustatymus. Kiekvienas pakeitimas turi būti patvirtintas čia. Serveris priima ryšius tik iš šio kompiuterio."
+
+msgid "Regenerate"
+msgstr "Generuoti iš naujo"
+
+msgid "Port"
+msgstr "Prievadas"
+
+msgid "Found automatically"
+msgstr "Rasta automatiškai"
+
+msgid "Browse..."
+msgstr "Naršyti..."
+
+msgid "Claude Code"
+msgstr "Claude Code"
+
+msgid "Notes folder"
+msgstr "Pastabų aplankas"
+
+msgid "Let the assistant add and edit notes"
+msgstr "Leisti asistentui pridėti ir redaguoti pastabas"
+
+msgid ""
+"e.g. Answer in French. I print mostly PETG on the U1 and prefer strong parts "
+"over speed."
+msgstr "pvz. Atsakyk lietuviškai. Daugiausia spausdinu PETG su U1 ir tvirtas detales vertinu labiau nei greitį."
+
+#, c-format, boost-format
+msgid ""
+"Added to the assistant's instructions at the start of each conversation. "
+"Also editable in %s."
+msgstr "Pridedama prie asistento instrukcijų kiekvieno pokalbio pradžioje. Taip pat galima redaguoti %s."
+
+msgid "Enable MCP server"
+msgstr "Įjungti MCP serverį"
+
+msgid ""
+"Allow other MCP clients on this computer (Claude Code, Gemini CLI...) to "
+"connect with the token below. The built-in chat does not need it. Any "
+"program that can read the token can use the server."
+msgstr "Leisti kitiems šio kompiuterio MCP klientams (Claude Code, Gemini CLI...) prisijungti naudojant žemiau esantį raktą. Integruotam pokalbiui to nereikia. Bet kuri programa, galinti perskaityti raktą, gali naudotis serveriu."
+
+msgid ""
+"Allow reading the state of the connected printer (loaded filaments, nozzles, "
+"print status and errors). The printer is never controlled."
+msgstr "Leisti skaityti prijungto spausdintuvo būseną (įdėtos gijos, purkštukai, spausdinimo būsena ir klaidos). Spausdintuvas niekada nevaldomas."
+
+msgid ""
+"Allow unloading filament from the toolheads. Each request has to be "
+"confirmed here, and it is refused while a print is running."
+msgstr "Leisti išimti giją iš spausdinimo galvučių. Kiekvienas prašymas turi būti patvirtintas čia ir atmetamas spausdinimo metu."
+
+msgid "At startup, connect to the printer when it is the only one available."
+msgstr "Paleidžiant prisijungti prie spausdintuvo, kai jis vienintelis pasiekiamas."
+
+msgid ""
+"Offer to adapt projects made for another printer (e.g. downloaded 3MF files) "
+"to the connected one."
+msgstr "Siūlyti pritaikyti kitam spausdintuvui sukurtus projektus (pvz. atsisiųstus 3MF failus) prijungtam spausdintuvui."
+
+msgid ""
+"Allow searching the Snapmaker wiki and support site for the manufacturer's "
+"recommendations (the searches are sent to Snapmaker)."
+msgstr "Leisti ieškoti gamintojo rekomendacijų Snapmaker wiki ir pagalbos svetainėje (paieškos siunčiamos Snapmaker)."
+
+msgid "Instructions for the assistant"
+msgstr "Instrukcijos asistentui"
+
+msgid "Token"
+msgstr "Raktas"
+
+msgid "Client configuration"
+msgstr "Klientų konfigūracija"
+
+msgid "All files"
+msgstr "Visi failai"
+
+msgid "Choose the Claude Code executable"
+msgstr "Pasirinkti Claude Code vykdomąjį failą"
+
+msgid "Choose the notes folder"
+msgstr "Pasirinkti pastabų aplanką"
+
+#, c-format, boost-format
+msgid "Running on %s"
+msgstr "Veikia adresu %s"
+
+#, c-format, boost-format
+msgid "Could not start the server: %s"
+msgstr "Nepavyko paleisti serverio: %s"
+
+msgid "Stopped"
+msgstr "Sustabdytas"
+
+#, c-format, boost-format
+msgid "Used by the chat: %s"
+msgstr "Naudoja pokalbis: %s"
+
+msgid "Claude Code not found: install it, or choose its executable."
+msgstr "Claude Code nerastas: įdiekite jį arba pasirinkite jo vykdomąjį failą."
+
+#, boost-format
+msgid "Add a part (%1%) to %2%"
+msgstr "Pridėti dalį (%1%) prie %2%"
+
+#, boost-format
+msgid "Add a negative part (%1%) to %2%"
+msgstr "Pridėti neigiamą elementą (%1%) prie %2%"
+
+#, boost-format
+msgid "Add a modifier (%1%) to %2%"
+msgstr "Pridėti modifikatorių (%1%) prie %2%"
+
+#, boost-format
+msgid "Add a support blocker (%1%) to %2%"
+msgstr "Pridėti atramų blokatorių (%1%) prie %2%"
+
+#, boost-format
+msgid "Add a support enforcer (%1%) to %2%"
+msgstr "Pridėti priverstines atramas (%1%) prie %2%"
+
+msgid "Arrange the objects of the current plate"
+msgstr "Išdėstyti dabartinės plokštės objektus"
+
+#, boost-format
+msgid "Scale %1% to %2% %%"
+msgstr "Keisti %1% mastelį į %2% %%"
+
+#, boost-format
+msgid "Resize %1% to %2%, keeping its proportions"
+msgstr "Keisti %1% dydį į %2% išlaikant proporcijas"
+
+#, boost-format
+msgid "Resize %1% to %2%"
+msgstr "Keisti %1% dydį į %2%"
+
+#, boost-format
+msgid "Rotate %1% by %2%"
+msgstr "Pasukti %1% %2%"
+
+#, boost-format
+msgid "Move %1% to %2%"
+msgstr "Perkelti %1% į %2%"
+
+#, boost-format
+msgid "Move %1% by %2%"
+msgstr "Pastumti %1% per %2%"
+
+#, boost-format
+msgid "Center %1% on its plate"
+msgstr "Centruoti %1% jo plokštėje"
+
+#, boost-format
+msgid "Drop %1% to the bed"
+msgstr "Nuleisti %1% ant pagrindo"
+
+#, boost-format
+msgid "Mirror %1% along %2%"
+msgstr "Atspindėti %1% pagal %2%"
+
+#, boost-format
+msgid "Cut %1% at %2% mm from its bottom"
+msgstr "Perpjauti %1% %2% mm aukštyje nuo apačios"
+
+msgid "keep the upper part"
+msgstr "palikti viršutinę dalį"
+
+msgid "keep the lower part"
+msgstr "palikti apatinę dalį"
+
+msgid "upper part placed on its cut face"
+msgstr "viršutinė dalis padėta ant pjūvio paviršiaus"
+
+#, boost-format
+msgid "Split %1% into objects"
+msgstr "Padalinti %1% į objektus"
+
+#, boost-format
+msgid "Duplicate %1% x%2%"
+msgstr "Dubliuoti %1% x%2%"
+
+#, boost-format
+msgid "Delete %1%"
+msgstr "Ištrinti %1%"
+
+#, boost-format
+msgid "Auto-orient %1%"
+msgstr "Automatiškai orientuoti %1%"
+
+#, boost-format
+msgid "at %1%"
+msgstr "ties %1%"
+
+#, boost-format
+msgid "Delete part %1% of %2%"
+msgstr "Ištrinti %2% dalį %1%"
+
+#, boost-format
+msgid "Print part %1% of %2% with filament %3%"
+msgstr "Spausdinti %2% dalį %1% gija %3%"
+
+#, boost-format
+msgid "Print %1% with filament %2%"
+msgstr "Spausdinti %1% gija %2%"
+
+#, boost-format
+msgid "Rename part %1% of %2% to %3%"
+msgstr "Pervardyti %2% dalį %1% į %3%"
+
+#, boost-format
+msgid "Rename %1% to %2%"
+msgstr "Pervardyti %1% į %2%"
+
+msgid ""
+"The AI assistant asks to change the objects of the project. Apply these "
+"operations? Undo restores the previous state."
+msgstr "DI asistentas prašo pakeisti projekto objektus. Taikyti šias operacijas? Atšaukti atkuria ankstesnę būseną."
+
+msgid "Toolhead"
+msgstr "Spausdinimo galvutė"
+
+msgid ""
+"The AI assistant asks to unload the filament of these toolheads. The printer "
+"heats each nozzle and moves. Unload now?"
+msgstr "DI asistentas prašo išimti šių spausdinimo galvučių giją. Spausdintuvas įkaitina kiekvieną purkštuką ir juda. Išimti dabar?"
+
+#, boost-format
+msgid "the closest profile for a layer height of %1% mm"
+msgstr "artimiausias profilis %1% mm sluoksnio aukščiui"
+
+#, boost-format
+msgid "slot and toolhead %1%"
+msgstr "lizdas ir spausdinimo galvutė %1%"
+
+msgid ""
+"Adapt this project to the connected printer? The printer, process and "
+"filament presets change; the toolheads can still be changed when printing."
+msgstr "Pritaikyti šį projektą prijungtam spausdintuvui? Pasikeis spausdintuvo, proceso ir gijos profiliai; spausdinimo galvutes dar galima pakeisti spausdinant."
+
+msgid "Adapt the project"
+msgstr "Pritaikyti projektą"
+
+#, boost-format
+msgid "This project is set up for %1% but the connected printer is a %2%."
+msgstr "Šis projektas paruoštas %1%, bet prijungtas spausdintuvas yra %2%."
+
+msgid "Adapt it to this printer"
+msgstr "Pritaikyti šiam spausdintuvui"
+
+#, c-format
+msgid ""
+"The project now uses %s. %zu settings of the original project differ from "
+"the new profile: ask the AI assistant (/adapt_project) to restore the "
+"original intent where it suits this printer."
+msgstr "Projektas dabar naudoja %s. %zu pradinio projekto nustatymų skiriasi nuo naujo profilio: paprašykite DI asistento (/adapt_project) atkurti pradinį sumanymą ten, kur jis tinka šiam spausdintuvui."
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."

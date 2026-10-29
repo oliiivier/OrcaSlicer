@@ -19317,6 +19317,406 @@ msgstr ""
 "déformer, tels que l’ABS, une augmentation appropriée de la température du "
 "plateau chauffant peut réduire la probabilité de déformation?"
 
+msgid "AI Assistant (MCP server): running"
+msgstr "Assistant IA (serveur MCP) : actif"
+
+msgid "AI Assistant (MCP server): stopped"
+msgstr "Assistant IA (serveur MCP) : arrêté"
+
+msgid "Chat with Claude"
+msgstr "Discuter avec Claude"
+
+msgid ""
+"Ask Claude about this project and let it propose setting changes (requires "
+"Claude Code)"
+msgstr "Interroger Claude sur ce projet et le laisser proposer des modifications de réglages (nécessite Claude Code)"
+
+msgid ""
+"Let Claude, Gemini or another MCP client analyze and fix the print settings"
+msgstr "Laisser Claude, Gemini ou un autre client MCP analyser et corriger les réglages d'impression"
+
+msgid "Claude"
+msgstr "Claude"
+
+msgid "Chat with Claude about this project"
+msgstr "Discuter avec Claude de ce projet"
+
+msgid ""
+"Ask about this project, a print problem, a setting... (Enter to send, "
+"Shift+Enter for a new line, paste a screenshot)"
+msgstr "Une question sur ce projet, un problème d'impression, un réglage... (Entrée pour envoyer, Maj+Entrée pour aller à la ligne, collez une capture d'écran)"
+
+msgid "New conversation"
+msgstr "Nouvelle conversation"
+
+msgid "MCP server settings"
+msgstr "Paramètres du serveur MCP"
+
+msgid ""
+"Claude can read the project, explain the slicer warnings, propose setting "
+"changes (you confirm each one in the slicer) and follow the connected "
+"printer."
+msgstr "Claude peut lire le projet, expliquer les avertissements du trancheur, proposer des modifications de réglages (vous confirmez chacune dans le trancheur) et suivre l'imprimante connectée."
+
+msgid "Starting Claude Code..."
+msgstr "Démarrage de Claude Code..."
+
+msgid "Thinking..."
+msgstr "Réflexion..."
+
+msgid "Stopped."
+msgstr "Arrêté."
+
+msgid ""
+"The MCP server of the slicer is off: Claude cannot see the project. Turn it "
+"on in the MCP server settings."
+msgstr "Le serveur MCP du trancheur est désactivé : Claude ne voit pas le projet. Activez-le dans les paramètres du serveur MCP."
+
+msgid "Claude Code could not connect to the MCP server of the slicer."
+msgstr "Claude Code n'a pas pu se connecter au serveur MCP du trancheur."
+
+msgid ""
+"Claude Code was not found. Install it (https://claude.com/claude-code), run "
+"\"claude\" once in a terminal to log in, then try again."
+msgstr "Claude Code est introuvable. Installez-le (https://claude.com/claude-code), lancez « claude » une fois dans un terminal pour vous connecter, puis réessayez."
+
+msgid ""
+"Claude Code stopped. Your next message restarts it and continues the "
+"conversation."
+msgstr "Claude Code s'est arrêté. Votre prochain message le relance et reprend la conversation."
+
+msgid "If you are not logged in, run \"claude\" once in a terminal to log in."
+msgstr "Si vous n'êtes pas connecté, lancez « claude » une fois dans un terminal pour vous connecter."
+
+msgid "3D view"
+msgstr "Vue 3D"
+
+msgid "Attach a screenshot of the 3D view"
+msgstr "Joindre une capture d'écran de la vue 3D"
+
+msgid "Window"
+msgstr "Fenêtre"
+
+msgid "Attach a screenshot of the whole slicer window"
+msgstr "Joindre une capture d'écran de toute la fenêtre du trancheur"
+
+msgid "The screenshot could not be taken."
+msgstr "La capture d'écran n'a pas pu être prise."
+
+msgid "Dock next to the 3D view"
+msgstr "Ancrer à côté de la vue 3D"
+
+msgid "Close this conversation"
+msgstr "Fermer cette conversation"
+
+msgid "Float in its own window"
+msgstr "Détacher dans sa propre fenêtre"
+
+msgid "Choose the model"
+msgstr "Choisir le modèle"
+
+msgid "Compacting the conversation..."
+msgstr "Compactage de la conversation..."
+
+msgid "Conversation compacted: Claude keeps a summary of it."
+msgstr "Conversation compactée : Claude en garde un résumé."
+
+msgid "Conversation cleared: Claude starts from scratch."
+msgstr "Conversation effacée : Claude repart de zéro."
+
+#, c-format, boost-format
+msgid "Could not start the MCP server: %s"
+msgstr "Impossible de démarrer le serveur MCP : %s"
+
+msgid "Claude Code was not found."
+msgstr "Claude Code est introuvable."
+
+msgid "Could not send the message to Claude Code."
+msgstr "Impossible d'envoyer le message à Claude Code."
+
+msgid "filament"
+msgstr "filament"
+
+msgid "toolhead"
+msgstr "tête"
+
+msgid "AI assistant:"
+msgstr "Assistant IA :"
+
+msgid "AI Assistant"
+msgstr "Assistant IA"
+
+msgid "Changes proposed by the AI assistant"
+msgstr "Modifications proposées par l'assistant IA"
+
+msgid "Parameter name"
+msgstr "Nom du paramètre"
+
+msgid "AI Assistant (MCP server)"
+msgstr "Assistant IA (serveur MCP)"
+
+msgid ""
+"Lets an AI assistant (Claude, Gemini...) analyze the open project, fix the "
+"problems reported by the slicer and tune the print settings. Every change "
+"has to be confirmed here. The server only accepts connections from this "
+"computer."
+msgstr "Permet à un assistant IA (Claude, Gemini...) d'analyser le projet ouvert, de corriger les problèmes signalés par le trancheur et d'ajuster les réglages d'impression. Chaque modification doit être confirmée ici. Le serveur n'accepte que les connexions venant de cet ordinateur."
+
+msgid "Regenerate"
+msgstr "Régénérer"
+
+msgid "Port"
+msgstr "Port"
+
+msgid "Found automatically"
+msgstr "Trouvé automatiquement"
+
+msgid "Browse..."
+msgstr "Parcourir..."
+
+msgid "Claude Code"
+msgstr "Claude Code"
+
+msgid "Notes folder"
+msgstr "Dossier des notes"
+
+msgid "Let the assistant add and edit notes"
+msgstr "Permettre à l'assistant d'ajouter et de modifier des notes"
+
+msgid ""
+"e.g. Answer in French. I print mostly PETG on the U1 and prefer strong parts "
+"over speed."
+msgstr "ex. Réponds en français. J'imprime surtout du PETG sur la U1 et je préfère des pièces solides à la vitesse."
+
+#, c-format, boost-format
+msgid ""
+"Added to the assistant's instructions at the start of each conversation. "
+"Also editable in %s."
+msgstr "Ajoutées aux instructions de l'assistant au début de chaque conversation. Modifiables aussi dans %s."
+
+msgid "Enable MCP server"
+msgstr "Activer le serveur MCP"
+
+msgid ""
+"Allow other MCP clients on this computer (Claude Code, Gemini CLI...) to "
+"connect with the token below. The built-in chat does not need it. Any "
+"program that can read the token can use the server."
+msgstr "Autoriser les autres clients MCP de cet ordinateur (Claude Code, Gemini CLI...) à se connecter avec le jeton ci-dessous. Le chat intégré n'en a pas besoin. Tout programme capable de lire le jeton peut utiliser le serveur."
+
+msgid ""
+"Allow reading the state of the connected printer (loaded filaments, nozzles, "
+"print status and errors). The printer is never controlled."
+msgstr "Autoriser la lecture de l'état de l'imprimante connectée (filaments chargés, buses, état de l'impression et erreurs). L'imprimante n'est jamais commandée."
+
+msgid ""
+"Allow unloading filament from the toolheads. Each request has to be "
+"confirmed here, and it is refused while a print is running."
+msgstr "Autoriser le déchargement du filament des têtes. Chaque demande doit être confirmée ici, et elle est refusée pendant une impression."
+
+msgid "At startup, connect to the printer when it is the only one available."
+msgstr "Au démarrage, se connecter à l'imprimante quand c'est la seule disponible."
+
+msgid ""
+"Offer to adapt projects made for another printer (e.g. downloaded 3MF files) "
+"to the connected one."
+msgstr "Proposer d'adapter les projets faits pour une autre imprimante (ex. fichiers 3MF téléchargés) à celle qui est connectée."
+
+msgid ""
+"Allow searching the Snapmaker wiki and support site for the manufacturer's "
+"recommendations (the searches are sent to Snapmaker)."
+msgstr "Autoriser la recherche des recommandations du fabricant sur le wiki et le site d'assistance de Snapmaker (les recherches sont envoyées à Snapmaker)."
+
+msgid "Instructions for the assistant"
+msgstr "Instructions pour l'assistant"
+
+msgid "Token"
+msgstr "Jeton"
+
+msgid "Client configuration"
+msgstr "Configuration des clients"
+
+msgid "All files"
+msgstr "Tous les fichiers"
+
+msgid "Choose the Claude Code executable"
+msgstr "Choisir l'exécutable de Claude Code"
+
+msgid "Choose the notes folder"
+msgstr "Choisir le dossier des notes"
+
+#, c-format, boost-format
+msgid "Running on %s"
+msgstr "Actif sur %s"
+
+#, c-format, boost-format
+msgid "Could not start the server: %s"
+msgstr "Impossible de démarrer le serveur : %s"
+
+msgid "Stopped"
+msgstr "Arrêté"
+
+#, c-format, boost-format
+msgid "Used by the chat: %s"
+msgstr "Utilisé par le chat : %s"
+
+msgid "Claude Code not found: install it, or choose its executable."
+msgstr "Claude Code introuvable : installez-le, ou choisissez son exécutable."
+
+#, boost-format
+msgid "Add a part (%1%) to %2%"
+msgstr "Ajouter une pièce (%1%) à %2%"
+
+#, boost-format
+msgid "Add a negative part (%1%) to %2%"
+msgstr "Ajouter une partie négative (%1%) à %2%"
+
+#, boost-format
+msgid "Add a modifier (%1%) to %2%"
+msgstr "Ajouter un modificateur (%1%) à %2%"
+
+#, boost-format
+msgid "Add a support blocker (%1%) to %2%"
+msgstr "Ajouter un bloqueur de support (%1%) à %2%"
+
+#, boost-format
+msgid "Add a support enforcer (%1%) to %2%"
+msgstr "Ajouter un générateur de supports (%1%) à %2%"
+
+msgid "Arrange the objects of the current plate"
+msgstr "Organiser les objets de la plaque actuelle"
+
+#, boost-format
+msgid "Scale %1% to %2% %%"
+msgstr "Mettre %1% à l'échelle %2% %%"
+
+#, boost-format
+msgid "Resize %1% to %2%, keeping its proportions"
+msgstr "Redimensionner %1% à %2% en gardant ses proportions"
+
+#, boost-format
+msgid "Resize %1% to %2%"
+msgstr "Redimensionner %1% à %2%"
+
+#, boost-format
+msgid "Rotate %1% by %2%"
+msgstr "Tourner %1% de %2%"
+
+#, boost-format
+msgid "Move %1% to %2%"
+msgstr "Déplacer %1% en %2%"
+
+#, boost-format
+msgid "Move %1% by %2%"
+msgstr "Déplacer %1% de %2%"
+
+#, boost-format
+msgid "Center %1% on its plate"
+msgstr "Centrer %1% sur sa plaque"
+
+#, boost-format
+msgid "Drop %1% to the bed"
+msgstr "Déposer %1% sur le plateau"
+
+#, boost-format
+msgid "Mirror %1% along %2%"
+msgstr "Symétrie de %1% selon %2%"
+
+#, boost-format
+msgid "Cut %1% at %2% mm from its bottom"
+msgstr "Couper %1% à %2% mm de sa base"
+
+msgid "keep the upper part"
+msgstr "garder la partie haute"
+
+msgid "keep the lower part"
+msgstr "garder la partie basse"
+
+msgid "upper part placed on its cut face"
+msgstr "partie haute posée sur sa face de coupe"
+
+#, boost-format
+msgid "Split %1% into objects"
+msgstr "Diviser %1% en objets"
+
+#, boost-format
+msgid "Duplicate %1% x%2%"
+msgstr "Dupliquer %1% x%2%"
+
+#, boost-format
+msgid "Delete %1%"
+msgstr "Supprimer %1%"
+
+#, boost-format
+msgid "Auto-orient %1%"
+msgstr "Orienter automatiquement %1%"
+
+#, boost-format
+msgid "at %1%"
+msgstr "en %1%"
+
+#, boost-format
+msgid "Delete part %1% of %2%"
+msgstr "Supprimer la partie %1% de %2%"
+
+#, boost-format
+msgid "Print part %1% of %2% with filament %3%"
+msgstr "Imprimer la partie %1% de %2% avec le filament %3%"
+
+#, boost-format
+msgid "Print %1% with filament %2%"
+msgstr "Imprimer %1% avec le filament %2%"
+
+#, boost-format
+msgid "Rename part %1% of %2% to %3%"
+msgstr "Renommer la partie %1% de %2% en %3%"
+
+#, boost-format
+msgid "Rename %1% to %2%"
+msgstr "Renommer %1% en %2%"
+
+msgid ""
+"The AI assistant asks to change the objects of the project. Apply these "
+"operations? Undo restores the previous state."
+msgstr "L'assistant IA demande de modifier les objets du projet. Appliquer ces opérations ? Annuler rétablit l'état précédent."
+
+msgid "Toolhead"
+msgstr "Tête"
+
+msgid ""
+"The AI assistant asks to unload the filament of these toolheads. The printer "
+"heats each nozzle and moves. Unload now?"
+msgstr "L'assistant IA demande de décharger le filament de ces têtes. L'imprimante chauffe chaque buse et se déplace. Décharger maintenant ?"
+
+#, boost-format
+msgid "the closest profile for a layer height of %1% mm"
+msgstr "le profil le plus proche pour une hauteur de couche de %1% mm"
+
+#, boost-format
+msgid "slot and toolhead %1%"
+msgstr "emplacement et tête %1%"
+
+msgid ""
+"Adapt this project to the connected printer? The printer, process and "
+"filament presets change; the toolheads can still be changed when printing."
+msgstr "Adapter ce projet à l'imprimante connectée ? Les préréglages d'imprimante, de traitement et de filament changent ; les têtes peuvent encore être changées au moment d'imprimer."
+
+msgid "Adapt the project"
+msgstr "Adapter le projet"
+
+#, boost-format
+msgid "This project is set up for %1% but the connected printer is a %2%."
+msgstr "Ce projet est prévu pour %1% mais l'imprimante connectée est une %2%."
+
+msgid "Adapt it to this printer"
+msgstr "L'adapter à cette imprimante"
+
+#, c-format
+msgid ""
+"The project now uses %s. %zu settings of the original project differ from "
+"the new profile: ask the AI assistant (/adapt_project) to restore the "
+"original intent where it suits this printer."
+msgstr "Le projet utilise maintenant %s. %zu réglages du projet d'origine diffèrent du nouveau profil : demandez à l'assistant IA (/adapt_project) de rétablir l'intention d'origine là où elle convient à cette imprimante."
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."
@@ -19893,9 +20293,6 @@ msgstr ""
 
 #~ msgid "Current Cabin humidity"
 #~ msgstr "Humidité dans le caisson"
-
-#~ msgid "Stopped."
-#~ msgstr "Arrêté."
 
 #, c-format, boost-format
 #~ msgid "Connect failed [%d]!"

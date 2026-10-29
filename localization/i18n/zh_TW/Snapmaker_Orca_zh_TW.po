@@ -17538,6 +17538,406 @@ msgstr ""
 "您知道嗎？當列印容易翹曲的材料（如 ABS）時，適當提高熱床溫度\n"
 "可以降低翹曲的機率。"
 
+msgid "AI Assistant (MCP server): running"
+msgstr "AI 助理（MCP 伺服器）：執行中"
+
+msgid "AI Assistant (MCP server): stopped"
+msgstr "AI 助理（MCP 伺服器）：已停止"
+
+msgid "Chat with Claude"
+msgstr "與 Claude 聊天"
+
+msgid ""
+"Ask Claude about this project and let it propose setting changes (requires "
+"Claude Code)"
+msgstr "向 Claude 詢問此專案，並讓它提出設定修改建議（需要 Claude Code）"
+
+msgid ""
+"Let Claude, Gemini or another MCP client analyze and fix the print settings"
+msgstr "讓 Claude、Gemini 或其他 MCP 用戶端分析並修正列印設定"
+
+msgid "Claude"
+msgstr "Claude"
+
+msgid "Chat with Claude about this project"
+msgstr "與 Claude 聊聊這個專案"
+
+msgid ""
+"Ask about this project, a print problem, a setting... (Enter to send, "
+"Shift+Enter for a new line, paste a screenshot)"
+msgstr "詢問此專案、列印問題或某項設定...（Enter 傳送，Shift+Enter 換行，可貼上螢幕截圖）"
+
+msgid "New conversation"
+msgstr "新對話"
+
+msgid "MCP server settings"
+msgstr "MCP 伺服器設定"
+
+msgid ""
+"Claude can read the project, explain the slicer warnings, propose setting "
+"changes (you confirm each one in the slicer) and follow the connected "
+"printer."
+msgstr "Claude 可以讀取專案、解釋切片軟體的警告、提出設定修改建議（每項都由您在切片軟體中確認），並追蹤已連線的列印設備。"
+
+msgid "Starting Claude Code..."
+msgstr "正在啟動 Claude Code..."
+
+msgid "Thinking..."
+msgstr "思考中..."
+
+msgid "Stopped."
+msgstr "已停止。"
+
+msgid ""
+"The MCP server of the slicer is off: Claude cannot see the project. Turn it "
+"on in the MCP server settings."
+msgstr "切片軟體的 MCP 伺服器已關閉：Claude 無法看到專案。請在 MCP 伺服器設定中開啟。"
+
+msgid "Claude Code could not connect to the MCP server of the slicer."
+msgstr "Claude Code 無法連線到切片軟體的 MCP 伺服器。"
+
+msgid ""
+"Claude Code was not found. Install it (https://claude.com/claude-code), run "
+"\"claude\" once in a terminal to log in, then try again."
+msgstr "找不到 Claude Code。請安裝（https://claude.com/claude-code），在終端機中執行一次「claude」登入，然後再試一次。"
+
+msgid ""
+"Claude Code stopped. Your next message restarts it and continues the "
+"conversation."
+msgstr "Claude Code 已停止。您的下一則訊息會重新啟動它並繼續對話。"
+
+msgid "If you are not logged in, run \"claude\" once in a terminal to log in."
+msgstr "如果您尚未登入，請在終端機中執行一次「claude」進行登入。"
+
+msgid "3D view"
+msgstr "3D 檢視"
+
+msgid "Attach a screenshot of the 3D view"
+msgstr "附加 3D 檢視的螢幕截圖"
+
+msgid "Window"
+msgstr "視窗"
+
+msgid "Attach a screenshot of the whole slicer window"
+msgstr "附加整個切片軟體視窗的螢幕截圖"
+
+msgid "The screenshot could not be taken."
+msgstr "無法擷取螢幕截圖。"
+
+msgid "Dock next to the 3D view"
+msgstr "停駐在 3D 檢視旁"
+
+msgid "Close this conversation"
+msgstr "關閉此對話"
+
+msgid "Float in its own window"
+msgstr "在獨立視窗中浮動"
+
+msgid "Choose the model"
+msgstr "選擇模型"
+
+msgid "Compacting the conversation..."
+msgstr "正在壓縮對話..."
+
+msgid "Conversation compacted: Claude keeps a summary of it."
+msgstr "對話已壓縮：Claude 保留了它的摘要。"
+
+msgid "Conversation cleared: Claude starts from scratch."
+msgstr "對話已清除：Claude 從頭開始。"
+
+#, c-format, boost-format
+msgid "Could not start the MCP server: %s"
+msgstr "無法啟動 MCP 伺服器：%s"
+
+msgid "Claude Code was not found."
+msgstr "找不到 Claude Code。"
+
+msgid "Could not send the message to Claude Code."
+msgstr "無法將訊息傳送給 Claude Code。"
+
+msgid "filament"
+msgstr "線材"
+
+msgid "toolhead"
+msgstr "列印頭"
+
+msgid "AI assistant:"
+msgstr "AI 助理："
+
+msgid "AI Assistant"
+msgstr "AI 助理"
+
+msgid "Changes proposed by the AI assistant"
+msgstr "AI 助理建議的修改"
+
+msgid "Parameter name"
+msgstr "參數名稱"
+
+msgid "AI Assistant (MCP server)"
+msgstr "AI 助理（MCP 伺服器）"
+
+msgid ""
+"Lets an AI assistant (Claude, Gemini...) analyze the open project, fix the "
+"problems reported by the slicer and tune the print settings. Every change "
+"has to be confirmed here. The server only accepts connections from this "
+"computer."
+msgstr "讓 AI 助理（Claude、Gemini...）分析開啟的專案，修正切片軟體回報的問題並調整列印設定。每項修改都必須在此確認。伺服器只接受來自本機的連線。"
+
+msgid "Regenerate"
+msgstr "重新產生"
+
+msgid "Port"
+msgstr "連接埠"
+
+msgid "Found automatically"
+msgstr "自動找到"
+
+msgid "Browse..."
+msgstr "瀏覽..."
+
+msgid "Claude Code"
+msgstr "Claude Code"
+
+msgid "Notes folder"
+msgstr "筆記資料夾"
+
+msgid "Let the assistant add and edit notes"
+msgstr "允許助理新增和編輯筆記"
+
+msgid ""
+"e.g. Answer in French. I print mostly PETG on the U1 and prefer strong parts "
+"over speed."
+msgstr "例如：用中文回答。我主要在 U1 上列印 PETG，比起速度更重視零件強度。"
+
+#, c-format, boost-format
+msgid ""
+"Added to the assistant's instructions at the start of each conversation. "
+"Also editable in %s."
+msgstr "在每次對話開始時加入助理的指示中。也可以在 %s 中編輯。"
+
+msgid "Enable MCP server"
+msgstr "啟用 MCP 伺服器"
+
+msgid ""
+"Allow other MCP clients on this computer (Claude Code, Gemini CLI...) to "
+"connect with the token below. The built-in chat does not need it. Any "
+"program that can read the token can use the server."
+msgstr "允許本機上的其他 MCP 用戶端（Claude Code、Gemini CLI...）使用下方的權杖連線。內建聊天不需要它。任何能讀取該權杖的程式都可以使用伺服器。"
+
+msgid ""
+"Allow reading the state of the connected printer (loaded filaments, nozzles, "
+"print status and errors). The printer is never controlled."
+msgstr "允許讀取已連線列印設備的狀態（已裝載的線材、噴嘴、列印狀態和錯誤）。列印設備永遠不會被控制。"
+
+msgid ""
+"Allow unloading filament from the toolheads. Each request has to be "
+"confirmed here, and it is refused while a print is running."
+msgstr "允許從列印頭退出線材。每個請求都必須在此確認，列印期間會被拒絕。"
+
+msgid "At startup, connect to the printer when it is the only one available."
+msgstr "啟動時，如果只有一台可用的列印設備則自動連線。"
+
+msgid ""
+"Offer to adapt projects made for another printer (e.g. downloaded 3MF files) "
+"to the connected one."
+msgstr "建議將為其他列印設備製作的專案（如下載的 3MF 檔案）調整為已連線的列印設備。"
+
+msgid ""
+"Allow searching the Snapmaker wiki and support site for the manufacturer's "
+"recommendations (the searches are sent to Snapmaker)."
+msgstr "允許在 Snapmaker wiki 和支援網站上搜尋製造商建議（搜尋內容會傳送給 Snapmaker）。"
+
+msgid "Instructions for the assistant"
+msgstr "給助理的指示"
+
+msgid "Token"
+msgstr "權杖"
+
+msgid "Client configuration"
+msgstr "用戶端設定"
+
+msgid "All files"
+msgstr "所有檔案"
+
+msgid "Choose the Claude Code executable"
+msgstr "選擇 Claude Code 執行檔"
+
+msgid "Choose the notes folder"
+msgstr "選擇筆記資料夾"
+
+#, c-format, boost-format
+msgid "Running on %s"
+msgstr "執行於 %s"
+
+#, c-format, boost-format
+msgid "Could not start the server: %s"
+msgstr "無法啟動伺服器：%s"
+
+msgid "Stopped"
+msgstr "已停止"
+
+#, c-format, boost-format
+msgid "Used by the chat: %s"
+msgstr "聊天使用：%s"
+
+msgid "Claude Code not found: install it, or choose its executable."
+msgstr "找不到 Claude Code：請安裝，或選擇其執行檔。"
+
+#, boost-format
+msgid "Add a part (%1%) to %2%"
+msgstr "在 %2% 新增零件（%1%）"
+
+#, boost-format
+msgid "Add a negative part (%1%) to %2%"
+msgstr "在 %2% 新增負零件（%1%）"
+
+#, boost-format
+msgid "Add a modifier (%1%) to %2%"
+msgstr "在 %2% 新增修改器（%1%）"
+
+#, boost-format
+msgid "Add a support blocker (%1%) to %2%"
+msgstr "在 %2% 新增支撐遮蔽（%1%）"
+
+#, boost-format
+msgid "Add a support enforcer (%1%) to %2%"
+msgstr "在 %2% 新增支撐產生器（%1%）"
+
+msgid "Arrange the objects of the current plate"
+msgstr "自動擺放目前列印板上的物件"
+
+#, boost-format
+msgid "Scale %1% to %2% %%"
+msgstr "將 %1% 縮放到 %2% %%"
+
+#, boost-format
+msgid "Resize %1% to %2%, keeping its proportions"
+msgstr "將 %1% 等比例調整為 %2%"
+
+#, boost-format
+msgid "Resize %1% to %2%"
+msgstr "將 %1% 調整為 %2%"
+
+#, boost-format
+msgid "Rotate %1% by %2%"
+msgstr "將 %1% 旋轉 %2%"
+
+#, boost-format
+msgid "Move %1% to %2%"
+msgstr "將 %1% 移動到 %2%"
+
+#, boost-format
+msgid "Move %1% by %2%"
+msgstr "將 %1% 平移 %2%"
+
+#, boost-format
+msgid "Center %1% on its plate"
+msgstr "將 %1% 置中於其列印板"
+
+#, boost-format
+msgid "Drop %1% to the bed"
+msgstr "將 %1% 下降到熱床"
+
+#, boost-format
+msgid "Mirror %1% along %2%"
+msgstr "沿 %2% 鏡像 %1%"
+
+#, boost-format
+msgid "Cut %1% at %2% mm from its bottom"
+msgstr "在距底部 %2% mm 處切割 %1%"
+
+msgid "keep the upper part"
+msgstr "保留上半部"
+
+msgid "keep the lower part"
+msgstr "保留下半部"
+
+msgid "upper part placed on its cut face"
+msgstr "上半部以切割面放置"
+
+#, boost-format
+msgid "Split %1% into objects"
+msgstr "將 %1% 拆分為物件"
+
+#, boost-format
+msgid "Duplicate %1% x%2%"
+msgstr "複製 %1% x%2%"
+
+#, boost-format
+msgid "Delete %1%"
+msgstr "刪除 %1%"
+
+#, boost-format
+msgid "Auto-orient %1%"
+msgstr "自動定向 %1%"
+
+#, boost-format
+msgid "at %1%"
+msgstr "位於 %1%"
+
+#, boost-format
+msgid "Delete part %1% of %2%"
+msgstr "刪除 %2% 的零件 %1%"
+
+#, boost-format
+msgid "Print part %1% of %2% with filament %3%"
+msgstr "以線材 %3% 列印 %2% 的零件 %1%"
+
+#, boost-format
+msgid "Print %1% with filament %2%"
+msgstr "以線材 %2% 列印 %1%"
+
+#, boost-format
+msgid "Rename part %1% of %2% to %3%"
+msgstr "將 %2% 的零件 %1% 重新命名為 %3%"
+
+#, boost-format
+msgid "Rename %1% to %2%"
+msgstr "將 %1% 重新命名為 %2%"
+
+msgid ""
+"The AI assistant asks to change the objects of the project. Apply these "
+"operations? Undo restores the previous state."
+msgstr "AI 助理請求修改專案中的物件。要套用這些操作嗎？復原可還原先前的狀態。"
+
+msgid "Toolhead"
+msgstr "列印頭"
+
+msgid ""
+"The AI assistant asks to unload the filament of these toolheads. The printer "
+"heats each nozzle and moves. Unload now?"
+msgstr "AI 助理請求退出這些列印頭的線材。列印設備會加熱每個噴嘴並移動。現在退出嗎？"
+
+#, boost-format
+msgid "the closest profile for a layer height of %1% mm"
+msgstr "層高 %1% mm 最接近的設定檔"
+
+#, boost-format
+msgid "slot and toolhead %1%"
+msgstr "槽位和列印頭 %1%"
+
+msgid ""
+"Adapt this project to the connected printer? The printer, process and "
+"filament presets change; the toolheads can still be changed when printing."
+msgstr "要將此專案調整為已連線的列印設備嗎？列印設備、列印參數和線材預設會改變；列印時仍可更換列印頭。"
+
+msgid "Adapt the project"
+msgstr "調整專案"
+
+#, boost-format
+msgid "This project is set up for %1% but the connected printer is a %2%."
+msgstr "此專案是為 %1% 設定的，但已連線的列印設備是 %2%。"
+
+msgid "Adapt it to this printer"
+msgstr "調整為此列印設備"
+
+#, c-format
+msgid ""
+"The project now uses %s. %zu settings of the original project differ from "
+"the new profile: ask the AI assistant (/adapt_project) to restore the "
+"original intent where it suits this printer."
+msgstr "專案現在使用 %s。原專案有 %zu 項設定與新設定檔不同：請讓 AI 助理（/adapt_project）在適合此列印設備的地方恢復原始意圖。"
+
 #~ msgid ""
 #~ "Improve shell precision by adjusting outer wall spacing. This also "
 #~ "improves layer consistency."
@@ -18078,9 +18478,6 @@ msgstr ""
 
 #~ msgid "Current Cabin humidity"
 #~ msgstr "濕度"
-
-#~ msgid "Stopped."
-#~ msgstr "已經停止。"
 
 #, c-format, boost-format
 #~ msgid "Connect failed [%d]!"

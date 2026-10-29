@@ -17214,6 +17214,406 @@ msgstr ""
 "ABS, kan en lämplig ökning av värmebäddens temperatur minska sannolikheten "
 "för vridning?"
 
+msgid "AI Assistant (MCP server): running"
+msgstr "AI-assistent (MCP-server): körs"
+
+msgid "AI Assistant (MCP server): stopped"
+msgstr "AI-assistent (MCP-server): stoppad"
+
+msgid "Chat with Claude"
+msgstr "Chatta med Claude"
+
+msgid ""
+"Ask Claude about this project and let it propose setting changes (requires "
+"Claude Code)"
+msgstr "Fråga Claude om det här projektet och låt den föreslå ändrade inställningar (kräver Claude Code)"
+
+msgid ""
+"Let Claude, Gemini or another MCP client analyze and fix the print settings"
+msgstr "Låt Claude, Gemini eller en annan MCP-klient analysera och rätta utskriftsinställningarna"
+
+msgid "Claude"
+msgstr "Claude"
+
+msgid "Chat with Claude about this project"
+msgstr "Chatta med Claude om det här projektet"
+
+msgid ""
+"Ask about this project, a print problem, a setting... (Enter to send, "
+"Shift+Enter for a new line, paste a screenshot)"
+msgstr "Fråga om det här projektet, ett utskriftsproblem, en inställning... (Enter för att skicka, Skift+Enter för ny rad, klistra in en skärmbild)"
+
+msgid "New conversation"
+msgstr "Ny konversation"
+
+msgid "MCP server settings"
+msgstr "Inställningar för MCP-servern"
+
+msgid ""
+"Claude can read the project, explain the slicer warnings, propose setting "
+"changes (you confirm each one in the slicer) and follow the connected "
+"printer."
+msgstr "Claude kan läsa projektet, förklara slicerns varningar, föreslå ändrade inställningar (du bekräftar varje ändring i slicern) och följa den anslutna skrivaren."
+
+msgid "Starting Claude Code..."
+msgstr "Startar Claude Code..."
+
+msgid "Thinking..."
+msgstr "Tänker..."
+
+msgid "Stopped."
+msgstr "Stoppad."
+
+msgid ""
+"The MCP server of the slicer is off: Claude cannot see the project. Turn it "
+"on in the MCP server settings."
+msgstr "Slicerns MCP-server är avstängd: Claude ser inte projektet. Slå på den i inställningarna för MCP-servern."
+
+msgid "Claude Code could not connect to the MCP server of the slicer."
+msgstr "Claude Code kunde inte ansluta till slicerns MCP-server."
+
+msgid ""
+"Claude Code was not found. Install it (https://claude.com/claude-code), run "
+"\"claude\" once in a terminal to log in, then try again."
+msgstr "Claude Code hittades inte. Installera det (https://claude.com/claude-code), kör \"claude\" en gång i en terminal för att logga in och försök sedan igen."
+
+msgid ""
+"Claude Code stopped. Your next message restarts it and continues the "
+"conversation."
+msgstr "Claude Code har stoppats. Ditt nästa meddelande startar om det och fortsätter konversationen."
+
+msgid "If you are not logged in, run \"claude\" once in a terminal to log in."
+msgstr "Om du inte är inloggad, kör \"claude\" en gång i en terminal för att logga in."
+
+msgid "3D view"
+msgstr "3D-vy"
+
+msgid "Attach a screenshot of the 3D view"
+msgstr "Bifoga en skärmbild av 3D-vyn"
+
+msgid "Window"
+msgstr "Fönster"
+
+msgid "Attach a screenshot of the whole slicer window"
+msgstr "Bifoga en skärmbild av hela slicerfönstret"
+
+msgid "The screenshot could not be taken."
+msgstr "Skärmbilden kunde inte tas."
+
+msgid "Dock next to the 3D view"
+msgstr "Docka bredvid 3D-vyn"
+
+msgid "Close this conversation"
+msgstr "Stäng den här konversationen"
+
+msgid "Float in its own window"
+msgstr "Lösgör till ett eget fönster"
+
+msgid "Choose the model"
+msgstr "Välj modell"
+
+msgid "Compacting the conversation..."
+msgstr "Komprimerar konversationen..."
+
+msgid "Conversation compacted: Claude keeps a summary of it."
+msgstr "Konversationen komprimerad: Claude behåller en sammanfattning av den."
+
+msgid "Conversation cleared: Claude starts from scratch."
+msgstr "Konversationen rensad: Claude börjar om från början."
+
+#, c-format, boost-format
+msgid "Could not start the MCP server: %s"
+msgstr "Kunde inte starta MCP-servern: %s"
+
+msgid "Claude Code was not found."
+msgstr "Claude Code hittades inte."
+
+msgid "Could not send the message to Claude Code."
+msgstr "Kunde inte skicka meddelandet till Claude Code."
+
+msgid "filament"
+msgstr "filament"
+
+msgid "toolhead"
+msgstr "skrivhuvud"
+
+msgid "AI assistant:"
+msgstr "AI-assistent:"
+
+msgid "AI Assistant"
+msgstr "AI-assistent"
+
+msgid "Changes proposed by the AI assistant"
+msgstr "Ändringar föreslagna av AI-assistenten"
+
+msgid "Parameter name"
+msgstr "Parameternamn"
+
+msgid "AI Assistant (MCP server)"
+msgstr "AI-assistent (MCP-server)"
+
+msgid ""
+"Lets an AI assistant (Claude, Gemini...) analyze the open project, fix the "
+"problems reported by the slicer and tune the print settings. Every change "
+"has to be confirmed here. The server only accepts connections from this "
+"computer."
+msgstr "Låter en AI-assistent (Claude, Gemini...) analysera det öppna projektet, åtgärda problem som slicern rapporterar och finjustera utskriftsinställningarna. Varje ändring måste bekräftas här. Servern tar bara emot anslutningar från den här datorn."
+
+msgid "Regenerate"
+msgstr "Generera nytt"
+
+msgid "Port"
+msgstr "Port"
+
+msgid "Found automatically"
+msgstr "Hittades automatiskt"
+
+msgid "Browse..."
+msgstr "Bläddra..."
+
+msgid "Claude Code"
+msgstr "Claude Code"
+
+msgid "Notes folder"
+msgstr "Mapp för anteckningar"
+
+msgid "Let the assistant add and edit notes"
+msgstr "Låt assistenten lägga till och redigera anteckningar"
+
+msgid ""
+"e.g. Answer in French. I print mostly PETG on the U1 and prefer strong parts "
+"over speed."
+msgstr "t.ex. Svara på svenska. Jag skriver mest ut PETG på U1 och föredrar starka delar framför hastighet."
+
+#, c-format, boost-format
+msgid ""
+"Added to the assistant's instructions at the start of each conversation. "
+"Also editable in %s."
+msgstr "Läggs till i assistentens instruktioner i början av varje konversation. Kan även redigeras i %s."
+
+msgid "Enable MCP server"
+msgstr "Aktivera MCP-servern"
+
+msgid ""
+"Allow other MCP clients on this computer (Claude Code, Gemini CLI...) to "
+"connect with the token below. The built-in chat does not need it. Any "
+"program that can read the token can use the server."
+msgstr "Låt andra MCP-klienter på den här datorn (Claude Code, Gemini CLI...) ansluta med token nedan. Den inbyggda chatten behöver det inte. Alla program som kan läsa token kan använda servern."
+
+msgid ""
+"Allow reading the state of the connected printer (loaded filaments, nozzles, "
+"print status and errors). The printer is never controlled."
+msgstr "Tillåt läsning av den anslutna skrivarens status (laddade filament, munstycken, utskriftsstatus och fel). Skrivaren styrs aldrig."
+
+msgid ""
+"Allow unloading filament from the toolheads. Each request has to be "
+"confirmed here, and it is refused while a print is running."
+msgstr "Tillåt urmatning av filament från skrivhuvudena. Varje begäran måste bekräftas här och avvisas under en utskrift."
+
+msgid "At startup, connect to the printer when it is the only one available."
+msgstr "Anslut vid start till skrivaren när den är den enda tillgängliga."
+
+msgid ""
+"Offer to adapt projects made for another printer (e.g. downloaded 3MF files) "
+"to the connected one."
+msgstr "Erbjud att anpassa projekt gjorda för en annan skrivare (t.ex. nedladdade 3MF-filer) till den anslutna."
+
+msgid ""
+"Allow searching the Snapmaker wiki and support site for the manufacturer's "
+"recommendations (the searches are sent to Snapmaker)."
+msgstr "Tillåt sökning efter tillverkarens rekommendationer på Snapmakers wiki och supportwebbplats (sökningarna skickas till Snapmaker)."
+
+msgid "Instructions for the assistant"
+msgstr "Instruktioner till assistenten"
+
+msgid "Token"
+msgstr "Token"
+
+msgid "Client configuration"
+msgstr "Klientkonfiguration"
+
+msgid "All files"
+msgstr "Alla filer"
+
+msgid "Choose the Claude Code executable"
+msgstr "Välj den körbara filen för Claude Code"
+
+msgid "Choose the notes folder"
+msgstr "Välj mapp för anteckningar"
+
+#, c-format, boost-format
+msgid "Running on %s"
+msgstr "Körs på %s"
+
+#, c-format, boost-format
+msgid "Could not start the server: %s"
+msgstr "Kunde inte starta servern: %s"
+
+msgid "Stopped"
+msgstr "Stoppad"
+
+#, c-format, boost-format
+msgid "Used by the chat: %s"
+msgstr "Används av chatten: %s"
+
+msgid "Claude Code not found: install it, or choose its executable."
+msgstr "Claude Code hittades inte: installera det eller välj dess körbara fil."
+
+#, boost-format
+msgid "Add a part (%1%) to %2%"
+msgstr "Lägg till en del (%1%) i %2%"
+
+#, boost-format
+msgid "Add a negative part (%1%) to %2%"
+msgstr "Lägg till en negativ del (%1%) i %2%"
+
+#, boost-format
+msgid "Add a modifier (%1%) to %2%"
+msgstr "Lägg till en modifierare (%1%) i %2%"
+
+#, boost-format
+msgid "Add a support blocker (%1%) to %2%"
+msgstr "Lägg till en support blockerare (%1%) i %2%"
+
+#, boost-format
+msgid "Add a support enforcer (%1%) to %2%"
+msgstr "Lägg till en support förstärkning (%1%) i %2%"
+
+msgid "Arrange the objects of the current plate"
+msgstr "Arrangera objekten på den aktuella plattan"
+
+#, boost-format
+msgid "Scale %1% to %2% %%"
+msgstr "Skala %1% till %2% %%"
+
+#, boost-format
+msgid "Resize %1% to %2%, keeping its proportions"
+msgstr "Ändra storlek på %1% till %2% med bibehållna proportioner"
+
+#, boost-format
+msgid "Resize %1% to %2%"
+msgstr "Ändra storlek på %1% till %2%"
+
+#, boost-format
+msgid "Rotate %1% by %2%"
+msgstr "Rotera %1% %2%"
+
+#, boost-format
+msgid "Move %1% to %2%"
+msgstr "Flytta %1% till %2%"
+
+#, boost-format
+msgid "Move %1% by %2%"
+msgstr "Förskjut %1% med %2%"
+
+#, boost-format
+msgid "Center %1% on its plate"
+msgstr "Centrera %1% på dess platta"
+
+#, boost-format
+msgid "Drop %1% to the bed"
+msgstr "Sänk %1% till bädden"
+
+#, boost-format
+msgid "Mirror %1% along %2%"
+msgstr "Spegla %1% längs %2%"
+
+#, boost-format
+msgid "Cut %1% at %2% mm from its bottom"
+msgstr "Skär %1% vid %2% mm från dess undersida"
+
+msgid "keep the upper part"
+msgstr "behåll den övre delen"
+
+msgid "keep the lower part"
+msgstr "behåll den undre delen"
+
+msgid "upper part placed on its cut face"
+msgstr "övre delen placerad på sin snittyta"
+
+#, boost-format
+msgid "Split %1% into objects"
+msgstr "Dela upp %1% till objekt"
+
+#, boost-format
+msgid "Duplicate %1% x%2%"
+msgstr "Duplicera %1% x%2%"
+
+#, boost-format
+msgid "Delete %1%"
+msgstr "Radera %1%"
+
+#, boost-format
+msgid "Auto-orient %1%"
+msgstr "Autoorientera %1%"
+
+#, boost-format
+msgid "at %1%"
+msgstr "vid %1%"
+
+#, boost-format
+msgid "Delete part %1% of %2%"
+msgstr "Radera del %1% av %2%"
+
+#, boost-format
+msgid "Print part %1% of %2% with filament %3%"
+msgstr "Skriv ut del %1% av %2% med filament %3%"
+
+#, boost-format
+msgid "Print %1% with filament %2%"
+msgstr "Skriv ut %1% med filament %2%"
+
+#, boost-format
+msgid "Rename part %1% of %2% to %3%"
+msgstr "Döp om del %1% av %2% till %3%"
+
+#, boost-format
+msgid "Rename %1% to %2%"
+msgstr "Döp om %1% till %2%"
+
+msgid ""
+"The AI assistant asks to change the objects of the project. Apply these "
+"operations? Undo restores the previous state."
+msgstr "AI-assistenten ber om att ändra projektets objekt. Tillämpa dessa åtgärder? Ångra återställer det tidigare läget."
+
+msgid "Toolhead"
+msgstr "Skrivhuvud"
+
+msgid ""
+"The AI assistant asks to unload the filament of these toolheads. The printer "
+"heats each nozzle and moves. Unload now?"
+msgstr "AI-assistenten ber om att mata ut filamentet från dessa skrivhuvuden. Skrivaren värmer varje munstycke och rör sig. Mata ut nu?"
+
+#, boost-format
+msgid "the closest profile for a layer height of %1% mm"
+msgstr "den närmaste profilen för en lagerhöjd på %1% mm"
+
+#, boost-format
+msgid "slot and toolhead %1%"
+msgstr "fack och skrivhuvud %1%"
+
+msgid ""
+"Adapt this project to the connected printer? The printer, process and "
+"filament presets change; the toolheads can still be changed when printing."
+msgstr "Anpassa det här projektet till den anslutna skrivaren? Förinställningarna för skrivare, process och filament ändras; skrivhuvudena kan fortfarande ändras vid utskrift."
+
+msgid "Adapt the project"
+msgstr "Anpassa projektet"
+
+#, boost-format
+msgid "This project is set up for %1% but the connected printer is a %2%."
+msgstr "Det här projektet är inställt för %1% men den anslutna skrivaren är en %2%."
+
+msgid "Adapt it to this printer"
+msgstr "Anpassa till den här skrivaren"
+
+#, c-format
+msgid ""
+"The project now uses %s. %zu settings of the original project differ from "
+"the new profile: ask the AI assistant (/adapt_project) to restore the "
+"original intent where it suits this printer."
+msgstr "Projektet använder nu %s. %zu inställningar i det ursprungliga projektet skiljer sig från den nya profilen: be AI-assistenten (/adapt_project) att återställa den ursprungliga avsikten där den passar den här skrivaren."
+
 #~ msgid "Alt + Mouse wheel"
 #~ msgstr "Alt + mushjul"
 
@@ -17581,9 +17981,6 @@ msgstr ""
 #, c-format, boost-format
 #~ msgid "Support: propagate branches at layer %d"
 #~ msgstr "Support: föröka grenar vid lager %d"
-
-#~ msgid "Stopped."
-#~ msgstr "Avbruten."
 
 #, c-format, boost-format
 #~ msgid "Connect failed [%d]!"
