@@ -169,7 +169,7 @@ toi, traductions des nouveaux textes, mise à jour de `FORK.md`, commit.
 ## 6 bis. État et suite
 
 Fait (phases 0 à 5 en partie) : 19 outils, conformes à la liste cible ; `tools/list` 23 624 octets,
-instructions 6 290 octets. Banc d'essai : 115 étapes par défaut, toutes passées en Debug.
+instructions 6 290 octets. Banc d'essai : 133 étapes par défaut, toutes passées en Debug.
 
 Non vérifié par le banc, à contrôler à la main sur le build Release :
 - capture de l'aperçu (`get_view` preview, scénario `13-preview`, étiquette `screen`) : la fenêtre du slicer de
