@@ -158,7 +158,7 @@ Noms changés depuis la version à 30 outils : `describe_setting` / `read_docume
 `import_models` / `save_project` / `export_file` → `edit_project`. Les instructions écrites par l'utilisateur
 (fenêtre MCP) qui citent d'anciens noms ne sont pas réécrites : les mettre à jour à la main.
 
-Prompts : `adapt_project`, `diagnose_print`, `fix_issues`, `optimize_settings`, `capitalize_experiences`. Dans
+Prompts : `prepare_print`, `adapt_project`, `diagnose_print`, `fix_issues`, `optimize_settings`, `capitalize_experiences`. Dans
 Claude Code ils s'appellent `/mcp__snapmaker-orca__<prompt>` (taper `/` puis le nom) et ne sont chargés qu'au
 démarrage : relancer Claude Code si le slicer n'était pas ouvert à ce moment.
 
@@ -273,7 +273,7 @@ dans la fenêtre MCP, désactivées par défaut :
 La documentation vient de `doc/` (wiki OrcaSlicer) : `scripts/fork/build-setting-docs.py` relie chaque réglage
 à sa section grâce aux liens d'aide de `Tab.cpp` et produit `resources/ai_assistant/setting_docs.json`, livré
 avec l'application (aucun accès réseau). `sync-upstream.sh` le régénère et le commite après chaque fusion.
-Prompts (commandes slash dans Claude Code / Gemini CLI) : `adapt_project`, `diagnose_print`, `fix_issues`,
+Prompts (commandes slash dans Claude Code / Gemini CLI) : `prepare_print`, `adapt_project`, `diagnose_print`, `fix_issues`,
 `optimize_settings`, `capitalize_experiences`.
 
 ### Fonctions d'Orca hors de portée du serveur (à faire)

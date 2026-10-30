@@ -786,6 +786,22 @@ const char* ADAPT_PROMPT =
     "5. get_issues and fix errors, then slice and get_view to check.\n"
     "6. Offer to record the experience with the original printer, so that we learn from these adaptations.";
 
+const char* PREPARE_PROMPT =
+    "Prepare the project open in my slicer for printing on my connected printer:\n"
+    "1. get_project and get_printer (status): the models, the printer and process presets, the filament of each "
+    "slot and what is loaded in each toolhead. If the project was made for another printer (e.g. a MakerWorld "
+    "3MF), follow the adapt_project workflow instead (adapt_to_printer first).\n"
+    "2. Look at the models with get_view. If you do not know what the part is for and it matters (mechanical part, "
+    "fit, visible surface, outdoor use...), ask me before going further.\n"
+    "3. Search the experiences for similar cases (printer, materials, kind of part).\n"
+    "4. Propose the simplest setup: orientation, supports and their interface material, which filament and "
+    "toolhead prints each object or feature, then the settings for the use of the part (walls, top/bottom shells, "
+    "infill, layer height). Check that each filament preset matches the filament loaded on its toolhead. Apply "
+    "with edit_objects, edit_presets and apply_changes (I confirm in the slicer); if something has to be done on "
+    "the printer (other nozzle, other filament), tell me instead.\n"
+    "5. get_issues and fix errors, then slice, check the preview with get_view, and give me the estimated time and "
+    "filament.";
+
 const char* CAPITALIZE_PROMPT =
     "Turn my confirmed print experiences into guides of this repository.\n"
     "1. Call experiences with action=search, status=confirmed and limit=500. Skip records that already have "
@@ -848,6 +864,14 @@ json McpTools::list_prompts() const
           { { "name", "adapt_project" },
             { "description", "Adapt a project made for another printer (e.g. a MakerWorld 3MF) to the connected printer "
                              "and restore the designer's settings where they suit it." } },
+          { { "name", "prepare_print" },
+            { "description", "Prepare the open project for the connected printer: orientation, supports, materials, "
+                             "settings for the use of the part, then slice and check." },
+            { "arguments",
+              json::array({ { { "name", "use" },
+                              { "description", "What the part is for, if known: e.g. bracket holding 2 kg, "
+                                               "decorative vase" },
+                              { "required", false } } }) } },
           { { "name", "fix_issues" },
             { "description", "Find the problems reported by the slicer and fix them, blocking errors first." } },
           { { "name", "optimize_settings" },
@@ -881,6 +905,11 @@ json McpTools::get_prompt(const std::string& name, const json& arguments)
     }
     if (name == "adapt_project")
         return prompt_message("Adapt project to my printer", ADAPT_PROMPT);
+    if (name == "prepare_print") {
+        const std::string use = arguments.value("use", std::string());
+        return prompt_message("Prepare the print",
+                              std::string(PREPARE_PROMPT) + (use.empty() ? "" : "\nThe part is for: " + use));
+    }
     if (name == "optimize_settings") {
         const std::string goal = arguments.value("goal", std::string());
         if (goal.empty())
