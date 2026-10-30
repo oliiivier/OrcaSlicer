@@ -43,6 +43,17 @@
       },
       "error": true,
       "error_contains": "printer control is disabled"
+    },
+    {
+      "call": "control_printer",
+      "args": {
+        "action": "exclude_objects",
+        "objects": [
+          "WIPE_TOWER"
+        ]
+      },
+      "error": true,
+      "error_contains": "printer control is disabled"
     }
   ]
 }

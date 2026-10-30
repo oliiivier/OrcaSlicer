@@ -505,6 +505,9 @@ static inline Point wipe_tower_point_to_object_point(GCode& gcodegen, const Vec2
     return Point(scale_(wipe_tower_pt.x() - gcodegen.origin()(0)), scale_(wipe_tower_pt.y() - gcodegen.origin()(1)));
 }
 
+// Name of the prime tower among the Klipper excludable objects.
+static constexpr const char* WIPE_TOWER_LABEL = "wipe_tower";
+
 std::string WipeTowerIntegration::append_tcr(GCode& gcodegen, const WipeTower::ToolChangeResult& tcr, int new_extruder_id, double z) const
 {
     if (new_extruder_id != -1 && new_extruder_id != tcr.new_tool)
@@ -839,6 +842,11 @@ std::string WipeTowerIntegration::append_tcr2(GCode& gcodegen, const WipeTower::
     bool has_nozzle_change = !tcr.nozzle_change_result.gcode.empty()
         && (gcodegen.config().nozzle_diameter.size() > 1);
 
+    // Excluding the prime tower skips its extrusions only: the tool change is left out of the label.
+    const bool        label_tower = gcodegen.m_label_wipe_tower && !tcr.priming;
+    const std::string tower_start = std::string("EXCLUDE_OBJECT_START NAME=") + WIPE_TOWER_LABEL + "\n";
+    const std::string tower_end   = std::string("EXCLUDE_OBJECT_END NAME=") + WIPE_TOWER_LABEL + "\n";
+
     ZHopType type = ZHopType::zhtAuto;
     if (gcodegen.m_writer.extruder() != nullptr) {
         type = ZHopType(get_value_at(gcodegen.m_config, gcodegen.m_config.z_hop_types, ConfigFlowDomain::Filament, gcodegen.m_writer.extruder()->id()));
@@ -865,7 +873,16 @@ std::string WipeTowerIntegration::append_tcr2(GCode& gcodegen, const WipeTower::
         check_add_eol(start_pos_str);
         nozzle_change_gcode_trans += start_pos_str;
         nozzle_change_gcode_trans += gcodegen.unretract();
+        // The wipe of the old nozzle is printed on the tower: it is skipped with it.
+        if (label_tower) {
+            check_add_eol(nozzle_change_gcode_trans);
+            nozzle_change_gcode_trans += tower_start;
+        }
         nozzle_change_gcode_trans += transform_gcode(tcr.nozzle_change_result.gcode, tcr.nozzle_change_result.start_pos, wipe_tower_offset, wipe_tower_rotation);
+        if (label_tower) {
+            check_add_eol(nozzle_change_gcode_trans);
+            nozzle_change_gcode_trans += tower_end;
+        }
         gcodegen.set_last_pos(wipe_tower_point_to_object_point(gcodegen, transform_wt_pt(tcr.nozzle_change_result.end_pos) + plate_origin_2d));
         gcodegen.m_wipe.reset_path();
         for (const Vec2f& wipe_pt : tcr.nozzle_change_result.wipe_path)
@@ -960,6 +977,9 @@ std::string WipeTowerIntegration::append_tcr2(GCode& gcodegen, const WipeTower::
     }
     toolchange_gcode_str += deretraction_str;
 
+    if (label_tower)
+        toolchange_gcode_str = tower_end + toolchange_gcode_str + tower_start;
+
     DynamicConfig config;
     config.set_key_value("change_filament_gcode", new ConfigOptionString(toolchange_gcode_str));
     config.set_key_value("layer_num", new ConfigOptionInt(gcodegen.m_layer_index));
@@ -969,7 +989,16 @@ std::string WipeTowerIntegration::append_tcr2(GCode& gcodegen, const WipeTower::
     std::string tcr_gcode,
         tcr_escaped_gcode = gcodegen.placeholder_parser_process("tcr_rotated_gcode", tcr_rotated_gcode, new_extruder_id, &config);
     unescape_string_cstyle(tcr_escaped_gcode, tcr_gcode);
-    gcode += tcr_gcode;
+    if (label_tower) {
+        // The labels of the last printed object have to be closed first.
+        gcodegen.m_writer.add_object_end_labels(gcode);
+        gcode += tower_start;
+        gcode += tcr_gcode;
+        gcode += tower_end;
+        if (!gcodegen.config().use_relative_e_distances)
+            gcode += gcodegen.writer().reset_e(true);
+    } else
+        gcode += tcr_gcode;
 
     // SoftFever: set new PA for new filament
     if (new_extruder_id != -1 && get_value_at(gcodegen.config(), gcodegen.config().enable_pressure_advance, ConfigFlowDomain::Filament, new_extruder_id)) {
@@ -2749,6 +2778,7 @@ void GCode::_do_export(Print& print, GCodeOutputStream& file, ThumbnailsGenerato
     file.write_format("; EXECUTABLE_BLOCK_START\n");
 
     // SoftFever
+    m_label_wipe_tower = false;
     if (m_enable_exclude_object)
         file.write(set_object_info(&print));
 
@@ -9343,6 +9373,18 @@ std::string GCode::set_object_info(Print* print)
                         gcode << "\nM486 A" << inst_name;
                     gcode << "\nM486 S-1\n";
                 }
+            }
+        }
+        // The prime tower is declared too, so that its purges can be skipped after a print incident.
+        // Its labels only wrap the purge extrusions: the tool changes are always performed.
+        if (gflavor == gcfKlipper) {
+            const Points corners = print->first_layer_wipe_tower_corners();
+            if (!corners.empty()) {
+                const Polygon hull   = Geometry::convex_hull(corners);
+                const auto    center = print->translate_to_print_space(hull.bounding_box().center());
+                gcode << "EXCLUDE_OBJECT_DEFINE NAME=" << WIPE_TOWER_LABEL << " CENTER=" << center.x() << "," << center.y()
+                      << " POLYGON=" << polygon_to_string(hull, print) << "\n";
+                m_label_wipe_tower = true;
             }
         }
     }

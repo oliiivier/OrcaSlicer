@@ -570,7 +570,8 @@ const std::vector<Tool>& tools()
         { "get_printer",
           "The printer connected in the slicer, when the user allowed printer access. Never changes anything on it.\n"
           "status: filament loaded, type, color and nozzle of each toolhead, print state and progress, last firmware "
-          "error, temperatures, and the names of the firmware objects; 'objects' reads some of them in full (e.g. "
+          "error, temperatures, the objects of the print that can be excluded (print_objects: names, excluded, current), "
+          "and the names of the firmware objects; 'objects' reads some of them in full (e.g. "
           "sensors) for diagnosis.\n"
           "snapshot: picture from its camera, taken now: first layer, failure (spaghetti, detached part, blob) or what "
           "the user describes.\n"
@@ -602,20 +603,30 @@ const std::vector<Tool>& tools()
           "print cannot be resumed.\n"
           "unload_filament: unloads 'toolheads' like the printer screen (the printer heats each nozzle, retracts the "
           "filament and turns the heaters off at the end). Needs an idle printer; empty toolheads and soft filaments "
-          "(TPU) are skipped; about 1.5 minutes per toolhead. Check get_printer (status) first.",
+          "(TPU) are skipped; about 1.5 minutes per toolhead. Check get_printer (status) first.\n"
+          "exclude_objects: stops printing 'objects' of the running or paused print (names from get_printer (status) "
+          "print_objects), e.g. a failed part, then waits until the printer lists them as excluded; this cannot be "
+          "undone. WIPE_TOWER is the prime tower: excluding it skips the purges but keeps the tool changes, so colors "
+          "may mix; only for a tower that failed. Pause first when the failure may spread, then resume.",
           by_action({ { "start_print", [](const json& a, ToolContext&) { return start_print(a); } },
                       { "pause", &control_print_action },
                       { "resume", &control_print_action },
                       { "cancel", &control_print_action },
-                      { "unload_filament", [](const json& a, ToolContext& c) { return unload_filament(a, c.abandoned, c.state); } } }),
+                      { "unload_filament", [](const json& a, ToolContext& c) { return unload_filament(a, c.abandoned, c.state); } },
+                      { "exclude_objects", [](const json& a, ToolContext& c) { return exclude_objects(a, c.abandoned, c.state); } } }),
           { { "type", "object" },
             { "properties",
-              { { "action", action_schema({ "start_print", "pause", "resume", "cancel", "unload_filament" }) },
+              { { "action", action_schema({ "start_print", "pause", "resume", "cancel", "unload_filament", "exclude_objects" }) },
                 { "toolheads",
                   { { "type", "array" },
                     { "items", { { "type", "integer" }, { "minimum", 1 } } },
                     { "minItems", 1 },
                     { "description", "unload_filament: toolheads numbered from 1 as on the printer." } } },
+                { "objects",
+                  { { "type", "array" },
+                    { "items", { { "type", "string" } } },
+                    { "minItems", 1 },
+                    { "description", "exclude_objects: object names as the printer lists them." } } },
                 { "reason", REASON } } },
             { "required", { "action" } } },
           10min,

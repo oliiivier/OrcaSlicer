@@ -6,6 +6,9 @@
 
 #include "test_data.hpp"
 
+#include <cctype>
+#include <optional>
+#include <sstream>
 #include <string>
 
 using namespace Slic3r;
@@ -30,7 +33,9 @@ static void init_degenerate_raft_print(Print& print)
         { "enable_prime_tower", true },
         { "raft_layers", 1 },
         { "support_filament", 2 },
-        { "machine_start_gcode", "" }
+        { "machine_start_gcode", "" },
+        // Required by the validation with relative E distances.
+        { "layer_change_gcode", "G92 E0" }
         });
 
     Model model;
@@ -56,7 +61,9 @@ static void init_degenerate_raft_print(Print& print)
 // extruder 3 has no block of its own category and WipeTower2::finish_layer_new used to
 // dereference a null block when finishing a layer with the wall filament (Sentry:
 // EXC_BAD_ACCESS / KERN_INVALID_ADDRESS / 0x58).
-static void init_multi_extruder_print(Print& print, const std::string& adhesiveness_categories, int wall_filament)
+// With `klipper_exclude_object`, the firmware is Klipper and "exclude_object" takes its value.
+static void init_multi_extruder_print(Print& print, const std::string& adhesiveness_categories, int wall_filament,
+                                      std::optional<bool> klipper_exclude_object = std::nullopt)
 {
     DynamicPrintConfig config = Test::default_print_config();
     config.set_deserialize_strict({
@@ -67,8 +74,12 @@ static void init_multi_extruder_print(Print& print, const std::string& adhesiven
         { "enable_prime_tower",             true },
         { "filament_adhesiveness_category", adhesiveness_categories },
         { "wipe_tower_filament",            wall_filament },
-        { "machine_start_gcode",            "" }
+        { "machine_start_gcode",            "" },
+        // Required by the validation with relative E distances.
+        { "layer_change_gcode",             "G92 E0" }
         });
+    if (klipper_exclude_object)
+        config.set_deserialize_strict({ { "gcode_flavor", "klipper" }, { "exclude_object", *klipper_exclude_object } });
 
     Model model;
     for (int i = 0; i < 2; ++i) {
@@ -152,6 +163,67 @@ SCENARIO("Wipe tower with fully defined adhesiveness categories", "[WipeTower]")
                 const std::string gcode = Test::gcode(print);
                 REQUIRE(gcode.find("WIPE_TOWER_START") != std::string::npos);
                 REQUIRE(gcode.find("CP TOOLCHANGE START") != std::string::npos);
+            }
+        }
+    }
+}
+
+// Labels of the prime tower among the Klipper excludable objects: the purges are wrapped, the
+// tool changes are not, and the labels never nest with those of the objects.
+SCENARIO("Prime tower declared as a Klipper excludable object", "[WipeTower]")
+{
+    GIVEN("2 cubes on extruders 2 and 3 with a prime tower, Klipper firmware")
+    {
+        WHEN("the G-code is generated with object exclusion")
+        {
+            Print print;
+            Test::init_multi_extruder_print(print, "50,60,70", 3, true);
+            const std::string gcode = Test::gcode(print);
+
+            THEN("the tower is declared")
+            {
+                REQUIRE(gcode.find("EXCLUDE_OBJECT_DEFINE NAME=wipe_tower CENTER=") != std::string::npos);
+            }
+            THEN("the labels are balanced, never nested, the tool changes are outside the tower labels, and every extrusion is inside a label")
+            {
+                std::istringstream lines(gcode);
+                std::string        line, current;
+                int                tower_blocks = 0;
+                bool               labeled      = false;
+                // An extruding move in the plane: E positive with X or Y.
+                auto extrudes = [](const std::string& l) {
+                    if (l.rfind("G1 ", 0) != 0 || (l.find(" X") == std::string::npos && l.find(" Y") == std::string::npos))
+                        return false;
+                    const size_t e = l.find(" E");
+                    return e != std::string::npos && l[e + 2] != '-';
+                };
+                while (std::getline(lines, line)) {
+                    if (labeled && current.empty() && extrudes(line))
+                        FAIL("extrusion outside the object labels: " << line);
+                    if (line.rfind("EXCLUDE_OBJECT_START NAME=", 0) == 0) {
+                        labeled = true;
+                        REQUIRE(current.empty());
+                        current = line.substr(26);
+                        if (current == "wipe_tower")
+                            ++tower_blocks;
+                    } else if (line.rfind("EXCLUDE_OBJECT_END NAME=", 0) == 0) {
+                        REQUIRE(current == line.substr(24));
+                        current.clear();
+                    } else if (line.size() >= 2 && line[0] == 'T' && std::isdigit((unsigned char) line[1])) {
+                        REQUIRE(current != "wipe_tower");
+                    }
+                }
+                REQUIRE(current.empty());
+                REQUIRE(tower_blocks > 0);
+            }
+        }
+        WHEN("the G-code is generated without object exclusion")
+        {
+            Print print;
+            Test::init_multi_extruder_print(print, "50,60,70", 3, false);
+            THEN("the tower is not labeled")
+            {
+                REQUIRE(Test::gcode(print).find("NAME=wipe_tower") == std::string::npos);
             }
         }
     }

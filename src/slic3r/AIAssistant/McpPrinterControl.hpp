@@ -26,4 +26,10 @@ void unload_filament_abandoned(nlohmann::json& state);
 // several calls through ToolRetry.
 nlohmann::json control_print(const nlohmann::json& args, const std::atomic<bool>& abandoned, nlohmann::json& state);
 
+// Stops printing the given objects of the running print (args.objects, names
+// declared by the G-code, the prime tower included) with EXCLUDE_OBJECT, then
+// waits until the firmware lists them as excluded. Runs over several calls
+// through ToolRetry.
+nlohmann::json exclude_objects(const nlohmann::json& args, const std::atomic<bool>& abandoned, nlohmann::json& state);
+
 }} // namespace Slic3r::AIAssistant

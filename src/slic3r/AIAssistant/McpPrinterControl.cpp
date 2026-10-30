@@ -11,9 +11,11 @@
 #include "slic3r/GUI/MsgDialog.hpp"
 #include "slic3r/Utils/GatewayService.hpp"
 
+#include <boost/algorithm/string/case_conv.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 #include <boost/log/trivial.hpp>
 
+#include <algorithm>
 #include <chrono>
 #include <map>
 #include <optional>
@@ -472,7 +474,142 @@ json follow_print_control(json& state)
     throw ToolRetry();
 }
 
+// ------------------------------------------------------------ object exclusion
+
+// Time for the firmware to list the objects as excluded.
+constexpr auto EXCLUDE_TIMEOUT = 30s;
+// Name of the prime tower among the excludable objects (Klipper upper-cases names).
+const char* WIPE_TOWER_NAME = "WIPE_TOWER";
+
+json exclusion_objects(std::string& reason)
+{
+    const McpSettings settings = McpSettings::load();
+    if (!settings.printer_access || !settings.printer_control) {
+        reason = CONTROL_DISABLED;
+        return nullptr;
+    }
+    return live_printer_objects({ { "print_stats", { "state" } }, { "exclude_object", nullptr } }, reason);
+}
+
+// Names of the objects declared by the printed G-code, and of the excluded ones.
+std::set<std::string> declared_objects(const json& objects)
+{
+    std::set<std::string> names;
+    const json            exclude = objects.value("exclude_object", json::object());
+    for (const json& obj : exclude.value("objects", json::array()))
+        if (obj.is_object() && obj.contains("name") && obj["name"].is_string())
+            names.insert(obj["name"].get<std::string>());
+    return names;
+}
+
+std::set<std::string> excluded_objects(const json& objects)
+{
+    std::set<std::string> names;
+    const json            exclude = objects.value("exclude_object", json::object());
+    for (const json& name : exclude.value("excluded_objects", json::array()))
+        if (name.is_string())
+            names.insert(name.get<std::string>());
+    return names;
+}
+
+json begin_exclusion(const json& args, const std::atomic<bool>& abandoned, json& state)
+{
+    std::vector<std::string> names = string_list(args, "objects");
+    if (names.empty())
+        throw ToolError("'objects' lists the names to exclude, from get_printer (status) print_objects");
+    for (std::string& name : names)
+        boost::algorithm::to_upper(name);
+
+    std::string reason;
+    const json  objects = exclusion_objects(reason);
+    if (objects.is_null())
+        throw ToolError("Cannot exclude objects: " + reason);
+    const std::string print = print_state(objects);
+    if (print != "printing" && print != "paused")
+        throw ToolError("The print state is '" + (print.empty() ? std::string("unknown") : print) + "': no print to exclude objects from");
+
+    const std::set<std::string> declared = declared_objects(objects);
+    if (declared.empty())
+        throw ToolError("The printed G-code declares no excludable object (it was sliced without \"Exclude objects\")");
+    const std::set<std::string> excluded = excluded_objects(objects);
+    std::set<std::string>       remaining;
+    for (const std::string& name : declared)
+        if (excluded.count(name) == 0 && name != WIPE_TOWER_NAME)
+            remaining.insert(name);
+
+    std::vector<std::string> to_exclude;
+    for (const std::string& name : names) {
+        if (declared.count(name) == 0) {
+            std::string known;
+            for (const std::string& d : declared)
+                known += (known.empty() ? "" : ", ") + d;
+            throw ToolError("'" + name + "' is not an object of the print; the objects are: " + known);
+        }
+        if (excluded.count(name) == 0 && std::find(to_exclude.begin(), to_exclude.end(), name) == to_exclude.end())
+            to_exclude.push_back(name);
+        remaining.erase(name);
+    }
+    if (to_exclude.empty())
+        return done({ { "excluded", json::array() }, { "message", "These objects were already excluded" } });
+    if (remaining.empty())
+        throw ToolError("This would exclude every object left to print: cancel the print instead");
+
+    std::vector<std::string> lines = to_exclude;
+    const bool               tower = std::find(to_exclude.begin(), to_exclude.end(), WIPE_TOWER_NAME) != to_exclude.end();
+    if (tower)
+        lines.push_back(_u8L("Without the prime tower, the nozzles are no longer purged after a tool change: colors may "
+                             "mix and the first lines after each change may be weak."));
+    if (!confirm(args.value("reason", std::string()), lines,
+                 _L("The AI assistant asks to stop printing these objects. They cannot be printed again in this print. "
+                    "Exclude them now?")))
+        return declined();
+    if (abandoned)
+        return timed_out();
+
+    std::string script;
+    for (const std::string& name : to_exclude)
+        script += (script.empty() ? "" : "\n") + std::string("EXCLUDE_OBJECT NAME=") + name;
+    state["exclude"]     = to_exclude;
+    state["request"]     = send_script(script);
+    state["deadline_ms"] = now_ms() + ms(EXCLUDE_TIMEOUT);
+    throw ToolRetry();
+}
+
+json follow_exclusion(json& state)
+{
+    const std::int64_t now = now_ms();
+    if (now < state.value("next_poll_ms", std::int64_t(0)))
+        throw ToolRetry();
+    state["next_poll_ms"] = now + ms(POLL_INTERVAL);
+
+    if (const std::string error = script_error(state["request"].get<int>()); !error.empty())
+        return { { "done", false }, { "error", "the printer refused the command: " + error } };
+
+    std::string                 reason;
+    const json                  objects  = exclusion_objects(reason);
+    const std::set<std::string> excluded = objects.is_null() ? std::set<std::string>() : excluded_objects(objects);
+    json                        missing  = json::array();
+    for (const json& name : state["exclude"])
+        if (excluded.count(name.get<std::string>()) == 0)
+            missing.push_back(name);
+    if (missing.empty())
+        return done({ { "excluded", state["exclude"] } });
+    if (now > state["deadline_ms"].get<std::int64_t>())
+        return { { "done", false },
+                 { "not_excluded", std::move(missing) },
+                 { "message", "The printer did not list these objects as excluded in time: check it with get_printer (status)" } };
+    throw ToolRetry();
+}
+
 } // namespace
+
+json exclude_objects(const json& args, const std::atomic<bool>& abandoned, json& state)
+{
+    require_plater();
+    if (!state.contains("exclude"))
+        return begin_exclusion(args, abandoned, state);
+    return follow_exclusion(state);
+}
 
 json control_print(const json& args, const std::atomic<bool>& abandoned, json& state)
 {

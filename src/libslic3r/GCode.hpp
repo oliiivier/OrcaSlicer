@@ -558,6 +558,8 @@ private:
     bool                                m_enable_cooling_markers;
     
     bool m_enable_exclude_object;
+    // The prime tower is declared to Klipper as an excludable object: its purges are labeled.
+    bool m_label_wipe_tower = false;
     std::vector<size_t> m_label_objects_ids;
     std::string _encode_label_ids_to_base64(std::vector<size_t> ids);
     // ORCA: Add support for role based fan speed control

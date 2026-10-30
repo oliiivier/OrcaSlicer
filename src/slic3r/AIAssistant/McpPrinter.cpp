@@ -1,5 +1,6 @@
 #include "McpPrinter.hpp"
 #include "McpMaterials.hpp"
+#include "McpPrinterLive.hpp"
 #include "McpSettings.hpp"
 #include "McpToolUtils.hpp"
 
@@ -260,6 +261,22 @@ json printer_status(const json& args)
             out["objects_error"] = "too large (" + std::to_string(text.size()) + " characters), request fewer objects";
         else
             out["objects"] = std::move(raw);
+    }
+
+    // Objects declared by the printed G-code, which control_printer can exclude.
+    // The device view of the gateway does not carry them: read them from the printer.
+    std::string live_reason;
+    const json  live = live_printer_objects({ { "exclude_object", nullptr } }, live_reason);
+    if (live.is_object() && live.contains("exclude_object") && live["exclude_object"].is_object()) {
+        const json& exclude = live["exclude_object"];
+        json        print_objects = json::array();
+        for (const json& obj : exclude.value("objects", json::array()))
+            if (obj.is_object() && obj.contains("name"))
+                print_objects.push_back(obj["name"]);
+        if (!print_objects.empty())
+            out["print_objects"] = { { "names", std::move(print_objects) },
+                                     { "excluded", exclude.value("excluded_objects", json::array()) },
+                                     { "current", exclude.value("current_object", json()) } };
     }
 
     json names = json::array();
