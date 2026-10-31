@@ -40,6 +40,7 @@ possible.
 | `src/slic3r/GUI/BBLTopbar.cpp`  | include of `AIAssistant.hpp` + `add_topbar_button()` after *Calibration* in `Init()`, `rescale_topbar_button()` in `Rescale()` |
 | `src/slic3r/GUI/GLCanvas3D.cpp` | include of `ScreenCapture.hpp` + `ScreenCapture::on_canvas_frame()` right before `SwapBuffers()` in `render()` |
 | `src/slic3r/GUI/GUI_ObjectList.cpp` | Linux: slicer colours for the object list (the GTK theme can be light while the slicer is dark) |
+| `src/dev-utils/platform/unix/build_linux_image.sh.in` | `chmod a+x` instead of `ug+x` on the two launchers: appimagetool refuses an AppDir whose executables others cannot run (fix for upstream as well) |
 | `README.md`                     | Section *This fork: an AI assistant inside the slicer*, in one block right after the introduction sentence |
 | `src/slic3r/GUI/GUI_App.cpp`    | `SplashScreen`: widens the splash screen so that the name and version fit (wider Linux fonts); `fit_width()` in `MakeBitmap()`, logo centred in `Decorate()`, image shown as soon as it is created |
 

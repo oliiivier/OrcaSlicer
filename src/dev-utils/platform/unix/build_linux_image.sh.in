@@ -351,7 +351,7 @@ fi
 
 exec "\$@"
 EOF
-    chmod ug+x "$LIBEXEC_DIR/@SLIC3R_APP_CMD@-env"
+    chmod a+x "$LIBEXEC_DIR/@SLIC3R_APP_CMD@-env"
 
 cat << EOF >@SLIC3R_APP_CMD@
 #!/bin/bash
@@ -384,7 +384,7 @@ fi
 exec "\$DIR/libexec/@SLIC3R_APP_CMD@-env" "\$DIR/bin/@SLIC3R_APP_CMD@" "\$@"
 EOF
 
-    chmod ug+x @SLIC3R_APP_CMD@
+    chmod a+x @SLIC3R_APP_CMD@
     cp -fl @SLIC3R_APP_CMD@ "$APPDIR/@SLIC3R_APP_CMD@"
 
     if [ -x "${CHECK_SCRIPT}" ] && [ -z "${ORCA_SKIP_APPIMAGE_AUDIT}" ]; then
