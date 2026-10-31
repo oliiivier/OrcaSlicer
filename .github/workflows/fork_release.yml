@@ -127,5 +127,5 @@ jobs:
             gh release upload "$TAG" assets/* --clobber
           else
             gh release create "$TAG" assets/* --prerelease --target "$GITHUB_SHA" \
-              --title "Snapmaker Orca + assistant IA $TAG" --notes-file scripts/fork/release-notes.md
+              --title "Snapmaker Orca + AI assistant $TAG" --notes-file scripts/fork/release-notes.md
           fi

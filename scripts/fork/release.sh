@@ -39,7 +39,7 @@ fi
 git push -q origin "refs/tags/$TAG"
 if ! gh release view -R "$REPO" "$TAG" >/dev/null 2>&1; then
     gh release create -R "$REPO" "$TAG" --prerelease --verify-tag \
-        --title "Snapmaker Orca + assistant IA $TAG" --notes-file scripts/fork/release-notes.md
+        --title "Snapmaker Orca + AI assistant $TAG" --notes-file scripts/fork/release-notes.md
 fi
 
 set_actions() {

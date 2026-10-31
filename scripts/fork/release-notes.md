@@ -1,51 +1,73 @@
-Build de test du fork [oliiivier/OrcaSlicer](https://github.com/oliiivier/OrcaSlicer) (branche `ai-assistant`) :
-Snapmaker Orca avec un assistant IA. Non signé, non officiel : ni Snapmaker ni Anthropic ne le distribuent.
+Test build of the fork [oliiivier/OrcaSlicer](https://github.com/oliiivier/OrcaSlicer) (branch `ai-assistant`):
+Snapmaker Orca with an AI assistant. Unsigned and unofficial: neither Snapmaker nor Anthropic distributes it.
 
-## Nouveautés de la v2.4.1-ai.2
+## New in v2.4.1-ai.3
 
-- **L'assistant modifie les objets** comme l'onglet *Préparer*, après une seule confirmation et en une étape
-  d'annulation : redimensionner, pivoter, déplacer, centrer, miroir, couper, séparer, dupliquer, supprimer,
-  orienter, disposer, ajouter une pièce, une pièce négative, un modificateur ou un bloqueur de supports,
-  changer le filament d'un objet ou d'une pièce, renommer.
-- **Instructions et notes** (fenêtre *AI Assistant*) : des instructions que vous écrivez, lues au début de
-  chaque conversation, et un dossier de notes Markdown que l'assistant consulte et complète (préférences,
-  particularités de l'imprimante et des filaments, résultats de calibration). Écriture désactivable.
-- **Documentation Snapmaker en direct** : l'assistant cherche et lit le wiki (wiki.snapmaker.com) et le site
-  de support (support.snapmaker.com) pour les recommandations du constructeur, en citant la page et sa date.
-  Désactivable (les recherches partent chez Snapmaker).
-- **Choix du modèle Claude** sous le champ de saisie du chat.
+- **The assistant works on the whole project**, always through the slicer's own commands and after your
+  confirmation:
+  - files: new project, open, import models, save, export the G-code, the sliced 3MF or the STL;
+  - plates: switch, add, delete an empty plate, rename, bed type and print sequence, move an object to another
+    plate, slice all plates;
+  - presets: select a printer, process or filament preset, save a user preset, add or remove a filament slot,
+    change its colour;
+  - height ranges with their own settings, and a pause or filament change at a given layer;
+  - support painting on overhangs (by angle) and clearing paint;
+  - the projects of the *Calibration* menu (temperature, flow, pressure advance, retraction, max volumetric
+    speed, VFA);
+  - undo and redo of the slicer's history.
+- **It looks at the sliced preview**: it switches to the *Preview* tab, picks a view and a layer range, and
+  captures what you see.
+- **During a print**: start the sliced plate (through the slicer's print dialog), pause, resume, cancel, and
+  exclude objects or the prime tower (Klipper's *Exclude objects*).
+- **New prompt `prepare_print`**: checks the open project and prepares it for printing.
+- **Parallel tool calls**: a slice, a print watch or a filament unload no longer blocks the other tools.
+- **Security**: the chat gives each Claude Code it starts a token of its own, revoked when it stops. Other MCP
+  clients only get access when *Allow other MCP clients* is checked in *Help → AI Assistant*.
+- **Translated**: the assistant's windows and messages are in the 19 languages of the slicer (machine
+  translations).
+- The chat shows `/compact`, `/clear` and the output of commands such as `/context`.
+- Tools grouped by domain (30 → 16, `action` parameter): instructions you wrote that name old tools must be
+  updated by hand (list of the changed names in [FORK.md](https://github.com/oliiivier/OrcaSlicer/blob/ai-assistant/FORK.md)).
 
-## Déjà dans la v2.4.1-ai.1
+## Already in v2.4.1-ai.2
 
-- **Chat avec Claude dans le slicer** (bouton *Claude* de la barre du haut) : flottant ou ancré à droite de la
-  vue 3D, une conversation par onglet (conservées après redémarrage), capture de la vue 3D ou de la fenêtre en
-  un clic. Nécessite [Claude Code](https://claude.com/claude-code) installé, avec une connexion faite une fois
-  dans un terminal (`claude`).
-- **Serveur MCP** (*Aide → AI Assistant (MCP server)*) : Claude, Gemini ou un autre client MCP lit le projet,
-  explique les avertissements, propose des réglages (chacun confirmé dans le slicer), suit l'imprimante
-  connectée et adapte un projet prévu pour une autre imprimante.
+- Object editing like the *Prepare* tab (scale, rotate, cut, split, add a modifier…), with one confirmation
+  and one undo step.
+- Your instructions, read at the start of every conversation, and a folder of Markdown notes the assistant
+  keeps.
+- Snapmaker's wiki and support site queried live, with the page and its date cited.
+- Choice of the Claude model in the chat.
 
-## Installation
+## Already in v2.4.1-ai.1
 
-| Système | Fichier | Remarque |
+- **Chat with Claude inside the slicer** (*Claude* button in the top bar): floating or docked next to the 3D
+  view, one conversation per tab, capture of the 3D view or of the window. Needs
+  [Claude Code](https://claude.com/claude-code) installed, signed in once in a terminal (`claude`).
+- **MCP server** (*Help → AI Assistant (MCP server)*): Claude, Gemini or another MCP client reads the project,
+  explains the warnings, proposes settings (each confirmed in the slicer), follows the connected printer and
+  adapts a project made for another printer.
+
+## Install
+
+| System | File | Note |
 |---|---|---|
-| Linux | `.AppImage` | `chmod +x` puis lancer |
-| Arch Linux, CachyOS | `.pkg.tar.zst` | `sudo pacman -U <fichier>` ; lancer `snapmaker-orca` |
-| Windows | `.exe` (installeur) ou `_portable.zip` | SmartScreen : *Informations complémentaires → Exécuter quand même* |
+| Linux | `.AppImage` | `chmod +x`, then run it |
+| Arch Linux, CachyOS | `.pkg.tar.zst` | `sudo pacman -U <file>`; run `snapmaker-orca` |
+| Windows | `.exe` (installer) or `_portable.zip` | SmartScreen: *More info → Run anyway* |
 
-Pas de version macOS pour l'instant.
+No macOS build for now.
 
-## À tester sur chaque système
+## To test on each system
 
-1. Demander à l'assistant de couper ou redimensionner un objet : confirmation, résultat, puis Ctrl+Z.
-2. Écrire une instruction dans *Aide → AI Assistant*, ouvrir une nouvelle conversation et vérifier qu'elle est
-   suivie ; demander à l'assistant de noter quelque chose, puis *Ouvrir* le dossier des notes.
-3. Une question de dépannage (« des fils sur ma pièce en PETG ») : l'assistant cite une page du wiki Snapmaker.
-4. Le bouton *Claude* ouvre le chat et active le serveur MCP ; *Aide → AI Assistant* indique le Claude Code
-   utilisé (« Used by the chat: … »), surtout pour une installation npm (Windows `claude.cmd`).
-5. Une question sur le projet ouvert obtient une réponse qui utilise les outils du slicer.
-6. Passage flottant ↔ ancré (bouton de l'en-tête du chat) sans page blanche ni plantage.
-7. Captures *3D view* et *Window*.
-8. Onglets retrouvés après redémarrage du slicer.
+1. Ask the assistant to save the project under a new name, then to export the G-code: confirmation, files
+   written.
+2. Ask it to add a pause at a layer of the sliced plate: the pause shows on the preview slider.
+3. Ask it to select another filament preset, then to save it as a user preset.
+4. Ask it to show the sliced preview of the first layers: the *Preview* tab opens on those layers.
+5. The *Claude* button opens the chat and turns the MCP server on; *Help → AI Assistant* shows the Claude
+   Code in use ("Used by the chat: …"), especially for an npm install (Windows `claude.cmd`).
+6. Switching floating ↔ docked (button in the chat header) without a blank page or a crash.
+7. *3D view* and *Window* captures.
+8. Tabs are back after restarting the slicer.
 
-Testé jusqu'ici sous Linux uniquement.
+Tested on Linux only so far.
