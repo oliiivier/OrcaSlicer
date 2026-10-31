@@ -4,6 +4,53 @@
 [![Build all](https://github.com/Snapmaker/OrcaSlicer/actions/workflows/build_all.yml/badge.svg?branch=main)](https://github.com/Snapmaker/OrcaSlicer/actions/workflows/build_all.yml)
 <br>Snapmaker Orca is an open source slicer for FDM printers based on OrcaSlicer.
  
+# This fork: an AI assistant inside the slicer
+
+This is an unofficial fork of [Snapmaker/OrcaSlicer](https://github.com/Snapmaker/OrcaSlicer). It adds an AI
+assistant that can see your project and your printer and work in the slicer with you. It explains what it
+finds and suggests what to do. Nothing changes until you confirm it in the slicer, and you can undo every change.
+
+![Claude docked next to the 3D view, discussing the prime tower of a four-colour project on a Snapmaker U1](docs/assets/ai-assistant-chat.png)
+
+*Claude docked to the right of the 3D view. In this four-colour Snapmaker U1 project, it has just made the
+prime tower wider and changed its type to Rib. It explains what could go wrong without the tower and cites
+Snapmaker's wiki page on the subject.*
+
+### What it adds
+
+- **Chat with Claude in the slicer**: click the *Claude* button in the top bar. The chat can float or dock
+  next to the 3D view. Each tab holds one conversation, and tabs are kept when you restart. One click attaches
+  a capture of the 3D view or of the whole window. You can choose the Claude model.
+- **Diagnose and fix**: the assistant reads the slicer's errors and warnings, explains them and proposes
+  settings. When it helps, it checks Snapmaker's own wiki and support site and cites the page and its date, so
+  you can see where a recommendation comes from. A dialog shows each proposed value next to the current one and
+  the reason for the change. You choose which ones to apply.
+- **Works like the Prepare tab**: it can scale, rotate, cut, split, arrange and orient objects, add
+  modifiers and support blockers, and paint supports. It also handles plates, presets and filament slots,
+  height ranges, pauses and colour changes at a given layer. It can leave chosen objects or the prime tower
+  out of a print. One confirmation applies a change, and Ctrl+Z undoes it.
+- **Slices and checks the result**: it slices one plate or all of them and reads the summary. It can look at
+  the sliced preview and create calibration projects.
+- **Knows your printer**: it reads the status of the connected printer and takes photos with its camera. It
+  can watch a print, start, pause or cancel one, and unload filament. When only one printer is online, the
+  slicer connects to it at startup.
+- **Adapts downloaded projects**: when a 3MF was made for another printer (from MakerWorld, for example), the
+  assistant switches it to the connected printer and nozzle. On the U1, it moves each filament to the
+  toolhead that holds the closest material and colour.
+- **Remembers and documents**: you can write instructions that the assistant reads at the start of every
+  conversation. It also keeps a folder of Markdown notes and a log of past prints and their results. The
+  documentation of every setting ships with the slicer, so it can explain any option without going online.
+- **Open to other MCP clients**: the assistant uses an MCP server built into the slicer, so Claude Code,
+  Gemini CLI or Claude Desktop can use it too (*Help → AI Assistant (MCP server)*). The server listens only
+  on the local machine and needs a token to accept a request.
+
+The chat needs [Claude Code](https://claude.com/claude-code) installed, with one login done in a terminal.
+
+📥 **[Download the fork's pre-releases](https://github.com/oliiivier/OrcaSlicer/releases)**: Linux AppImage,
+Arch Linux package and Windows installer. The builds are not signed, and neither Snapmaker nor Anthropic
+distributes them. [FORK.md](FORK.md) describes the fork in detail: its tools, its security and
+how it follows upstream.
+
 
 
 # Download

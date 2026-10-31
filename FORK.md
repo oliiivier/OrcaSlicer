@@ -1,47 +1,49 @@
-# Fork oliiivier/OrcaSlicer — Assistant IA
+# Fork oliiivier/OrcaSlicer — AI assistant
 
-Fork de [Snapmaker/OrcaSlicer](https://github.com/Snapmaker/OrcaSlicer) qui intègre un serveur
-[MCP](https://modelcontextprotocol.io) : un assistant (Claude, Gemini…) peut analyser le projet et la configuration,
-recommander des réglages et, à terme, les appliquer après confirmation dans le slicer.
-Ce fork n'a pas vocation à être fusionné en amont : l'objectif est de pouvoir intégrer les mises à jour upstream
-avec un minimum de conflits.
+Fork of [Snapmaker/OrcaSlicer](https://github.com/Snapmaker/OrcaSlicer) that embeds an
+[MCP](https://modelcontextprotocol.io) server: an assistant (Claude, Gemini…) can analyse the project and the
+configuration, recommend settings and apply them after confirmation in the slicer.
+This fork is not meant to be merged upstream: the goal is to take in upstream updates with as few conflicts as
+possible.
 
 ## Branches
 
-| Branche              | Rôle                                                                  |
+| Branch               | Role                                                                  |
 |----------------------|-----------------------------------------------------------------------|
-| `main`               | Miroir exact de `upstream/main`. **Aucun commit du fork dessus.**     |
-| `ai-assistant`       | Branche par défaut du fork : upstream + fonctionnalités du fork.      |
-| `feat/*`             | Développement des fonctionnalités, PR vers `ai-assistant`.            |
+| `main`               | Exact mirror of `upstream/main`. **No fork commits on it.**           |
+| `ai-assistant`       | Default branch of the fork: upstream + the fork's features.           |
+| `feat/*`             | Feature development, PRs into `ai-assistant`.                         |
 
-## Règles pour limiter les conflits
+## Rules to limit conflicts
 
-1. Tout le code du fork vit dans des dossiers qui n'existent pas upstream :
-   - `src/slic3r/AIAssistant/` (C++ et `AIAssistant.cmake`)
-   - `resources/ai_assistant/` (documentation générée pour le serveur MCP)
-   - `resources/web/ai_assistant/` (page du chat) et `resources/images/topbar_claude.svg`
-   - `.github/workflows/fork_release.yml` (builds de la release du fork)
+1. All of the fork's code lives in folders that do not exist upstream:
+   - `src/slic3r/AIAssistant/` (C++ and `AIAssistant.cmake`)
+   - `resources/ai_assistant/` (documentation generated for the MCP server)
+   - `resources/web/ai_assistant/` (chat page) and `resources/images/topbar_claude.svg`
+   - `.github/workflows/fork_release.yml` (fork release builds)
    - `scripts/fork/`
-2. Les fichiers upstream ne sont touchés qu'aux **points d'accroche** ci-dessous, toujours entourés de
-   `#ifdef SNAPMAKER_AI_ASSISTANT // fork`. Si un nouveau point est nécessaire, l'ajouter à cette liste.
-3. Toujours intégrer upstream par **merge** (jamais de rebase de `ai-assistant`, jamais de squash des fusions upstream).
-4. Traductions : les textes du fork sont **ajoutés en fin** de `localization/i18n/Snapmaker_Orca.pot` et des
-   `.po` (fichiers upstream), jamais insérés au milieu, et `localization/i18n/list.txt` liste les sources du
-   fork. Si upstream relance `msgmerge` et que la fusion entre en conflit, prendre sa version puis rajouter les
-   entrées du fork en fin de fichier.
+   - `docs/assets/` (README images)
+2. Upstream files are only touched at the **hook points** below, always wrapped in
+   `#ifdef SNAPMAKER_AI_ASSISTANT // fork`. If a new hook point is needed, add it to this list.
+3. Always integrate upstream with a **merge** (never rebase `ai-assistant`, never squash upstream merges).
+4. Translations: the fork's strings are **appended at the end** of `localization/i18n/Snapmaker_Orca.pot` and of
+   the `.po` files (upstream files), never inserted in the middle, and `localization/i18n/list.txt` lists the
+   fork's sources. If upstream reruns `msgmerge` and the merge conflicts, take their version and then append the
+   fork's entries again at the end of the file.
 
-### Points d'accroche dans le code upstream
+### Hook points in upstream code
 
-| Fichier                         | Modification                                                  |
+| File                            | Change                                                        |
 |---------------------------------|---------------------------------------------------------------|
-| `src/slic3r/CMakeLists.txt`     | `include(AIAssistant/AIAssistant.cmake OPTIONAL)` après `encoding_check(libslic3r_gui)` |
-| `src/slic3r/GUI/MainFrame.cpp`  | include de `AIAssistant.hpp` + appel `append_menu_items()` à la fin de `generate_help_menu()` |
-| `src/slic3r/GUI/BBLTopbar.cpp`  | include de `AIAssistant.hpp` + `add_topbar_button()` après *Calibration* dans `Init()`, `rescale_topbar_button()` dans `Rescale()` |
-| `src/slic3r/GUI/GLCanvas3D.cpp` | include de `ScreenCapture.hpp` + `ScreenCapture::on_canvas_frame()` juste avant `SwapBuffers()` dans `render()` |
-| `src/slic3r/GUI/GUI_ObjectList.cpp` | Linux : couleurs du slicer pour la liste des objets (le thème GTK peut être clair quand le slicer est sombre) |
-| `src/slic3r/GUI/GUI_App.cpp`    | `SplashScreen` : élargit l'écran de démarrage pour que le nom et la version tiennent (polices Linux plus larges) ; `fit_width()` dans `MakeBitmap()`, logo centré dans `Decorate()`, image affichée dès la création |
+| `src/slic3r/CMakeLists.txt`     | `include(AIAssistant/AIAssistant.cmake OPTIONAL)` after `encoding_check(libslic3r_gui)` |
+| `src/slic3r/GUI/MainFrame.cpp`  | include of `AIAssistant.hpp` + call to `append_menu_items()` at the end of `generate_help_menu()` |
+| `src/slic3r/GUI/BBLTopbar.cpp`  | include of `AIAssistant.hpp` + `add_topbar_button()` after *Calibration* in `Init()`, `rescale_topbar_button()` in `Rescale()` |
+| `src/slic3r/GUI/GLCanvas3D.cpp` | include of `ScreenCapture.hpp` + `ScreenCapture::on_canvas_frame()` right before `SwapBuffers()` in `render()` |
+| `src/slic3r/GUI/GUI_ObjectList.cpp` | Linux: slicer colours for the object list (the GTK theme can be light while the slicer is dark) |
+| `README.md`                     | Section *This fork: an AI assistant inside the slicer*, in one block right after the introduction sentence |
+| `src/slic3r/GUI/GUI_App.cpp`    | `SplashScreen`: widens the splash screen so that the name and version fit (wider Linux fonts); `fit_width()` in `MakeBitmap()`, logo centred in `Decorate()`, image shown as soon as it is created |
 
-Lister les écarts réels avec upstream (doit rester court) :
+List the actual differences with upstream (should stay short):
 
 ```bash
 git diff upstream/main...ai-assistant --stat -- . ':!src/slic3r/AIAssistant' ':!resources/ai_assistant' \
@@ -49,347 +51,334 @@ git diff upstream/main...ai-assistant --stat -- . ':!src/slic3r/AIAssistant' ':!
     ':!.github/workflows/fork_release.yml'
 ```
 
-## Synchronisation avec upstream
+## Syncing with upstream
 
-GitHub Actions est **désactivé** sur ce fork (réglage du dépôt, pas une modification de fichier) :
-les workflows hérités d'upstream (`.github/workflows/`) restent dans l'arbre, intacts, mais ne tournent pas,
-y compris ceux qu'upstream ajoutera plus tard. La synchronisation et la compilation se font en local :
+GitHub Actions is **disabled** on this fork (a repository setting, not a file change): the workflows inherited
+from upstream (`.github/workflows/`) stay in the tree, untouched, but do not run, including those upstream adds
+later. Syncing and building are done locally:
 
 ```bash
-scripts/fork/sync-upstream.sh        # fusionne upstream/main dans ai-assistant et remet main sur upstream/main
-scripts/fork/sync-upstream.sh -b     # idem puis compile (dépendances déjà compilées)
-scripts/fork/sync-upstream.sh -b -p  # idem puis pousse main et ai-assistant sur origin
+scripts/fork/sync-upstream.sh        # merges upstream/main into ai-assistant and resets main to upstream/main
+scripts/fork/sync-upstream.sh -b     # same, then builds (dependencies already built)
+scripts/fork/sync-upstream.sh -b -p  # same, then pushes main and ai-assistant to origin
 ```
 
-En cas de conflit, le script s'arrête en listant les fichiers concernés (normalement seulement les points
-d'accroche) : les résoudre, `git commit`, puis relancer le script.
+On a conflict, the script stops and lists the files involved (normally only the hook points): resolve them,
+`git commit`, then run the script again.
 
-Réactiver Actions si besoin : `gh api -X PUT repos/oliiivier/OrcaSlicer/actions/permissions -F enabled=true`.
+Re-enable Actions if needed: `gh api -X PUT repos/oliiivier/OrcaSlicer/actions/permissions -F enabled=true`.
 
-## Release (builds Linux, Windows)
+## Release (Linux, Windows builds)
 
 ```bash
-scripts/fork/release.sh v2.4.1-ai.1   # publie la tête poussée de ai-assistant en pré-release
+scripts/fork/release.sh v2.4.1-ai.1   # publishes the pushed head of ai-assistant as a pre-release
 ```
 
-Le script pousse d'abord le tag par git et crée la pré-release (le jeton du workflow ne peut pas créer un tag
-sur un commit qui modifie `.github/workflows`, ce qu'apportent les fusions d'upstream). Il active Actions le
-temps de la release seulement : il désactive tous les workflows sauf
-`fork_release.yml` (y compris ceux qu'upstream a ajoutés depuis), lance celui-ci, attend la fin (plusieurs
-heures : les dépendances sont recompilées, le fork n'a pas de cache) puis désactive Actions. `fork_release.yml`
-réutilise les workflows de build d'upstream, qui ne publient rien hors de leur `main`, et attache AppImage,
-paquet pacman (contenu de l'AppImage repaqueté dans un conteneur Arch Linux), installeur et zip Windows à la
-pré-release (macOS retiré pour l'instant : aucun runner arm64 disponible), avec `scripts/fork/release-notes.md` pour texte. Les
-paquets ne sont pas signés (pas de certificat dans le fork) et la publication des symboles Sentry échoue sans
-ses secrets, sans bloquer la release.
+The script first pushes the tag with git and creates the pre-release (the workflow token cannot create a tag on
+a commit that changes `.github/workflows`, which upstream merges bring). It enables Actions for the release
+only: it disables every workflow except `fork_release.yml` (including those upstream has added since), runs it,
+waits for it to finish (several hours: dependencies are rebuilt, the fork has no cache) and then disables
+Actions. `fork_release.yml` reuses upstream's build workflows, which publish nothing outside their `main`, and
+attaches the AppImage, the pacman package (the AppImage's content repackaged in an Arch Linux container), and
+the Windows installer and zip to the pre-release (macOS dropped for now: no arm64 runner available), with
+`scripts/fork/release-notes.md` as its text. The packages are not signed (no certificate in the fork) and the
+upload of Sentry symbols fails without its secrets, without blocking the release.
 
-### Paquet pacman (Arch Linux, CachyOS)
+### pacman package (Arch Linux, CachyOS)
 
 ```bash
-./build_linux.sh -s                    # compile le slicer (build/package)
-scripts/fork/arch/build-package.sh     # paquet build/snapmaker-orca-ai-<version>-x86_64.pkg.tar.zst
-scripts/fork/arch/build-package.sh Snapmaker_Orca_Linux_*.AppImage   # ou à partir d'une AppImage du fork
+./build_linux.sh -s                    # builds the slicer (build/package)
+scripts/fork/arch/build-package.sh     # package build/snapmaker-orca-ai-<version>-x86_64.pkg.tar.zst
+scripts/fork/arch/build-package.sh Snapmaker_Orca_Linux_*.AppImage   # or from an AppImage of the fork
 sudo pacman -U build/snapmaker-orca-ai-*.pkg.tar.zst
 ```
 
-`scripts/fork/arch/PKGBUILD` empaquette la compilation locale (le contenu de l'AppImage) dans
-`/opt/snapmaker-orca-ai` avec `/usr/bin/snapmaker-orca`, le raccourci et les icônes ; la version suit le commit
-(`2.4.1.r<n>.g<hash>`). Il fournit `snapmaker-orca` et remplace donc un paquet AppImage d'upstream déjà installé.
+`scripts/fork/arch/PKGBUILD` packages the local build (the AppImage's content) into `/opt/snapmaker-orca-ai`
+with `/usr/bin/snapmaker-orca`, the desktop entry and the icons; the version follows the commit
+(`2.4.1.r<n>.g<hash>`). It provides `snapmaker-orca` and so replaces an upstream AppImage package that is
+already installed.
 
-`build_linux.sh` télécharge la gateway `snapmaker_control` et remplace `resources/web/flutter_web` par les
-pages Snapmaker Connect de la même version (`.github/connect-bundle.lock.json`) : ces fichiers suivis par git
-apparaissent alors modifiés, il ne faut **pas** les restaurer (l'ancienne version ne gère plus la connexion au
-compte Snapmaker). `build-package.sh` refuse un `build/package` dont les pages ne sont pas de la bonne version.
+`build_linux.sh` downloads the `snapmaker_control` gateway and replaces `resources/web/flutter_web` with the
+Snapmaker Connect pages of the same version (`.github/connect-bundle.lock.json`): these tracked files then show
+as modified, and they must **not** be restored (the old version no longer handles signing in to the Snapmaker
+account). `build-package.sh` refuses a `build/package` whose pages are not the right version.
 
-## Serveur MCP
+## MCP server
 
-Menu *Aide → AI Assistant (MCP server)* : activation, port (13700 par défaut), accès des autres clients MCP,
-chemin de Claude Code pour le chat, et configuration à copier dans Claude Code, Gemini CLI ou Claude Desktop.
-Le serveur écoute uniquement sur `127.0.0.1`, exige `Authorization: Bearer <jeton>` et refuse les requêtes
-venant d'un navigateur (en-têtes `Origin`/`Host`).
+*Help → AI Assistant (MCP server)* menu: enabling, port (13700 by default), access for other MCP clients, path
+of Claude Code for the chat, and configuration to copy into Claude Code, Gemini CLI or Claude Desktop.
+The server listens only on `127.0.0.1`, requires `Authorization: Bearer <token>` and refuses requests coming
+from a browser (`Origin`/`Host` headers).
 
-Jetons : le chat intégré donne à chaque CLI qu'il lance un jeton tiré au hasard (`McpService::Grant`), gardé en
-mémoire et révoqué quand la CLI s'arrête. Les autres clients n'ont accès que si l'option *Allow other MCP
-clients* est cochée : leur jeton est alors gardé dans `ai_assistant/mcp_token` (lisible par l'utilisateur seul)
-et renouvelé à chaque activation. Les versions précédentes le gardaient dans `Snapmaker_Orca.conf` : il y est
-déplacé au démarrage, l'accès externe restant activé. Un programme lancé sous le même compte peut toujours lire
-ces jetons ; seul un bac à sable (Flatpak, firejail...) l'en empêche.
+Tokens: the built-in chat gives each CLI it starts a random token (`McpService::Grant`), kept in memory and
+revoked when the CLI stops. Other clients only have access if the *Allow other MCP clients* option is checked:
+their token is then kept in `ai_assistant/mcp_token` (readable by the user only) and renewed on every
+activation. Earlier versions kept it in `Snapmaker_Orca.conf`: it is moved out of there at startup, with
+external access left enabled. A program running under the same account can still read these tokens; only a
+sandbox (Flatpak, firejail...) prevents it.
 
-| Fichier | Rôle |
+| File | Role |
 |---|---|
-| `McpServer` | Transport Streamable HTTP + JSON-RPC, indépendant de l'interface (testable seul) |
-| `McpTools` | Registre des outils et prompts, exécution sur le thread de l'interface |
-| `McpActions` | Conventions communes des outils d'écriture : confirmation, forme des résultats, références (objet, pièce, plaque, emplacement), chemins de fichiers, mode test |
-| `McpIssues` | Collecte des erreurs et avertissements du slicer (`get_issues`) |
-| `McpChanges` | Validation, confirmation et application des réglages (`apply_changes`) |
-| `McpChangesDialog` | Fenêtre de confirmation : une case par réglage, aide du réglage et commentaire du modèle au survol |
-| `McpManufacturerDocs` | Documentation Snapmaker en ligne : wiki et site de support (`manufacturer_docs`) |
-| `McpMaterials` | Têtes, emplacements de filament, filaments mixtes, attribution par élément |
-| `McpNotes` | Instructions de l'utilisateur et dossier de notes Markdown partagé (`notes`) |
-| `McpObjects` | Opérations de l'onglet Préparer sur les objets, après confirmation (`edit_objects`) |
-| `McpPresets` | Préréglages et emplacements de filament par les listes et boutons de la barre latérale (`edit_presets`) |
-| `McpSlicing` | Slicing de la plaque courante ou de toutes les plaques et résumé du résultat (`slice`) |
-| `McpProject` | Fichiers, plaques, calibrations et lancement d'impression (`edit_project`, `edit_plates`, `calibrate`, `control_printer` start_print) |
-| `McpRender` | Rendu PNG du plateau depuis une vue nommée, capture de l'aperçu tranché (`get_view`) |
-| `McpPrinter` | Lecture seule de l'imprimante connectée (`get_printer` status, écarts projet/imprimante) |
-| `McpPrinterLive` | Lecture en direct (`printer.objects.query`), photo de la caméra et suivi d'impression (`get_printer` snapshot, watch) |
-| `McpPrinterControl` | Commandes envoyées à l'imprimante (`control_printer`) : déchargement des têtes, pause, reprise et arrêt |
-| `PrinterAutoConnect` | Connexion automatique au démarrage quand une seule imprimante est en ligne |
-| `ProjectAdapt` | Adaptation d'un projet à l'imprimante connectée (`adapt_to_printer`) et notification |
-| `McpExperiences` | Journal local des retours d'expérience (`experiences`) |
-| `McpDocs` | Documentation des réglages livrée avec l'application (`get_docs`) |
-| `McpService` | Cycle de vie du serveur (démarrage, arrêt à la fermeture) |
-| `McpSettings` | Section `[ai_assistant]` de la configuration de l'application |
-| `McpDialog` | Fenêtre de réglages |
+| `McpServer` | Streamable HTTP + JSON-RPC transport, independent of the UI (testable on its own) |
+| `McpTools` | Registry of tools and prompts, execution on the UI thread |
+| `McpActions` | Shared conventions of the write tools: confirmation, result shape, references (object, part, plate, slot), file paths, test mode |
+| `McpIssues` | Collects the slicer's errors and warnings (`get_issues`) |
+| `McpChanges` | Validation, confirmation and application of settings (`apply_changes`) |
+| `McpChangesDialog` | Confirmation dialog: one checkbox per setting, setting help and the model's comment on hover |
+| `McpManufacturerDocs` | Snapmaker's online documentation: wiki and support site (`manufacturer_docs`) |
+| `McpMaterials` | Toolheads, filament slots, mixed filaments, per-item assignment |
+| `McpNotes` | User instructions and shared folder of Markdown notes (`notes`) |
+| `McpObjects` | Prepare-tab operations on objects, after confirmation (`edit_objects`) |
+| `McpPresets` | Presets and filament slots through the sidebar's lists and buttons (`edit_presets`) |
+| `McpSlicing` | Slicing of the current plate or all plates and summary of the result (`slice`) |
+| `McpProject` | Files, plates, calibrations and starting a print (`edit_project`, `edit_plates`, `calibrate`, `control_printer` start_print) |
+| `McpRender` | PNG render of the bed from a named view, capture of the sliced preview (`get_view`) |
+| `McpPrinter` | Read-only access to the connected printer (`get_printer` status, project/printer mismatches) |
+| `McpPrinterLive` | Live reads (`printer.objects.query`), camera photo and print watching (`get_printer` snapshot, watch) |
+| `McpPrinterControl` | Commands sent to the printer (`control_printer`): unloading toolheads, pause, resume and cancel |
+| `PrinterAutoConnect` | Automatic connection at startup when only one printer is online |
+| `ProjectAdapt` | Adapting a project to the connected printer (`adapt_to_printer`) and notification |
+| `McpExperiences` | Local log of print experiences (`experiences`) |
+| `McpDocs` | Setting documentation shipped with the application (`get_docs`) |
+| `McpService` | Server lifecycle (start, stop on close) |
+| `McpSettings` | `[ai_assistant]` section of the application configuration |
+| `McpDialog` | Settings dialog |
 
-Outils (regroupés par domaine, le paramètre `action` choisit l'opération) : `get_issues`, `get_project`,
+Tools (grouped by domain, the `action` parameter picks the operation): `get_issues`, `get_project`,
 `get_config`, `get_docs` (setting, page), `apply_changes`, `edit_presets` (select, save, add_slot, remove_slot,
-set_color), `edit_objects`, `edit_plates`, `edit_project` (new,
-open, import, save, export), `undo` (undo, redo), `adapt_to_printer`, `slice`, `get_view` (model, preview), `calibrate`, `get_printer` (status, snapshot,
-watch), `control_printer` (start_print, pause, resume, cancel, unload_filament), `notes` (list, read, write),
-`experiences` (search, record, report), `manufacturer_docs` (search, read). Le chat affiche l'action à côté du
-nom de l'outil.
+set_color), `edit_objects`, `edit_plates`, `edit_project` (new, open, import, save, export), `undo` (undo, redo),
+`adapt_to_printer`, `slice`, `get_view` (model, preview), `calibrate`, `get_printer` (status, snapshot, watch),
+`control_printer` (start_print, pause, resume, cancel, unload_filament), `notes` (list, read, write),
+`experiences` (search, record, report), `manufacturer_docs` (search, read). The chat shows the action next to the
+tool name.
 
-Noms changés depuis la version à 30 outils : `describe_setting` / `read_documentation` → `get_docs`,
+Names changed since the 30-tool version: `describe_setting` / `read_documentation` → `get_docs`,
 `render_view` → `get_view`, `get_printer_status` / `printer_snapshot` / `watch_print` → `get_printer`,
 `start_print` / `control_print` / `unload_filament` → `control_printer`, `list_notes` / `read_note` / `write_note`
 → `notes`, `record_experience` / `report_outcome` / `search_experiences` → `experiences`,
 `search_manufacturer_docs` / `read_manufacturer_page` → `manufacturer_docs`, `new_project` / `open_project` /
-`import_models` / `save_project` / `export_file` → `edit_project`. Les instructions écrites par l'utilisateur
-(fenêtre MCP) qui citent d'anciens noms ne sont pas réécrites : les mettre à jour à la main.
+`import_models` / `save_project` / `export_file` → `edit_project`. User-written instructions (MCP dialog) that
+mention old names are not rewritten: update them by hand.
 
-Prompts : `prepare_print`, `adapt_project`, `diagnose_print`, `fix_issues`, `optimize_settings`, `capitalize_experiences`. Dans
-Claude Code ils s'appellent `/mcp__snapmaker-orca__<prompt>` (taper `/` puis le nom) et ne sont chargés qu'au
-démarrage : relancer Claude Code si le slicer n'était pas ouvert à ce moment.
+Prompts: `prepare_print`, `adapt_project`, `diagnose_print`, `fix_issues`, `optimize_settings`,
+`capitalize_experiences`. In Claude Code they are called `/mcp__snapmaker-orca__<prompt>` (type `/` then the
+name) and are only loaded at startup: restart Claude Code if the slicer was not open at that time.
 
-Connexion automatique (case dans la fenêtre MCP, activée par défaut) : au démarrage, pendant 2 minutes, si
-aucune imprimante n'est connectée et qu'une seule est en ligne (`query.device.list`), le slicer s'y connecte
-(`action.device.connect`, comme l'onglet Appareil). Une seule tentative ; jamais si plusieurs sont en ligne.
+Automatic connection (checkbox in the MCP dialog, on by default): at startup, for 2 minutes, if no printer is
+connected and only one is online (`query.device.list`), the slicer connects to it (`action.device.connect`, like
+the Device tab). A single attempt; never if several are online.
 
-Adaptation d'un projet prévu pour une autre imprimante (3MF MakerWorld…) : outil `adapt_to_printer` et
-prompt `adapt_project`, plus une notification dans le slicer quand le projet ouvert vise un autre modèle que
-l'imprimante connectée (case dans la fenêtre MCP, activée par défaut ; surveillance par minuterie, sans point
-d'accroche). Après confirmation : preset de l'imprimante connectée avec sa buse, procédé à la hauteur de couche
-la plus proche, et chaque emplacement de filament déplacé vers la tête chargée la plus proche (même matériau,
-puis couleur la plus proche). Sur la U1 l'emplacement N imprime par défaut avec la tête N : le projet prend un
-emplacement par tête et tout suit (peinture, filament des objets, volumes et plages, filaments par fonction).
-Les réglages de procédé d'origine qui diffèrent sont renvoyés pour que l'assistant restaure l'intention du
-modèle.
+Adapting a project made for another printer (MakerWorld 3MF…): `adapt_to_printer` tool and `adapt_project`
+prompt, plus a notification in the slicer when the open project targets a different model than the connected
+printer (checkbox in the MCP dialog, on by default; watched by a timer, without a hook point). After
+confirmation: preset of the connected printer with its nozzle, process with the closest layer height, and each
+filament slot moved to the closest loaded toolhead (same material, then closest colour). On the U1, slot N prints
+with toolhead N by default: the project takes one slot per toolhead and everything follows (painting, object
+filaments, volumes and ranges, per-feature filaments). The original process settings that differ are returned so
+that the assistant can restore the model's intent.
 
-`apply_changes` montre chaque réglage proposé avec une case cochée, l'ancienne et la nouvelle valeur et le
-commentaire du modèle (`comment`) ; le survol affiche aussi l'aide du réglage. L'utilisateur applique tout ou
-décoche des valeurs : celles-ci reviennent au modèle sous `unchecked` et sont notées dans le journal
-d'expériences (`declined_by_user`), pour le suivi de l'impression.
+`apply_changes` shows each proposed setting with a checked box, the old and new values and the model's comment
+(`comment`); hovering also shows the setting's help. The user applies everything or unchecks values: those are
+returned to the model under `unchecked` and recorded in the experience log (`declined_by_user`), for following
+up on the print.
 
-Instructions de l'utilisateur : champ de la fenêtre MCP, enregistré dans `<data_dir>/ai_assistant/instructions.md`
-(modifiable aussi hors du slicer) et ajouté aux instructions du serveur, donc lu au début de chaque conversation
-(chat intégré comme clients externes). Notes : dossier de fichiers Markdown (par défaut
-`<data_dir>/ai_assistant/notes`, réglable, bouton *Ouvrir*) que l'assistant liste, lit et enrichit ; l'écriture se
-désactive dans la fenêtre. Les noms restent dans le dossier (sous-dossiers par `/`, ni `..` ni fichiers cachés,
-extension `.md` imposée), 1 Mo maximum par note.
+User instructions: a field of the MCP dialog, saved in `<data_dir>/ai_assistant/instructions.md` (also editable
+outside the slicer) and appended to the server's instructions, so read at the start of every conversation (the
+built-in chat as well as external clients). Notes: a folder of Markdown files (by default
+`<data_dir>/ai_assistant/notes`, configurable, *Open* button) that the assistant lists, reads and adds to;
+writing can be disabled in the dialog. Names stay inside the folder (subfolders with `/`, no `..` and no hidden
+files, `.md` extension enforced), 1 MB maximum per note.
 
-Documentation du constructeur, interrogée en direct plutôt que copiée (elle change souvent, perd ses images et
-vidéos en Markdown, et n'est pas à nous) : recherche dans le wiki (API GraphQL publique de Wiki.js) et le site
-de support (API Zendesk Help Center), lecture d'une page en texte avec sa date de mise à jour. Seuls
-`wiki.snapmaker.com` et `support.snapmaker.com` sont contactés, en tâche de fond (l'outil attend la réponse
-sans bloquer l'interface), et seulement si la case de la fenêtre MCP est cochée (activée par défaut).
-L'assistant résume dans les notes ce qui sert, avec l'adresse et la date.
+Manufacturer documentation, queried live rather than copied (it changes often, loses its images and videos in
+Markdown, and is not ours): search in the wiki (public GraphQL API of Wiki.js) and the support site (Zendesk
+Help Center API), reading a page as text with its last update date. Only `wiki.snapmaker.com` and
+`support.snapmaker.com` are contacted, in the background (the tool waits for the answer without blocking the
+UI), and only if the checkbox in the MCP dialog is checked (on by default). The assistant summarises what is
+useful in the notes, with the address and the date.
 
-Préréglages (`edit_presets`) : la sélection passe par la liste de la barre latérale, comme un clic (le slicer
-demande lui-même quoi faire des modifications non enregistrées et règle buses, plaques et volumes de purge) ;
-l'enregistrement par le bouton de l'onglet de réglages, nom donné (préréglage utilisateur, jamais un nom de
-préréglage système) ; ajout et retrait d'emplacement par les commandes de la liste des filaments (le retrait
-dit dans la confirmation quels objets changent d'emplacement) ; la couleur comme le sélecteur de couleur de
-l'emplacement (couleur unie). `get_project.presets` donne les préréglages choisis, ceux que proposent les
-listes (visibles et compatibles) et les modifications non enregistrées.
+Presets (`edit_presets`): selection goes through the sidebar list, like a click (the slicer itself asks what to
+do with unsaved changes and sets nozzles, plates and flush volumes); saving goes through the button of the
+settings tab, with a given name (a user preset, never the name of a system preset); adding and removing a slot
+through the filament list's commands (removal says in the confirmation which objects change slot); the colour
+like the slot's colour picker (solid colour). `get_project.presets` gives the selected presets, those offered by
+the lists (visible and compatible) and the unsaved changes.
 
-Conventions des outils qui modifient quelque chose (`McpActions`) : une seule forme de confirmation (raison
-donnée par le modèle, liste des opérations, question Oui/Non ; `apply_changes` garde sa fenêtre à cases, les
-fichiers et l'impression les dialogues du slicer). Résultat toujours `done` ; refus `declined: true`, délai
-dépassé `timed_out: true` ; liste d'opérations : `applied`, `failed` (opération et erreur), `not_run`. Les
-erreurs de saisie restent des erreurs MCP (`isError`). Les instructions envoyées au client sont un paragraphe
-par domaine d'outils (`INSTRUCTIONS` dans `McpTools.cpp`).
+Conventions of the tools that change something (`McpActions`): a single form of confirmation (reason given by
+the model, list of operations, Yes/No question; `apply_changes` keeps its checkbox dialog, files and printing
+the slicer's dialogs). The result is always `done`; refusal `declined: true`, timeout `timed_out: true`; list of
+operations: `applied`, `failed` (operation and error), `not_run`. Input errors stay MCP errors (`isError`). The
+instructions sent to the client are one paragraph per tool domain (`INSTRUCTIONS` in `McpTools.cpp`).
 
-`apply_changes` refuse `post_process` (scripts exécutés sur l'ordinateur à l'export du G-code), même confirmé.
+`apply_changes` refuses `post_process` (scripts run on the computer when the G-code is exported), even when
+confirmed.
 
-`edit_objects` enchaîne les opérations de l'onglet Préparer sur les objets : redimensionner (facteur ou cote),
-pivoter, déplacer, centrer, poser sur le plateau, miroir, couper horizontalement, séparer en objets, dupliquer,
-supprimer, orienter automatiquement, disposer le plateau courant, ajouter une pièce, une pièce négative, un
-modificateur ou un bloqueur / forceur de supports (cube, cylindre, cône, sphère aux cotes et à la position
-données), supprimer une pièce, changer le filament d'un objet ou d'une pièce, renommer, déplacer vers une autre plaque
-(même position sur la plaque, comme un glisser-déposer). La liste est confirmée en une fois par
-l'utilisateur et forme une seule étape d'annulation (plus une par orientation ou disposition, tâches de fond
-attendues par l'outil). Les opérations passent par la sélection et le canevas 3D, comme la souris et les
-gizmos ; un gizmo ouvert bloque l'outil. La sélection est vidée avant les opérations qui suppriment ou
-remplacent un objet ou une pièce (la liste des objets la redessinerait sur des volumes supprimés). Pièces
-coupées : `<nom>_A` (haut), `<nom>_B` (bas).
+`edit_objects` chains the Prepare tab's operations on objects: scale (factor or size), rotate, move, centre,
+drop to bed, mirror, cut horizontally, split into objects, duplicate, delete, auto-orient, arrange the current
+plate, add a part, a negative part, a modifier or a support blocker / enforcer (cube, cylinder, cone, sphere with
+the given size and position), delete a part, change the filament of an object or a part, rename, move to another
+plate (same position on the plate, like a drag and drop). The list is confirmed at once by the user and forms a
+single undo step (plus one per orientation or arrangement, background jobs that the tool waits for). Operations
+go through the selection and the 3D canvas, like the mouse and the gizmos; an open gizmo blocks the tool. The
+selection is cleared before operations that delete or replace an object or a part (the object list would redraw
+it on deleted volumes). Cut parts: `<name>_A` (top), `<name>_B` (bottom).
 
-Plages de hauteur (`edit_objects` add_height_range, remove_height_range) : comme *Plage de hauteur* de la liste
-des objets, avec la hauteur de couche, le filament (`extruder`) et les réglages par région (parois, remplissage,
-surfaces, vitesses) ; les plages ne se chevauchent pas, la liste des objets est reconstruite pour l'objet.
-Événements par couche (`edit_plates` add_layer_event, remove_layer_event) : pause ou changement de filament
-vers un emplacement, à une couche de la plaque courante tranchée (numéro ou hauteur la plus proche), écrits
-dans `Model::plates_custom_gcodes` comme le curseur de l'aperçu ; jamais de G-code libre. `undo` défait ou
-refait des étapes de l'historique du slicer (Ctrl+Z / Ctrl+Y) après confirmation listant leurs noms.
+Height ranges (`edit_objects` add_height_range, remove_height_range): like *Height range* in the object list,
+with layer height, filament (`extruder`) and per-region settings (walls, infill, surfaces, speeds); ranges do not
+overlap, and the object list is rebuilt for the object. Layer events (`edit_plates` add_layer_event,
+remove_layer_event): pause or filament change to a slot, at a layer of the current sliced plate (number or
+closest height), written to `Model::plates_custom_gcodes` like the preview slider; never free G-code. `undo` undoes
+or redoes steps of the slicer's history (Ctrl+Z / Ctrl+Y) after a confirmation that lists their names.
 
-Calibrations (`calibrate`) : les paramètres de la fenêtre de chaque entrée du menu *Calibration*, avec les
-mêmes contrôles, puis la même fonction du slicer (`Plater::calib_*`), qui ferme le projet courant. Peinture
-automatique (`edit_objects` paint_supports) : les faces orientées vers le bas à moins de `angle_deg` de
-l'horizontale (hors faces posées sur le plateau) deviennent forceurs ou bloqueurs de supports, en gardant la
-peinture existante ; `clear_paint` efface la peinture des supports, de la couture, des couleurs ou du fuzzy
-skin.
+Calibrations (`calibrate`): the parameters of the dialog of each entry of the *Calibration* menu, with the same
+checks, then the same slicer function (`Plater::calib_*`), which closes the current project. Automatic painting
+(`edit_objects` paint_supports): downward-facing faces less than `angle_deg` from horizontal (excluding faces
+resting on the bed) become support enforcers or blockers, keeping existing paint; `clear_paint` clears the paint
+of supports, seam, colours or fuzzy skin.
 
-Fichiers et plaques : `edit_project` appelle les commandes du slicer. Nouveau projet, ouverture, import et
-enregistrement d'un chemin donné, exports vers un chemin donné (G-code de la plaque courante copié tel que
-tranché, sans les scripts de post-traitement ; 3MF tranché de la plaque courante ; STL de tous les objets en
-un maillage) sont confirmés par une question ; un fichier existant n'est remplacé qu'avec `overwrite: true`.
-Sans chemin, ou pour *Enregistrer sous* (`save_as`), le dialogue de fichier du slicer sert de confirmation. Le
-slicer demande lui-même d'enregistrer un projet modifié avant de le fermer. Les chemins donnés doivent être
-absolus (`~` accepté). `edit_plates` sélectionne (sans confirmation), ajoute, supprime (une plaque vide
-seulement : sinon ses objets partiraient hors des plaques), renomme les plaques et règle leur type de plateau
-et leur ordre d'impression, comme la fenêtre de réglages de la plaque. `get_project` liste les plaques ;
-`slice` avec `all_plates` agit comme *Trancher tout*.
+Files and plates: `edit_project` calls the slicer's commands. New project, opening, importing and saving to a
+given path, and exports to a given path (G-code of the current plate copied as sliced, without the
+post-processing scripts; sliced 3MF of the current plate; STL of all objects as one mesh) are confirmed by a
+question; an existing file is only replaced with `overwrite: true`. Without a path, or for *Save as*
+(`save_as`), the slicer's file dialog serves as confirmation. The slicer itself asks to save a modified project
+before closing it. Given paths must be absolute (`~` accepted). `edit_plates` selects (without confirmation),
+adds, deletes (an empty plate only: otherwise its objects would end up off the plates), renames plates and sets
+their bed type and print sequence, like the plate settings dialog. `get_project` lists the plates; `slice` with
+`all_plates` acts like *Slice all*.
 
-Accès à l'imprimante, via la connexion Snapmaker Connect déjà ouverte par l'application ; deux cases à cocher
-dans la fenêtre MCP, désactivées par défaut :
+Printer access, through the Snapmaker Connect connection already opened by the application; two checkboxes in
+the MCP dialog, off by default:
 
-- **Lecture** : état (`query.device.objects`, ou `printer.objects.query` pour ce qui change vite), photo de
-  la caméra (URL de capture de la webcam déclarée à Moonraker, `server.webcams.list`, en général
-  `http://<ip>/webcam/snapshot.jpg` sur le réseau local ; pas `camera.start_monitor`, dont le flux reste
-  actif ~6 min après l'arrêt), suivi borné d'une impression. Numéros de série, réseau, comptes et secrets sont
-  retirés avant envoi au modèle.
-- **Contrôle** (exige la lecture), `control_printer`, confirmé dans le slicer à chaque demande : `start_print` ouvre le dialogue
-  d'impression du slicer pour la plaque tranchée (comme le bouton *Imprimer la plaque* : l'utilisateur vérifie
-  le nom et la correspondance des filaments, puis lance) ; `control_print` met en pause, reprend ou arrête
-  l'impression (`printer.print.pause`, `resume`, `cancel`) puis attend le nouvel état ; `unload_filament`,
-  refusé pendant une impression, confirmé
-  dans le slicer à chaque demande. Même séquence que l'écran de la U1 : `AUTO_FEEDING_BATCH ACTION=START`,
-  puis `ACTION=DOING STAGE=prepare EXTRUDER=n UNLOAD=1` (le firmware chauffe lui-même). L'écran de
-  l'imprimante envoie ensuite `STAGE=doing` dès `unload_heat_finish` (l'outil ne l'envoie qu'après 15 s sans
-  relais), et `ACTION=STOP` termine (chauffes coupées), y compris si l'appel est abandonné. Le firmware
-  s'arrête à `unload_finish` : le filament est sorti de la buse mais reste dans la tête, l'utilisateur le
-  retire à la main. Les filaments souples (`filament_soft`) ne sont jamais déchargés.
+- **Read**: status (`query.device.objects`, or `printer.objects.query` for what changes quickly), camera photo
+  (capture URL of the webcam declared to Moonraker, `server.webcams.list`, usually
+  `http://<ip>/webcam/snapshot.jpg` on the local network; not `camera.start_monitor`, whose stream stays active
+  ~6 min after stopping), bounded watching of a print. Serial numbers, network, accounts and secrets are removed
+  before sending to the model.
+- **Control** (requires read), `control_printer`, confirmed in the slicer on every request: `start_print` opens
+  the slicer's print dialog for the sliced plate (like the *Print plate* button: the user checks the name and the
+  filament mapping, then starts); `control_print` pauses, resumes or cancels the print (`printer.print.pause`,
+  `resume`, `cancel`) then waits for the new state; `unload_filament`, refused during a print, confirmed in the
+  slicer on every request. Same sequence as the U1's screen: `AUTO_FEEDING_BATCH ACTION=START`, then
+  `ACTION=DOING STAGE=prepare EXTRUDER=n UNLOAD=1` (the firmware heats by itself). The printer's screen then sends
+  `STAGE=doing` as soon as `unload_heat_finish` (the tool only sends it after 15 s without it being relayed), and
+  `ACTION=STOP` ends it (heaters off), including if the call is abandoned. The firmware stops at
+  `unload_finish`: the filament is out of the nozzle but stays in the toolhead, and the user pulls it out by
+  hand. Flexible filaments (`filament_soft`) are never unloaded.
 
-La documentation vient de `doc/` (wiki OrcaSlicer) : `scripts/fork/build-setting-docs.py` relie chaque réglage
-à sa section grâce aux liens d'aide de `Tab.cpp` et produit `resources/ai_assistant/setting_docs.json`, livré
-avec l'application (aucun accès réseau). `sync-upstream.sh` le régénère et le commite après chaque fusion.
-Prompts (commandes slash dans Claude Code / Gemini CLI) : `prepare_print`, `adapt_project`, `diagnose_print`, `fix_issues`,
-`optimize_settings`, `capitalize_experiences`.
+The documentation comes from `doc/` (OrcaSlicer wiki): `scripts/fork/build-setting-docs.py` links each setting
+to its section through the help links of `Tab.cpp` and produces `resources/ai_assistant/setting_docs.json`,
+shipped with the application (no network access). `sync-upstream.sh` regenerates and commits it after each
+merge. Prompts (slash commands in Claude Code / Gemini CLI): `prepare_print`, `adapt_project`, `diagnose_print`,
+`fix_issues`, `optimize_settings`, `capitalize_experiences`.
 
-### Fonctions d'Orca hors de portée du serveur (à faire)
+### Orca features out of the server's reach (to do)
 
-Plan de réalisation et regroupement des outils : [`src/slic3r/AIAssistant/PLAN.md`](src/slic3r/AIAssistant/PLAN.md).
+Implementation plan and tool grouping: [`src/slic3r/AIAssistant/PLAN.md`](src/slic3r/AIAssistant/PLAN.md).
 
-- [x] Fichiers et projet : nouveau projet, ouvrir un projet, importer des modèles (STL, 3MF, STEP),
-  enregistrer le projet, exporter le G-code, le STL ou le 3MF tranché.
-- [x] Plaques : changer de plaque, en ajouter, en supprimer, déplacer un objet vers une autre plaque,
-  réglages par plaque (type de plateau, ordre d'impression), trancher toutes les plaques.
-- [x] Impression : lancer l'impression de la plaque tranchée, mettre en pause, reprendre, arrêter.
-- [ ] Chargement du filament (piste : même séquence `AUTO_FEEDING_BATCH` que le déchargement).
-- [x] Préréglages : enregistrer un préréglage utilisateur, choisir un autre préréglage d'imprimante, de
-  traitement ou de filament, ajouter ou retirer un emplacement de filament, changer sa couleur.
-- [x] Plages de hauteur avec réglages propres. (Reste : hauteur de couche variable.)
-- [x] Pause ou changement de filament à une couche (pas de G-code personnalisé : il partirait tel quel à
-  l'imprimante).
-- [x] Peinture automatique des supports (remplissage des surplombs par angle) et effacement des peintures.
-- [ ] Peinture à la main (écartée : le modèle ne peut pas viser des triangles) et outils de la vue 3D (texte,
-  SVG, mesure, coupe inclinée ou avec connecteurs, simplification, réparation, booléens, poser sur une face,
-  oreilles de bordure).
-- [x] Aperçu tranché en image (trajectoires, supports, plage de couches).
-- [x] Calibrations (température, débit, pressure advance, rétraction, débit volumique maximal, VFA).
-- [ ] Préférences de l'application, compte Snapmaker et MakerWorld (écartés).
-- [x] Annulation par l'assistant (`undo`).
+- [x] Files and project: new project, open a project, import models (STL, 3MF, STEP), save the project, export
+  the G-code, the STL or the sliced 3MF.
+- [x] Plates: switch plate, add one, delete one, move an object to another plate, per-plate settings (bed type,
+  print sequence), slice all plates.
+- [x] Printing: start printing the sliced plate, pause, resume, cancel.
+- [ ] Filament loading (lead: same `AUTO_FEEDING_BATCH` sequence as unloading).
+- [x] Presets: save a user preset, pick another printer, process or filament preset, add or remove a filament
+  slot, change its colour.
+- [x] Height ranges with their own settings. (Remaining: variable layer height.)
+- [x] Pause or filament change at a layer (no custom G-code: it would go to the printer as is).
+- [x] Automatic support painting (overhangs filled by angle) and clearing paint.
+- [ ] Hand painting (dropped: the model cannot aim at triangles) and 3D view tools (text, SVG, measure, angled
+  cut or cut with connectors, simplify, repair, booleans, lay on face, brim ears).
+- [x] Sliced preview as an image (toolpaths, supports, layer range).
+- [x] Calibrations (temperature, flow rate, pressure advance, retraction, max volumetric speed, VFA).
+- [ ] Application preferences, Snapmaker account and MakerWorld (dropped).
+- [x] Undo by the assistant (`undo`).
 
-Écartés volontairement : chauffe, déplacement des axes et mise à l'origine de l'imprimante.
+Deliberately left out: heating, moving the axes and homing the printer.
 
-### Retours d'expérience
+### Print experiences
 
-1. **Journal local** (`<dossier de config>/ai_assistant/experiences/*.json`, hors dépôt) : une fiche par
-   diagnostic. Le serveur y met les faits (imprimante, matériaux, problèmes, réglages modifiés ou refusés via
-   `apply_changes`), le modèle le symptôme et le diagnostic, puis le résultat réel de l'impression
-   (`experiences` report, avec le rapport de l'imprimante si l'accès est activé).
-2. **Capitalisation** : prompt `capitalize_experiences` lancé dans Claude Code depuis ce dépôt. Il regroupe
-   les fiches confirmées et rédige `resources/ai_assistant/guides/exp_*.md` (format et règles :
-   `resources/ai_assistant/guides/README.md`), puis attend la relecture du diff.
-3. **Injection** : après relecture, commit. Les guides sont livrés dans `setting_docs.json` et servis par
-   `get_docs` page (type `experience`).
+1. **Local log** (`<config folder>/ai_assistant/experiences/*.json`, outside the repository): one record per
+   diagnosis. The server stores the facts (printer, materials, issues, settings changed or declined through
+   `apply_changes`), the model the symptom and the diagnosis, then the actual result of the print
+   (`experiences` report, with the printer's report if access is enabled).
+2. **Capitalisation**: the `capitalize_experiences` prompt run in Claude Code from this repository. It groups
+   the confirmed records and writes `resources/ai_assistant/guides/exp_*.md` (format and rules:
+   `resources/ai_assistant/guides/README.md`), then waits for the diff to be reviewed.
+3. **Injection**: after review, commit. The guides ship in `setting_docs.json` and are served by `get_docs` page
+   (type `experience`).
 
-`get_view` (model) montre le modèle (pas les supports ni les trajectoires) ; `get_view` (preview) bascule sur
-l'onglet Aperçu, choisit la vue et la plage de couches du curseur, puis capture la vue 3D telle qu'affichée
-(légende et curseurs compris) : la vue change à l'écran et la fenêtre doit être visible. Le serveur traite les requêtes en
-parallèle (8 fils) : un `slice` (jusqu'à 10 min), un suivi d'impression ou un déchargement ne bloque pas les autres outils ; leur
-exécution reste sérialisée sur le fil de l'interface. Claude Code abandonne un appel MCP après 60 s par
-défaut : le chat intégré passe `"timeout"` (31 min) dans sa config MCP, un client externe doit être lancé avec
-`MCP_TOOL_TIMEOUT` (valeur affichée dans les paramètres MCP).
+`get_view` (model) shows the model (not the supports or the toolpaths); `get_view` (preview) switches to the
+Preview tab, picks the view and the slider's layer range, then captures the 3D view as displayed (legend and
+sliders included): the view changes on screen and the window must be visible. The server handles requests in
+parallel (8 threads): a `slice` (up to 10 min), print watching or unloading does not block the other tools; their
+execution stays serialised on the UI thread. Claude Code abandons an MCP call after 60 s by default: the built-in
+chat passes `"timeout"` (31 min) in its MCP config, and an external client must be started with
+`MCP_TOOL_TIMEOUT` (value shown in the MCP settings).
 
-Multi-têtes (Snapmaker U1, 4 têtes) : `get_project.materials` décrit les têtes et chaque emplacement
-(preset, type, couleur, température, tête, utilisé sur le plateau) ; les réglages par emplacement/tête sont
-renvoyés en tableaux ; `apply_changes` cible un emplacement (`filament_slot`) ou une tête (`toolhead`).
-Un seul preset de filament peut avoir des modifications non enregistrées à la fois : l'assistant doit
-faire enregistrer le précédent avant de passer à un autre emplacement.
+Multiple toolheads (Snapmaker U1, 4 toolheads): `get_project.materials` describes the toolheads and each slot
+(preset, type, colour, temperature, toolhead, used on the plate); per-slot/per-toolhead settings are returned as
+arrays; `apply_changes` targets a slot (`filament_slot`) or a toolhead (`toolhead`). Only one filament preset can
+have unsaved changes at a time: the assistant must have the previous one saved before moving to another slot.
 
-Les instructions envoyées au client imposent l'ordre : erreurs bloquantes, puis avertissements, puis
-optimisations. Toute modification passe par une confirmation dans le slicer ; les surcharges par objet
-s'annulent avec Ctrl+Z, les modifications de presets restent des éditions non enregistrées.
+The instructions sent to the client enforce the order: blocking errors, then warnings, then optimisations. Every
+change goes through a confirmation in the slicer; per-object overrides are undone with Ctrl+Z, and preset changes
+stay unsaved edits.
 
-### Banc d'essai
+### Test bench
 
-Option CMake `SNAPMAKER_AI_TEST_HOOKS` (désactivée par défaut), qui n'agit que sur la configuration `Debug` :
-les paquets et le workflow de release compilent `Release` et n'en contiennent jamais rien. Elle compile le
-mode test : avec `SNAPMAKER_AI_TEST_CONFIRM=yes|no` dans l'environnement, chaque confirmation de l'assistant
-(question commune, fenêtre des réglages, adaptation) reçoit cette réponse sans s'afficher, `new_project`
-abandonne les modifications sans demander, et une notification rouge permanente signale le mode.
+CMake option `SNAPMAKER_AI_TEST_HOOKS` (off by default), which only affects the `Debug` configuration: the
+packages and the release workflow build `Release` and never contain any of it. It builds the test mode: with
+`SNAPMAKER_AI_TEST_CONFIRM=yes|no` in the environment, every confirmation of the assistant (shared question,
+settings dialog, adaptation) gets that answer without being shown, `new_project` discards changes without
+asking, and a permanent red notification signals the mode.
 
 ```bash
 PATH=$HOME/.venvs/orca-build/bin:$PATH cmake -S . -B build -DSNAPMAKER_AI_TEST_HOOKS=ON
 PATH=$HOME/.venvs/orca-build/bin:$PATH cmake --build build --config Debug --target Snapmaker_Orca -j 8
-python3 -I scripts/fork/mcp-test.py                  # tous les scénarios sans étiquette
-python3 -I scripts/fork/mcp-test.py 05-objects       # un scénario
-python3 -I scripts/fork/mcp-test.py --tags printer   # avec ceux qui demandent l'imprimante réelle (lecture seule)
+python3 -I scripts/fork/mcp-test.py                  # all untagged scenarios
+python3 -I scripts/fork/mcp-test.py 05-objects       # one scenario
+python3 -I scripts/fork/mcp-test.py --tags printer   # plus those that need the real printer (read-only)
 ```
 
-Le script copie la configuration de l'utilisateur dans un dossier temporaire (port 13799, accès externe
-activé avec un jeton tiré au hasard, imprimante désactivée sauf `--tags printer`, notes et journal dans la
-copie), lance une instance par réponse nécessaire (`--datadir`, environnement Zink du lanceur sous Wayland +
-NVIDIA), joue les scénarios `scripts/fork/mcp-tests/*.json` (appel, résultat attendu en sous-ensemble du JSON),
-arrête l'instance par son groupe de processus et écrit `build/mcp-test-report.md` avec la taille de
-`tools/list` et des instructions. Les modèles viennent d'une copie de `resources/handy_models`. Étiquettes :
-`printer` (imprimante réelle, lecture seule), `network` (documentation Snapmaker en ligne), `cut` (la coupe
-déclenche une assertion de `cut_mesh()` upstream en Debug, sur des cas que Release traite).
+The script copies the user's configuration to a temporary folder (port 13799, external access enabled with a
+random token, printer disabled unless `--tags printer`, notes and log in the copy), starts one instance per
+answer needed (`--datadir`, the launcher's Zink environment under Wayland + NVIDIA), plays the scenarios
+`scripts/fork/mcp-tests/*.json` (call, expected result as a subset of the JSON), stops the instance by its process
+group and writes `build/mcp-test-report.md` with the size of `tools/list` and of the instructions. The models come
+from a copy of `resources/handy_models`. Tags: `printer` (real printer, read-only), `network` (Snapmaker's online
+documentation), `cut` (cutting triggers an assertion in upstream's `cut_mesh()` in Debug, on cases that Release
+handles).
 
-## Chat Claude
+## Claude chat
 
-Bouton *Claude* de la barre du haut (ou *Aide → Chat with Claude*) : un chat avec Claude dans le slicer,
-flottant ou ancré à droite de la vue 3D (bouton dans l'en-tête du chat, choix mémorisé). Il fait tourner la CLI
-Claude Code installée sur la machine (`claude -p` en stream-json, connexion faite une fois dans un terminal) et
-la relie au serveur MCP, qu'il active s'il est éteint. La CLI n'a aucun autre outil (`--tools=`, pas de shell,
-de fichiers ni de web) et tourne dans un dossier vide (`ai_assistant/chat`). `claude` est cherché dans le
-PATH, les emplacements d'installation habituels puis le PATH du shell de connexion (nvm, préfixe npm…) ; sous
-Windows, le raccourci `claude.cmd` de npm est lu pour lancer sa cible sans `cmd.exe`. Chemin imposable dans la
-fenêtre *AI Assistant* (`claude_path`).
+*Claude* button in the top bar (or *Help → Chat with Claude*): a chat with Claude inside the slicer, floating or
+docked to the right of the 3D view (button in the chat header, choice remembered). It runs the Claude Code CLI
+installed on the machine (`claude -p` in stream-json, signed in once in a terminal) and connects it to the MCP
+server, which it enables if it is off. The CLI has no other tool (`--tools=`, no shell, files or web) and runs
+in an empty folder (`ai_assistant/chat`). `claude` is looked for in the PATH, the usual install locations, then
+the login shell's PATH (nvm, npm prefix…); on Windows, npm's `claude.cmd` shim is read to launch its target
+without `cmd.exe`. The path can be forced in the *AI Assistant* dialog (`claude_path`).
 
-Onglets : une conversation (session Claude Code, reprise par `--resume`) par onglet, enregistrées avec ce
-qu'elles affichent dans `ai_assistant/chats.json`. La CLI d'un onglet inactif et sans réponse en cours est
-arrêtée, puis relancée à son message suivant. Boutons de capture de la vue 3D (relue dans OpenGL) ou de toute la
-fenêtre, jointe au message suivant. Choix du modèle sous le champ de saisie, comme dans l'extension VS Code :
-liste donnée par la CLI (requête de contrôle `initialize`, gardée dans `chats.json`), choix mémorisé
-(`chat_model` de la section `ai_assistant` de la configuration), passé par `--model` au lancement et appliqué
-aux CLI déjà lancées par `set_model`. La configuration MCP donnée à la CLI (avec son jeton) est écrite dans
-`ai_assistant/claude_mcp_<onglet>.json`, lisible par l'utilisateur seul et supprimée à l'arrêt de la CLI. La page du chat est
-`resources/web/ai_assistant/chat.html`.
+Tabs: one conversation (Claude Code session, resumed with `--resume`) per tab, saved with what they display in
+`ai_assistant/chats.json`. The CLI of an inactive tab with no reply in progress is stopped, then restarted on its
+next message. Buttons capture the 3D view (read back from OpenGL) or the whole window, attached to the next
+message. Model choice under the input field, as in the VS Code extension: list given by the CLI (`initialize`
+control request, kept in `chats.json`), choice remembered (`chat_model` in the `ai_assistant` section of the
+configuration), passed with `--model` at launch and applied to CLIs already running with `set_model`. The MCP
+configuration given to the CLI (with its token) is written to `ai_assistant/claude_mcp_<tab>.json`, readable by
+the user only and deleted when the CLI stops. The chat page is `resources/web/ai_assistant/chat.html`.
 
-Testé sous Linux uniquement : la recherche de `claude` sous Windows et macOS, le passage de la page entre
-fenêtre et volet, et la capture de la fenêtre entière (copie d'écran) restent à vérifier sur ces systèmes.
+Tested on Linux only: finding `claude` on Windows and macOS, moving the page between window and pane, and
+capturing the whole window (screenshot) are still to be checked on those systems.
 
-| Fichier | Rôle |
+| File | Role |
 |---|---|
-| `ClaudeProcess` | Lance la CLI, écrit et lit les messages JSON ligne par ligne, interruption, modèle |
-| `ChatPanel` | Page du chat, onglets et sessions, fenêtre flottante ou volet wxAUI du `Plater` |
-| `ScreenCapture` | Capture de la vue 3D et de la fenêtre principale |
+| `ClaudeProcess` | Starts the CLI, writes and reads JSON messages line by line, interruption, model |
+| `ChatPanel` | Chat page, tabs and sessions, floating window or wxAUI pane of the `Plater` |
+| `ScreenCapture` | Capture of the 3D view and of the main window |
 
-## Compilation
+## Building
 
-L'assistant est activé par défaut. Pour compiler sans lui (et vérifier que le fork reste neutre) :
+The assistant is enabled by default. To build without it (and check that the fork stays neutral):
 
 ```bash
 cmake -DSNAPMAKER_AI_ASSISTANT=OFF ...
