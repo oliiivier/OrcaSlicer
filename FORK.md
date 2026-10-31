@@ -41,6 +41,8 @@ possible.
 | `src/slic3r/GUI/GLCanvas3D.cpp` | include of `ScreenCapture.hpp` + `ScreenCapture::on_canvas_frame()` right before `SwapBuffers()` in `render()` |
 | `src/slic3r/GUI/GUI_ObjectList.cpp` | Linux: slicer colours for the object list (the GTK theme can be light while the slicer is dark) |
 | `src/dev-utils/platform/unix/build_linux_image.sh.in` | `chmod a+x` instead of `ug+x` on the two launchers: appimagetool refuses an AppDir whose executables others cannot run (fix for upstream as well) |
+| `src/libslic3r/GCode.cpp`, `GCode.hpp` | With *Exclude objects*, the prime tower is declared to Klipper as `wipe_tower` and its extrusions are labeled (`m_label_wipe_tower`, in `append_tcr2()` and `set_object_info()`); not behind `#ifdef`, since it changes the G-code (fix for upstream as well) |
+| `tests/fff_print/test_wipe_tower.cpp` | Tests of the prime tower labels; the existing tests set `layer_change_gcode` to `G92 E0`, which the validation requires and without which they had stopped running |
 | `README.md`                     | Section *This fork: an AI assistant inside the slicer*, in one block right after the introduction sentence |
 | `src/slic3r/GUI/GUI_App.cpp`    | `SplashScreen`: widens the splash screen so that the name and version fit (wider Linux fonts); `fit_width()` in `MakeBitmap()`, logo centred in `Decorate()`, image shown as soon as it is created |
 
@@ -63,6 +65,11 @@ scripts/fork/sync-upstream.sh        # merges upstream/main into ai-assistant an
 scripts/fork/sync-upstream.sh -b     # same, then builds (dependencies already built)
 scripts/fork/sync-upstream.sh -b -p  # same, then pushes main and ai-assistant to origin
 ```
+
+After the merge, the script initialises and updates the submodules: since upstream's #1128, the Snapmaker
+profiles come from `submodules/Profiles` ([Snapmaker/snapmaker-profiles](https://github.com/Snapmaker/snapmaker-profiles)),
+pinned by upstream and copied into `resources/profiles` by CMake at every build. The fork uses the same
+submodule and does not change its revision. After a fresh clone: `git submodule update --init --recursive`.
 
 On a conflict, the script stops and lists the files involved (normally only the hook points): resolve them,
 `git commit`, then run the script again.
