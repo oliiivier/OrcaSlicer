@@ -61,6 +61,10 @@ else
     fi
 fi
 
+# The Snapmaker profiles come from submodules/Profiles, copied into resources/profiles at build time.
+git submodule sync --recursive
+git submodule update --init --recursive
+
 # Keep the documentation served by the MCP server in step with the merged code.
 python3 -I scripts/fork/build-setting-docs.py
 if [ -n "$(git status --porcelain -- resources/ai_assistant)" ]; then
