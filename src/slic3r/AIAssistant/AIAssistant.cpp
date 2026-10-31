@@ -80,6 +80,7 @@ void show_settings()
 {
     McpDialog dlg(wxGetApp().mainframe);
     dlg.ShowModal();
+    ChatPanel::settings_changed();
 }
 
 // Next to the top bar's own ids (3100-3200, BBLTopbar.cpp).

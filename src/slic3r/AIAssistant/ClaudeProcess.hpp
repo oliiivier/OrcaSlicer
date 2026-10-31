@@ -75,8 +75,9 @@ public:
     // Changes the model of the next requests, empty for the CLI's default.
     bool set_model(const std::string& model);
 
-    // Finds the CLI: `configured_path` when given, else on the PATH, in the usual install
-    // locations, then (macOS, Linux) on the PATH of the user's login shell. Invalid if not found.
+    // Finds the CLI: `configured_path` when given, else on the PATH (Windows: also the one saved
+    // in the registry), in the usual install locations, then (macOS, Linux) on the PATH of the
+    // user's login shell. Invalid if not found.
     static Launch locate(const std::string& configured_path);
 
 private:

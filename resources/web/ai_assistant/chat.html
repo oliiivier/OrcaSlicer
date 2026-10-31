@@ -601,10 +601,19 @@ header svg { width: 14px; height: 14px; fill: none; stroke: currentColor; stroke
         addInfo("error", e.text);
       break;
     case "notice":
+      // One notice per label, shared by the tabs: a new one replaces it, "clear" removes it.
+      document.querySelectorAll(".notice[data-label]").forEach(function (n) {
+        if (n.dataset.label === e.label)
+          n.parentNode.removeChild(n);
+      });
+      if (e.clear)
+        break;
+      var notice;
       if (e.label === "not_found")
-        addNotice("error", escapeHtml(L("not_found")).replace(/(https:\/\/\S+?)\)/, '<a data-url="$1">$1</a>)'));
+        notice = addNotice("error", escapeHtml(L("not_found")).replace(/(https:\/\/\S+?)\)/, '<a data-url="$1">$1</a>)'));
       else
-        addNotice(e.level || "warning", escapeHtml(L(e.label)) + ' <a data-action="settings">' + escapeHtml(L("settings")) + "</a>");
+        notice = addNotice(e.level || "warning", escapeHtml(L(e.label)) + ' <a data-action="settings">' + escapeHtml(L("settings")) + "</a>");
+      notice.dataset.label = e.label;
       break;
     case "tabs":
       renderTabs(e.tabs || [], e.active);

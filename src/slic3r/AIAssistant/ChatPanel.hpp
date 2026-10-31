@@ -29,6 +29,8 @@ public:
     static void show();
     // Shows the chat, or hides it when it is shown.
     static void toggle();
+    // Follows the MCP server settings after they changed, if the chat exists.
+    static void settings_changed();
 
     ~ChatPanel() override;
 
@@ -54,7 +56,8 @@ private:
     // Starts the CLI of the conversation if needed, continuing its session.
     bool ensure_started(Conversation& conv);
     // Stops the idle CLIs started before the MCP server was turned on or off, or moved:
-    // they restart with the new server on their next message.
+    // they restart with the new server on their next message. Removes the notice that
+    // Claude Code was not found once it can be found.
     void sync_server();
     void send_user_message(Conversation& conv, const nlohmann::json& request);
     // Attaches a screenshot of the 3D view or of the whole main window to the next message.

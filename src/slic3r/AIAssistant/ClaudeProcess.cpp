@@ -10,6 +10,10 @@
 #include <wx/textfile.h>
 #include <wx/tokenzr.h>
 #include <wx/utils.h>
+#ifdef _WIN32
+#include <wx/log.h>
+#include <wx/msw/registry.h>
+#endif
 
 #include <chrono>
 #include <cstdio>
@@ -104,6 +108,22 @@ ClaudeProcess::Launch launch_from(const wxString& path)
     ClaudeProcess::Launch launch;
     launch.program = path.ToUTF8().data();
     return launch;
+}
+
+// The PATH saved in the registry for the user, then for the system: an installer updates it,
+// while the slicer keeps the PATH it was started with.
+wxString registry_path()
+{
+    wxLogNull no_log; // a missing key is not an error
+    wxString  paths;
+    for (const wxString& key : {wxString("HKEY_CURRENT_USER\\Environment"),
+                                wxString("HKEY_LOCAL_MACHINE\\SYSTEM\\CurrentControlSet\\Control\\Session Manager\\Environment")}) {
+        wxRegKey reg(key);
+        wxString value; // %VARIABLES% expanded
+        if (reg.Exists() && reg.HasValue("Path") && reg.QueryValue("Path", value))
+            paths += value + PATH_SEP;
+    }
+    return paths;
 }
 #else
 // The PATH of the user's interactive login shell, which reads the files that set it up
@@ -368,14 +388,22 @@ ClaudeProcess::Launch ClaudeProcess::locate(const std::string& configured_path)
     if (!configured_path.empty())
         return wxFileExists(wxString::FromUTF8(configured_path)) ? launch_from(wxString::FromUTF8(configured_path)) : Launch();
 
-    // Native installer, then npm.
-    for (const wxString& name : {wxString("claude.exe"), wxString("claude.cmd")})
-        if (const wxString found = find_in(path_list, name); !found.empty())
-            if (Launch launch = launch_from(found); launch.valid())
-                return launch;
-    wxString appdata;
+    // Native installer, then npm, on the slicer's PATH, then on the one saved in the registry.
+    for (const wxString& paths : {path_list, registry_path()})
+        for (const wxString& name : {wxString("claude.exe"), wxString("claude.cmd")})
+            if (const wxString found = find_in(paths, name); !found.empty())
+                if (Launch launch = launch_from(found); launch.valid())
+                    return launch;
+    // The user's folder is USERPROFILE: wxGetHomeDir() prefers HOME, then HOMEDRIVE and
+    // HOMEPATH, which may point elsewhere (a network drive...).
+    wxString profile, appdata, local_appdata;
+    if (!wxGetEnv("USERPROFILE", &profile) || profile.empty())
+        profile = home;
     wxGetEnv("APPDATA", &appdata);
-    for (const wxString& candidate : {home + "\\.local\\bin\\claude.exe", appdata + "\\npm\\claude.cmd"})
+    wxGetEnv("LOCALAPPDATA", &local_appdata);
+    for (const wxString& candidate : {profile + "\\.local\\bin\\claude.exe",
+                                      local_appdata + "\\Microsoft\\WinGet\\Links\\claude.exe",
+                                      appdata + "\\npm\\claude.cmd"})
         if (wxFileExists(candidate))
             if (Launch launch = launch_from(candidate); launch.valid())
                 return launch;

@@ -410,9 +410,20 @@ void ChatPanel::close(Conversation& conv)
     }
 }
 
+void ChatPanel::settings_changed()
+{
+    if (instance() != nullptr)
+        instance()->sync_server();
+}
+
 void ChatPanel::sync_server()
 {
     post_server_state();
+    if (ClaudeProcess::locate(McpSettings::load().claude_path).valid()) {
+        post({{"kind", "notice"}, {"label", "not_found"}, {"clear", true}});
+        if (m_active != nullptr)
+            post_busy(*m_active); // replaces the "not found" status
+    }
     const std::string url = McpService::is_running() ? McpService::url() : std::string();
     for (auto& conv : m_conversations)
         if (conv->claude && conv->claude->is_running() && !conv->busy && conv->server_url != url)
@@ -454,7 +465,6 @@ void ChatPanel::on_script_message(wxWebViewEvent& evt)
             close(*conv);
     } else if (command == "open_settings") {
         show_settings();
-        sync_server();
     } else if (command == "capture") {
         capture(request.value("target", "") == "window");
     } else if (command == "set_model") {
@@ -592,6 +602,7 @@ bool ChatPanel::ensure_started(Conversation& conv)
         post_status("error", from_u8(error));
         return false;
     }
+    post({{"kind", "notice"}, {"label", "not_found"}, {"clear", true}});
     if (!m_models_asked)
         m_models_asked = conv.claude->initialize();
     return true;

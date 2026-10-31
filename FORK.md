@@ -363,8 +363,12 @@ docked to the right of the 3D view (button in the chat header, choice remembered
 installed on the machine (`claude -p` in stream-json, signed in once in a terminal) and connects it to the MCP
 server, which it enables if it is off. The CLI has no other tool (`--tools=`, no shell, files or web) and runs
 in an empty folder (`ai_assistant/chat`). `claude` is looked for in the PATH, the usual install locations, then
-the login shell's PATH (nvm, npm prefix…); on Windows, npm's `claude.cmd` shim is read to launch its target
-without `cmd.exe`. The path can be forced in the *AI Assistant* dialog (`claude_path`).
+the login shell's PATH (nvm, npm prefix…). On Windows, the PATH saved in the registry replaces the login
+shell's (an installer updates it, not the PATH of a running slicer), the install locations are under
+`%USERPROFILE%` (not `wxGetHomeDir()`, which prefers `HOME` or `HOMEDRIVE`/`HOMEPATH`), `%LOCALAPPDATA%` (WinGet)
+and `%APPDATA%` (npm), and npm's `claude.cmd` shim is read to launch its target without `cmd.exe`. The chat's
+"not found" notice is shared by the tabs and goes away as soon as Claude Code can be found (settings closed,
+chat reopened, CLI started). The path can be forced in the *AI Assistant* dialog (`claude_path`).
 
 Tabs: one conversation (Claude Code session, resumed with `--resume`) per tab, saved with what they display in
 `ai_assistant/chats.json`. The CLI of an inactive tab with no reply in progress is stopped, then restarted on its
